@@ -1,9 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const dotenv = require('dotenv');
 const connectDB = require('./src/config/db');
 
-// Load environment variables
+// Load environment variables (server/.env or root .env)
+dotenv.config({ path: path.join(__dirname, '.env') });
 dotenv.config();
 
 // Initialize Express app
@@ -41,7 +43,6 @@ app.use('/api/admin', require('./src/routes/adminRoutes'));
 app.use('/api/public', require('./src/routes/publicRoutes'));
 
 // Serve client dist in production or for unified full-stack serving
-const path = require('path');
 const clientDistPath = path.join(__dirname, '../client/dist');
 const fs = require('fs');
 
