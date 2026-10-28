@@ -71,6 +71,14 @@ exports.loginAdmin = async (req, res) => {
 // POST /api/admin/auth/register
 exports.registerAdmin = async (req, res) => {
   try {
+    const adminCount = await AdminUser.countDocuments();
+    if (adminCount > 0) {
+      return res.status(403).json({
+        success: false,
+        message: 'Public registration is disabled. Administrator accounts are managed securely inside the Admin Dashboard.',
+      });
+    }
+
     const { name, email, password, phone, role } = req.body;
 
     if (!name || !email || !password) {

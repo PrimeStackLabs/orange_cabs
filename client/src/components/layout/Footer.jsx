@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Lock } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 import { BUSINESS_INFO } from '../../data/businessInfo';
 import './Footer.css';
 
@@ -41,7 +41,6 @@ export default function Footer() {
               <li><Link to="/fleet">Our Fleet</Link></li>
               <li><Link to="/about">About Us</Link></li>
               <li><Link to="/contact">Contact</Link></li>
-              <li><Link to="/admin/login">Admin Login</Link></li>
             </ul>
           </div>
 
@@ -130,11 +129,6 @@ export default function Footer() {
           <p className="copyright-clean">
             © {currentYear} <strong>{BUSINESS_INFO.name}</strong>. All rights reserved.
           </p>
-
-          <Link to="/admin/login" className="footer-admin-badge" title="SKB Tour and Travels Admin Console">
-            <Lock size={12} />
-            <span>Admin</span>
-          </Link>
 
           <p className="designer-credit">
             Designed and developed by <strong>bookmywebsite.in</strong>
