@@ -5,7 +5,6 @@ import {
   Mail,
   AlertCircle,
   ArrowRight,
-  ShieldCheck,
   CheckCircle2,
 } from 'lucide-react';
 import { useAdminAuth } from '../context/AdminAuthContext';
@@ -49,13 +48,6 @@ export default function Login() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleFillDemo = () => {
-    setLoginEmail('admin@skbtravels.com');
-    setLoginPassword('admin123');
-    setError('');
-    setSuccessMsg('');
   };
 
   return (
@@ -242,7 +234,7 @@ export default function Login() {
           </button>
         </form>
 
-        {/* Quick Demo Helper / Back to Home */}
+        {/* Back to Home */}
         <div
           style={{
             marginTop: '1.5rem',
@@ -254,34 +246,14 @@ export default function Login() {
             alignItems: 'center',
           }}
         >
-          <button
-            type="button"
-            onClick={handleFillDemo}
-            style={{
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
-              padding: '0.5rem 0.95rem',
-              borderRadius: 8,
-              fontSize: '0.78rem',
-              color: '#334155',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              fontWeight: 600,
-            }}
-          >
-            <ShieldCheck size={14} className="text-gold" />
-            <span>Fill Default Admin Credentials</span>
-          </button>
-
           <Link
             to="/"
             style={{
-              fontSize: '0.78rem',
-              color: '#94a3b8',
+              fontSize: '0.82rem',
+              color: '#64748b',
               textDecoration: 'none',
               marginTop: '0.25rem',
+              fontWeight: 500,
             }}
           >
             ← Back to Public Website
