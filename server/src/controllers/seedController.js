@@ -18,7 +18,7 @@ exports.seedDatabase = async (req, res) => {
       admin = await AdminUser.create({
         name: 'Admin',
         email: 'admin@skbtravels.com',
-        password: 'admin123',
+        password: 'admin@123',
         role: 'super_admin',
         phone: '9035897960',
       });
@@ -442,7 +442,7 @@ exports.seedDatabase = async (req, res) => {
       message: 'Database successfully seeded with realistic business data and default admin user.',
       defaultAdmin: {
         email: 'admin@skbtravels.com',
-        password: 'admin123',
+        password: 'admin@123',
         role: 'super_admin',
       },
     });
