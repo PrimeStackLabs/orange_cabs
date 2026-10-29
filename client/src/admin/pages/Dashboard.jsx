@@ -22,6 +22,7 @@ import {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
+  RotateCw,
 } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import Modal from '../components/Modal';
@@ -35,9 +36,29 @@ import {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [stats, setStats] = useState(null);
-  const [overview, setOverview] = useState(null);
-  const [loading, setLoading] = useState(true);
+
+  // Instant local-first hydration (ZERO loading delay!)
+  const [stats, setStats] = useState(() => {
+    try {
+      const cached = localStorage.getItem('skb_cached_dashboard_stats');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [overview, setOverview] = useState(() => {
+    try {
+      const cached = localStorage.getItem('skb_cached_dashboard_overview_week');
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [loading, setLoading] = useState(!stats);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastSyncTime, setLastSyncTime] = useState('Live');
   const [period, setPeriod] = useState('week');
 
   // Interactive Calendar State
@@ -76,18 +97,21 @@ export default function Dashboard() {
     preferredVehicle: 'Toyota Innova Crysta',
   });
 
-  const loadData = async () => {
+  const loadData = async (isManual = false) => {
+    if (isManual) setIsRefreshing(true);
     try {
       const [sData, oData] = await Promise.all([
         getDashboardStats(),
         getDashboardOverview(period),
       ]);
-      setStats(sData);
-      setOverview(oData);
+      if (sData) setStats(sData);
+      if (oData) setOverview(oData);
+      setLastSyncTime(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
     } catch (err) {
       console.error('Dashboard load error:', err);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -292,6 +316,20 @@ export default function Dashboard() {
         </div>
 
         <div className="welcome-banner-widgets" ref={calendarRef}>
+          {/* Live Sync Badge & Refresh Action */}
+          <div className="banner-sync-pill">
+            <span className="sync-pulse-dot" />
+            <span className="sync-text">{isRefreshing ? 'Syncing...' : `Live (${lastSyncTime})`}</span>
+            <button
+              type="button"
+              onClick={() => loadData(true)}
+              className={`btn-sync-refresh ${isRefreshing ? 'spin' : ''}`}
+              title="Refresh live data from database"
+            >
+              <RotateCw size={13} />
+            </button>
+          </div>
+
           <div
             className={`banner-date-widget ${isCalendarOpen ? 'active' : ''}`}
             onClick={() => setIsCalendarOpen(!isCalendarOpen)}
@@ -449,7 +487,7 @@ export default function Dashboard() {
       <section className="admin-stats-grid">
         <StatCard
           title="Total Bookings"
-          value={stats?.totalBookings?.value ?? '124'}
+          value={stats?.totalBookings?.value !== undefined ? String(stats.totalBookings.value) : '0'}
           growth={stats?.totalBookings?.growth ?? '+12%'}
           icon={Calendar}
           type="sparkline"
@@ -458,7 +496,7 @@ export default function Dashboard() {
 
         <StatCard
           title="Enquiries"
-          value={stats?.enquiries?.value ?? '87'}
+          value={stats?.enquiries?.value !== undefined ? String(stats.enquiries.value) : '0'}
           growth={stats?.enquiries?.growth ?? '+8%'}
           icon={Users}
           type="sparkline"
@@ -467,17 +505,17 @@ export default function Dashboard() {
 
         <StatCard
           title="Active Vehicles"
-          value={stats?.activeVehicles?.value ?? '12'}
-          subMeta={`${stats?.activeVehicles?.available ?? 8} Available, ${stats?.activeVehicles?.onTrip ?? 4} On Trip`}
+          value={stats?.activeVehicles?.value !== undefined ? String(stats.activeVehicles.value) : '0'}
+          subMeta={`${stats?.activeVehicles?.available ?? 0} Available, ${stats?.activeVehicles?.onTrip ?? 0} On Trip`}
           icon={Car}
           type="circular"
-          percentage={stats?.activeVehicles?.percentage ?? 67}
+          percentage={stats?.activeVehicles?.percentage ?? 100}
         />
 
         <StatCard
           title="Average Rating"
-          value={stats?.averageRating?.value ?? '4.8'}
-          subtitle={`from ${stats?.averageRating?.reviewCount ?? 120}+ reviews`}
+          value={stats?.averageRating?.value !== undefined ? String(stats.averageRating.value) : '5.0'}
+          subtitle={`from ${stats?.averageRating?.reviewCount ?? 0} customer reviews`}
           icon={Star}
           type="stars"
         />
@@ -812,11 +850,25 @@ export default function Dashboard() {
 
                   <div className="enquiry-meta-right">
                     <span className="enquiry-time-text">
-                      {e.timeAgo || '2m ago'}
+                      {e.timeAgo || 'Just now'}
                     </span>
                     <span className={`status-pill ${status}`}>
                       {statusLabel}
                     </span>
+                    <button
+                      type="button"
+                      className="btn-icon-action mini btn-whatsapp-direct"
+                      onClick={(evt) => {
+                        evt.stopPropagation();
+                        const phone = (e.phoneNumber || '').replace(/\D/g, '');
+                        const clean = phone.length === 10 ? `91${phone}` : phone;
+                        const msg = `Hello ${e.customerName || 'Customer'}, regarding your travel enquiry with SKB Tour and Travels. How may we assist you?`;
+                        window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+                      }}
+                      title={`Chat with ${e.customerName} on WhatsApp`}
+                    >
+                      <MessageSquare size={13} />
+                    </button>
                     <button
                       type="button"
                       className="btn-icon-action mini"

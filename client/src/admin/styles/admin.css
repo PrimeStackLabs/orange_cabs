@@ -672,6 +672,82 @@
   justify-content: flex-start;
   align-self: flex-start;
   margin-left: auto;
+  gap: 0.65rem;
+}
+
+/* Live Sync Pill & Refresh Action */
+.banner-sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(11, 19, 43, 0.9);
+  border: 1px solid rgba(231, 184, 77, 0.4);
+  color: #ffffff;
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.sync-pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+  animation: syncPulse 2s infinite;
+}
+
+@keyframes syncPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.sync-text {
+  color: #e2e8f0;
+  letter-spacing: 0.2px;
+}
+
+.btn-sync-refresh {
+  background: transparent;
+  border: 0;
+  color: #E7B84D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.btn-sync-refresh:hover {
+  color: #ffffff;
+  transform: rotate(60deg);
+}
+
+.btn-sync-refresh.spin svg {
+  animation: spinRefresh 0.8s linear infinite;
+}
+
+@keyframes spinRefresh {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.btn-whatsapp-direct {
+  background: #ecfdf5 !important;
+  color: #10b981 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.btn-whatsapp-direct:hover {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+  transform: scale(1.08);
 }
 
 .banner-date-widget {

@@ -29,6 +29,7 @@ import { FLEET_DATA } from '../data/fleetData';
 import { BUSINESS_INFO } from '../data/businessInfo';
 import { FAQ_DATA } from '../data/faqData';
 import { REVIEWS_DATA, REVIEWS_STATS } from '../data/reviewsData';
+import QuickEnquiryModal from '../components/ui/QuickEnquiryModal';
 import './Home.css';
 
 // Official Authentic WhatsApp Icon SVG
@@ -55,6 +56,20 @@ export default function Home() {
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
   const [travelDate, setTravelDate] = useState('');
+
+  // Quick Enquiry Modal State
+  const [enquiryModal, setEnquiryModal] = useState({ isOpen: false, prefill: {} });
+
+  const handleOpenVehicleEnquiry = (vehicleName) => {
+    setEnquiryModal({
+      isOpen: true,
+      prefill: {
+        preferredVehicle: vehicleName,
+        tripType: `${vehicleName} Rental Enquiry`,
+        message: `I would like to enquire about availability and rates for ${vehicleName}.`,
+      },
+    });
+  };
 
   // FAQ Accordion State (first item open by default)
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
@@ -612,19 +627,16 @@ export default function Home() {
                   <p className="vehicle-tagline-text">{vehicle.description}</p>
 
                   {/* Direct WhatsApp Enquiry Button */}
-                  <a
-                    href={`https://wa.me/919035897960?text=${encodeURIComponent(
-                      `Hello SKB Tour and Travels, I am interested in booking the ${vehicle.name}. Please share availability and pricing.`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => handleOpenVehicleEnquiry(vehicle.name)}
                     className="btn-enquire-now-pill"
                     aria-label={`Enquire about ${vehicle.name} on WhatsApp`}
                   >
                     <WhatsAppSvgIcon size={16} />
                     <span>Enquire Now</span>
                     <ArrowRight size={14} />
-                  </a>
+                  </button>
                 </div>
               </div>
             ))}
@@ -1057,6 +1069,13 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Quick Enquiry Modal for Instant WhatsApp Capture */}
+      <QuickEnquiryModal
+        isOpen={enquiryModal.isOpen}
+        onClose={() => setEnquiryModal({ isOpen: false, prefill: {} })}
+        prefill={enquiryModal.prefill}
+      />
     </div>
   );
 }

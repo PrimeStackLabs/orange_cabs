@@ -111,6 +111,27 @@ exports.createBooking = async (req, res) => {
       } catch (custErr) {
         console.warn('Customer auto-upsert error:', custErr.message);
       }
+
+      // Auto-mirror to Enquiry so it immediately shows in the Admin Enquiries inbox as well
+      try {
+        const Enquiry = require('../models/Enquiry');
+        await Enquiry.create({
+          enquiryReference: `ENQ-${Math.floor(1000 + Math.random() * 9000)}`,
+          customerName: fullName.trim(),
+          phoneNumber: cleanPhone,
+          tripType: tripTypeLabel || tripType,
+          pickupLocation: pickupLocation.trim(),
+          destination: destination.trim(),
+          preferredDate: parsedDate,
+          preferredVehicle: preferredVehicle.trim(),
+          message: additionalInstructions || `Booking ref: ${bookingReference}`,
+          source: 'website_form',
+          status: 'new',
+          convertedBookingId: savedBooking._id,
+        });
+      } catch (enqErr) {
+        console.warn('Enquiry auto-mirror error:', enqErr.message);
+      }
     } catch (dbErr) {
       console.warn('[Booking DB Warning] Saving to in-memory fallback:', dbErr.message);
       dbPersisted = false;

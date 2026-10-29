@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users,
@@ -13,9 +13,22 @@ import {
 } from 'lucide-react';
 import { FLEET_DATA } from '../data/fleetData';
 import { createWhatsAppQuickUrl } from '../utils/whatsapp';
+import QuickEnquiryModal from '../components/ui/QuickEnquiryModal';
 import './Fleet.css';
 
 export default function Fleet() {
+  const [enquiryModal, setEnquiryModal] = useState({ isOpen: false, prefill: {} });
+
+  const handleOpenEnquiry = (vehicleName) => {
+    setEnquiryModal({
+      isOpen: true,
+      prefill: {
+        vehicleName,
+        preferredVehicle: vehicleName,
+        tripType: `${vehicleName} Rental Enquiry`,
+      },
+    });
+  };
   return (
     <div className="fleet-page-root">
       {/* 1. Header Banner */}
@@ -110,16 +123,13 @@ export default function Fleet() {
                   <div key={vehicle.id} className="fleet-card-dark-special">
                     <h3 className="special-card-title">{vehicle.name}</h3>
                     <p className="special-card-text">{vehicle.description}</p>
-                    <a
-                      href={createWhatsAppQuickUrl(
-                        'Hello Vicky, I need a specific vehicle not listed on the website. Please advise availability.'
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEnquiry(vehicle.name)}
                       className="btn-enquire-now-pill"
                     >
                       Enquire Now
-                    </a>
+                    </button>
                   </div>
                 );
               }
@@ -175,19 +185,16 @@ export default function Fleet() {
 
                     <p className="vehicle-tagline-text">{vehicle.description}</p>
 
-                    <a
-                      href={`https://wa.me/919035897960?text=${encodeURIComponent(
-                        `Hello SKB Tour and Travels, I am interested in booking the ${vehicle.name}. Please share availability and pricing.`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEnquiry(vehicle.name)}
                       className="btn-enquire-now-pill"
                       aria-label={`Enquire about ${vehicle.name} on WhatsApp`}
                     >
                       <MessageCircle size={16} />
                       <span>Enquire Now</span>
                       <ArrowRight size={14} />
-                    </a>
+                    </button>
                   </div>
                 </div>
               );
@@ -242,6 +249,13 @@ export default function Fleet() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Quick Enquiry Modal */}
+      <QuickEnquiryModal
+        isOpen={enquiryModal.isOpen}
+        onClose={() => setEnquiryModal({ isOpen: false, prefill: {} })}
+        prefill={enquiryModal.prefill}
+      />
     </div>
   );
 }

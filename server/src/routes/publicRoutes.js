@@ -7,6 +7,11 @@ const Review = require('../models/Review');
 const Gallery = require('../models/Gallery');
 const Offer = require('../models/Offer');
 const BusinessSettings = require('../models/BusinessSettings');
+const enquiryRoutes = require('./enquiryRoutes');
+
+// Mount public enquiry router alias
+router.use('/enquiry', enquiryRoutes);
+router.use('/enquiries', enquiryRoutes);
 
 // Public active packages
 router.get('/packages', async (req, res) => {

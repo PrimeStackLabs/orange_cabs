@@ -38,6 +38,7 @@ app.get('/api/health', (req, res) => {
 // Routes
 app.use('/api/bookings', require('./src/routes/bookingRoutes'));
 app.use('/api/contacts', require('./src/routes/contactRoutes'));
+app.use('/api/enquiries', require('./src/routes/enquiryRoutes'));
 app.use('/api/fleet', require('./src/routes/fleetRoutes'));
 app.use('/api/admin', require('./src/routes/adminRoutes'));
 app.use('/api/public', require('./src/routes/publicRoutes'));

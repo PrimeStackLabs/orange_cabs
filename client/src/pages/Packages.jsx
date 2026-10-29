@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Car,
@@ -11,9 +11,22 @@ import {
   MessageCircle,
   ArrowRight,
 } from 'lucide-react';
+import QuickEnquiryModal from '../components/ui/QuickEnquiryModal';
 import './Packages.css';
 
 export default function Packages() {
+  const [enquiryModal, setEnquiryModal] = useState({ isOpen: false, prefill: {} });
+
+  const handleOpenPackageEnquiry = (packageName = 'Travel Package Enquiry') => {
+    setEnquiryModal({
+      isOpen: true,
+      prefill: {
+        tripType: packageName,
+        title: packageName,
+        message: `I would like to enquire about rates and vehicle availability for: ${packageName}`,
+      },
+    });
+  };
   return (
     <div className="packages-page-root">
       {/* 1. Header Banner */}
@@ -53,15 +66,14 @@ export default function Packages() {
                 <span>Book a Package</span>
                 <ArrowRight size={16} />
               </Link>
-              <a
-                href="https://wa.me/919035897960?text=Hello%20SKB%20Travels,%20I%20would%20like%20to%20enquire%20about%20travel%20packages%20and%20rates."
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => handleOpenPackageEnquiry('Travel Packages & Rates')}
                 className="btn-fleet-hero-wa"
               >
                 <MessageCircle size={16} />
                 <span>Ask on WhatsApp</span>
-              </a>
+              </button>
             </div>
           </div>
 
@@ -350,18 +362,15 @@ export default function Packages() {
                   <Phone size={16} />
                   <span>Call: +91 73381 40524</span>
                 </a>
-                <a
-                  href={`https://wa.me/919035897960?text=${encodeURIComponent(
-                    'Hello Vicky, I would like to confirm pricing and vehicle availability for my journey.'
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => handleOpenPackageEnquiry('Outstation & City Travel Quote')}
                   className="cond-wa-btn"
                   aria-label="Enquire on WhatsApp"
                 >
                   <MessageCircle size={16} />
                   <span>WhatsApp Quote</span>
-                </a>
+                </button>
               </div>
             </div>
 
@@ -381,6 +390,13 @@ export default function Packages() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Quick Enquiry Modal */}
+      <QuickEnquiryModal
+        isOpen={enquiryModal.isOpen}
+        onClose={() => setEnquiryModal({ isOpen: false, prefill: {} })}
+        prefill={enquiryModal.prefill}
+      />
     </div>
   );
 }

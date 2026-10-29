@@ -73,7 +73,10 @@ export function AdminAuthProvider({ children }) {
       return { success: true };
     } catch (err) {
       // Local fallback for standalone mode or offline admin testing:
-      if (email.toLowerCase().trim() === 'admin@skbtravels.com' && password === 'admin123') {
+      if (
+        email.toLowerCase().trim() === 'admin@skbtravels.com' &&
+        (password === 'admin123' || password === 'admin@123')
+      ) {
         const fallbackAdmin = {
           id: 'admin_local_1',
           name: 'Admin',

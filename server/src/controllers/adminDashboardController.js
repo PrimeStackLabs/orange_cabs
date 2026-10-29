@@ -3,6 +3,21 @@ const Enquiry = require('../models/Enquiry');
 const Vehicle = require('../models/Vehicle');
 const Review = require('../models/Review');
 
+function formatTimeAgo(date) {
+  if (!date) return 'Recently';
+  const diffMs = Date.now() - new Date(date).getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDays = Math.floor(diffHr / 24);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+}
+
 exports.getDashboardStats = async (req, res) => {
   try {
     const totalBookings = await Booking.countDocuments();
@@ -18,7 +33,7 @@ exports.getDashboardStats = async (req, res) => {
     const totalReviews = reviews.length;
     const avgRating = totalReviews > 0
       ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalReviews).toFixed(1)
-      : '4.8';
+      : '5.0';
 
     return res.status(200).json({
       success: true,
@@ -37,11 +52,11 @@ exports.getDashboardStats = async (req, res) => {
           value: totalVehicles,
           available: availableVehicles,
           onTrip: onTripVehicles,
-          percentage: vehiclePercentage || 67,
+          percentage: vehiclePercentage || (totalVehicles > 0 ? 100 : 0),
         },
         averageRating: {
           value: parseFloat(avgRating),
-          reviewCount: totalReviews || 120,
+          reviewCount: totalReviews,
         },
       },
     });
@@ -73,14 +88,11 @@ exports.getDashboardOverview = async (req, res) => {
       .limit(5)
       .lean();
 
-    // Map enquiries with readable time ago
-    const enrichedEnquiries = recentEnquiries.map((e, idx) => {
-      const times = ['2 minutes ago', '15 minutes ago', '1 hour ago', '2 hours ago', '3 hours ago'];
-      return {
-        ...e,
-        timeAgo: times[idx] || 'Recently',
-      };
-    });
+    // Map enquiries with real calculated time ago
+    const enrichedEnquiries = recentEnquiries.map((e) => ({
+      ...e,
+      timeAgo: formatTimeAgo(e.createdAt),
+    }));
 
     const allBookings = await Booking.find().lean();
     let chartData = [];
