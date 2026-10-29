@@ -6,9 +6,9 @@ export default function Settings() {
   const [form, setForm] = useState({
     businessName: 'SKB Tour and Travels',
     ownerName: 'Vicky',
-    primaryPhone: '9035897960',
-    alternatePhone: '7338140524',
-    whatsappNumber: '919035897960',
+    primaryPhone: '7338140524',
+    alternatePhone: '9035897960',
+    whatsappNumber: '7338140524',
     contactEmail: 'vickymegha903@gmail.com',
     locationArea: 'Airport area, Devanahalli',
     city: 'Bengaluru',

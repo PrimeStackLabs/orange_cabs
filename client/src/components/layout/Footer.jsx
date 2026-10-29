@@ -96,7 +96,7 @@ export default function Footer() {
                   </svg>
                 </a>
                 <a
-                  href="https://wa.me/919035897960"
+                  href="https://wa.me/917338140524"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="soc-btn wa"

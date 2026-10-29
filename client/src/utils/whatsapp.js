@@ -1,11 +1,11 @@
 /**
  * Client-side WhatsApp utilities for SKB Tour and Travels
- * Owner: Vicky
- * Primary Number: 9035897960
- * International Number: 919035897960
+ * Primary WhatsApp Booking & Enquiry Number: 7338140524 (+91 73381 40524)
  */
 
-export const WHATSAPP_NUMBER = '919035897960';
+export const WHATSAPP_NUMBER =
+  (import.meta.env.VITE_WHATSAPP_NUMBER ? String(import.meta.env.VITE_WHATSAPP_NUMBER).replace(/\D/g, '') : '') ||
+  '917338140524';
 
 export function createWhatsAppBookingUrl(bookingData) {
   const tripTypeLabels = {

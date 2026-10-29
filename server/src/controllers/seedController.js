@@ -33,7 +33,7 @@ exports.seedDatabase = async (req, res) => {
         ownerName: 'Vicky',
         primaryPhone: '7338140524',
         alternatePhone: '9035897960',
-        whatsappNumber: '919035897960',
+        whatsappNumber: '917338140524',
         contactEmail: 'vickymegha903@gmail.com',
         locationArea: 'Airport area',
         pinCode: '560300',

@@ -889,7 +889,7 @@ export default function Home() {
             </div>
             <div className="faq-support-actions">
               <a
-                href={`https://wa.me/919035897960?text=${encodeURIComponent(
+                href={`https://wa.me/917338140524?text=${encodeURIComponent(
                   'Hello Vicky, I have a question regarding cab booking with SKB Tour and Travels.'
                 )}`}
                 target="_blank"

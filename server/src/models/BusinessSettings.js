@@ -12,15 +12,15 @@ const businessSettingsSchema = new mongoose.Schema(
     },
     primaryPhone: {
       type: String,
-      default: '9035897960',
+      default: '7338140524',
     },
     alternatePhone: {
       type: String,
-      default: '7338140524',
+      default: '9035897960',
     },
     whatsappNumber: {
       type: String,
-      default: '919035897960',
+      default: '917338140524',
     },
     contactEmail: {
       type: String,

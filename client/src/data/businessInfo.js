@@ -22,7 +22,7 @@ export const BUSINESS_INFO = {
     notes: 'Conveniently serving Kempegowda International Airport (BLR) terminals and PAN India outstation routes.',
   },
   whatsapp: {
-    internationalNumber: '919035897960',
+    internationalNumber: '917338140524',
     defaultGreeting: 'Hello Vicky, I am looking to book a ride with SKB Tour and Travels.',
   },
   operatingHours: '24/7 Booking Enquiry & Travel Support',

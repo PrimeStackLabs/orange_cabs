@@ -1,10 +1,9 @@
 /**
  * WhatsApp message generator for SKB Tour and Travels
- * Business Owner: Vicky
- * Primary WhatsApp: 919035897960
+ * Primary WhatsApp Booking & Enquiry Number: 7338140524 (+91 73381 40524)
  */
 
-const WHATSAPP_PHONE = '919035897960';
+const WHATSAPP_PHONE = process.env.WHATSAPP_NUMBER || '917338140524';
 
 function formatBookingWhatsAppMessage(booking) {
   const tripTypeLabels = {
