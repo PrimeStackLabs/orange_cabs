@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { API_BASE } from '../../services/apiConfig';
 
 const AdminAuthContext = createContext(null);
 
@@ -20,7 +21,6 @@ export function AdminAuthProvider({ children }) {
   useEffect(() => {
     // If token exists, verify session
     if (token) {
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
       fetch(`${API_BASE}/admin/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -49,7 +49,6 @@ export function AdminAuthProvider({ children }) {
   }, [token]);
 
   const login = async (email, password) => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
     try {
       const res = await fetch(`${API_BASE}/admin/auth/login`, {
         method: 'POST',
@@ -94,7 +93,6 @@ export function AdminAuthProvider({ children }) {
   };
 
   const register = async ({ name, email, password, phone, role }) => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
     try {
       const res = await fetch(`${API_BASE}/admin/auth/register`, {
         method: 'POST',

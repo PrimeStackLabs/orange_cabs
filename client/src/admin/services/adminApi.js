@@ -3,7 +3,7 @@
  * Seamlessly interfaces with Express backend with intelligent local fallback for offline resilience.
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+import { API_BASE } from '../../services/apiConfig';
 
 function getAuthHeader() {
   const token = localStorage.getItem('skb_admin_token');

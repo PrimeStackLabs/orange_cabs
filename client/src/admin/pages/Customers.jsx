@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Download, Star, Phone, Mail, Calendar, Eye, Edit2 } from 'lucide-react';
 import Modal from '../components/Modal';
 import { getCustomers, updateCustomer } from '../services/adminApi';
+import { API_BASE } from '../../services/apiConfig';
 
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -38,7 +39,6 @@ export default function Customers() {
   };
 
   const handleExportCsv = () => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
     window.open(`${API_BASE}/admin/customers/export/csv`, '_blank');
   };
 

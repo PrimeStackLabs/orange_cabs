@@ -2,7 +2,7 @@
  * REST API client for SKB Tour and Travels
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'https://skbtravels.in/api';
+import { API_BASE } from './apiConfig';
 
 export async function submitBooking(bookingPayload) {
   try {

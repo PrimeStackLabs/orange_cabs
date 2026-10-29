@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, TrendingUp, Calendar, CheckCircle2, Car, Users, DollarSign } from 'lucide-react';
 import { getReportsAnalytics } from '../services/adminApi';
+import { API_BASE } from '../../services/apiConfig';
 
 export default function Reports() {
   const [data, setData] = useState(null);
@@ -21,7 +22,6 @@ export default function Reports() {
   }, []);
 
   const handleExportCsv = () => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
     window.open(`${API_BASE}/admin/bookings/export/csv`, '_blank');
   };
 

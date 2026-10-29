@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Modal from '../components/Modal';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { API_BASE } from '../../services/apiConfig';
 import {
   getBookings,
   createBooking,
@@ -125,7 +126,6 @@ export default function Bookings() {
   };
 
   const handleExportCsv = () => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
     window.open(`${API_BASE}/admin/bookings/export/csv`, '_blank');
   };
 
