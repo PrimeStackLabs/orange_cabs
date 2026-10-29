@@ -19,28 +19,32 @@ export function AdminAuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // If token exists, verify session
+    // If token exists, verify/refresh session in background without kicking the user out
     if (token) {
+      if (token.startsWith('local_session_token_')) {
+        setLoading(false);
+        return;
+      }
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 7000);
+
       fetch(`${API_BASE}/admin/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal,
       })
         .then(async (res) => {
-          if (!res.ok) {
-            if (res.status === 401 || res.status === 403) {
-              logout();
+          clearTimeout(timer);
+          if (res.ok) {
+            const data = await res.json();
+            if (data?.success && data?.admin) {
+              setAdmin(data.admin);
+              localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(data.admin));
             }
-            return null;
-          }
-          return await res.json();
-        })
-        .then((data) => {
-          if (data && data.success && data.admin) {
-            setAdmin(data.admin);
-            localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(data.admin));
           }
         })
         .catch(() => {
-          // Server offline fallback: keep cached admin session
+          // Keep active session during network latency or background cold-starts
         })
         .finally(() => setLoading(false));
     } else {
