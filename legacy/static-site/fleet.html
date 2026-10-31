@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Orange Cabs Fleet Showcase — 500+ GPS-enabled vehicles including Electric EVs, Executive Sedans, Innova Crysta SUVs, Tempo Travellers, and Luxury Coaches in Bengaluru.">
+  <meta name="keywords" content="Orange Cabs Fleet, EV Fleet Bengaluru, Corporate Cab Fleet, Innova Crysta Rental, Corporate Bus Rental Bangalore">
+  <meta name="author" content="primepro.ai">
+  <title>500+ Enterprise Fleet Showcase | Orange Cabs Bengaluru</title>
+
+  <!-- Google Fonts: Syne & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Master Stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <style>
+    /* Fleet Page Specific Polish */
+    .fleet-hero {
+      padding: 160px 0 80px;
+      background: radial-gradient(circle at 50% 20%, rgba(163, 28, 27 , 0.15) 0%, transparent 60%), #06110C;
+      text-align: center;
+      position: relative;
+    }
+    .comparison-table-wrap {
+      overflow-x: auto;
+      background: var(--bg-surface);
+      border-radius: 20px;
+      border: 1px solid var(--border-glass);
+      margin-top: 40px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    .fleet-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .fleet-table th, .fleet-table td {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-glass);
+      font-size: 0.95rem;
+    }
+    .fleet-table th {
+      background: rgba(255, 255, 255, 0.04);
+      color: #FFFFFF;
+      font-family: var(--font-heading);
+      text-transform: uppercase;
+      font-size: 0.82rem;
+      letter-spacing: 0.05em;
+    }
+    .fleet-table tr:hover td {
+      background: rgba(163, 28, 27 , 0.05);
+    }
+    .table-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(163, 28, 27 , 0.15);
+      color: var(--orange-light);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       NAVIGATION BAR
+       ========================================================================== -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo" aria-label="Orange Cabs Home">
+        <div class="logo-symbol">
+          <span>OC</span>
+        </div>
+        <div class="logo-text-group">
+          <div class="brand-title">ORANGE<span>CABS</span></div>
+          <div class="brand-subtitle">Corporate Mobility • Est. 2016</div>
+        </div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li class="nav-item"><a href="index.html#about">About</a></li>
+          <li class="nav-item"><a href="index.html#services">Services</a></li>
+          <li class="nav-item"><a href="fleet.html" class="active">3D Fleet</a></li>
+          <li class="nav-item"><a href="index.html#operations">Operations</a></li>
+          <li class="nav-item"><a href="index.html#calculator">Estimator</a></li>
+          <li class="nav-item"><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="tel:+919742588995" class="nav-phone" title="Call Operations 24/7">
+          <i class="fas fa-phone-alt"></i>
+          <span>+91 97425 88995</span>
+        </a>
+        <a href="index.html#contact" class="btn btn-primary btn-glow">
+          <span>Request Quote</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+        <button class="mobile-toggle" aria-label="Open mobile menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       FLEET HERO HEADER
+       ========================================================================== -->
+  <section class="fleet-hero">
+    <div class="container">
+      <div class="section-tag"><i class="fas fa-award"></i> The 500+ Vehicle Blueprint</div>
+      <h1 class="section-title">High-Caliber <em>Fleet Inventory</em></h1>
+      <p class="section-sub">
+        Explore detailed technical specifications, passenger accommodations, and safety systems across our diversified commercial vehicle portfolio.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       DETAILED FLEET BREAKDOWN (7 CLASSES)
+       ========================================================================== -->
+  <section class="section-padding fleet-section" style="padding-top: 20px;">
+    <div class="container">
+
+      <!-- Filter Chips -->
+      <div class="fleet-filter-bar">
+        <button class="filter-chip active" data-filter="all">All Vehicles (7)</button>
+        <button class="filter-chip" data-filter="ev">🌱 Electric EV</button>
+        <button class="filter-chip" data-filter="cng">⛽ Eco CNG</button>
+        <button class="filter-chip" data-filter="sedan">🚗 Executive Sedans</button>
+        <button class="filter-chip" data-filter="suv">🚙 Luxury SUVs</button>
+        <button class="filter-chip" data-filter="tempo">🚐 Tempo Travellers</button>
+        <button class="filter-chip" data-filter="coach">🚍 Luxury Coaches</button>
+        <button class="filter-chip" data-filter="bus">🚎 Staff Buses</button>
+      </div>
+
+      <!-- Fleet Grid with 3D Tilt -->
+      <div class="fleet-grid">
+
+        <!-- 1. EV Sedan -->
+        <div class="fleet-card-3d" data-category="ev">
+          <div class="fleet-media-wrap">
+            <img src="assets/images/ev.jpeg" alt="Electric EV Sedan" onerror="this.src='https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=600&auto=format&fit=crop&q=80';">
+            <div class="fleet-media-overlay"></div>
+            <span class="fleet-category-tag">🌱 Electric Vehicle (EV)</span>
+            <span class="fleet-seat-tag">4 Seater + Chauffeur</span>
+          </div>
+          <div class="fleet-card-body">
+            <h3 class="fleet-vehicle-name">Electric Vehicle (EV Sedan)</h3>
+            <p class="fleet-vehicle-desc">
+              Zero-tailpipe emissions for green enterprise campuses. Whisper-silent acceleration, regenerative braking, smart climate control, and certified real-time satellite tracking.
+            </p>
+            <div class="fleet-specs-grid">
+              <div class="spec-badge"><span class="emoji">⚡</span><span>Zero Emission</span></div>
+              <div class="spec-badge"><span class="emoji">🔋</span><span>315 km Range</span></div>
+              <div class="spec-badge"><span class="emoji">🛰️</span><span>Nyletech GPS</span></div>
+            </div>
+            <div class="fleet-card-actions">
+              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20am%20interested%20in%20deploying%20Electric%20Vehicles%20(EV)%20for%20our%20corporate%20commutes." target="_blank" class="btn btn-primary btn-card-inquire">
+                <i class="fab fa-whatsapp"></i> Inquire EV Fleet
+              </a>
+              <button class="btn btn-card-specs">Specs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Eco CNG -->
+        <div class="fleet-card-3d" data-category="cng">
+          <div class="fleet-media-wrap">
+            <img src="assets/images/cng.jpeg" alt="Eco CNG Sedan" onerror="this.src='https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=600&auto=format&fit=crop&q=80';">
+            <div class="fleet-media-overlay"></div>
+            <span class="fleet-category-tag">⛽ Clean Fuel CNG</span>
+            <span class="fleet-seat-tag">4 Seater + Chauffeur</span>
+          </div>
+          <div class="fleet-card-body">
+            <h3 class="fleet-vehicle-name">Eco CNG Executive Sedan</h3>
+            <p class="fleet-vehicle-desc">
+              Clean-burning compressed natural gas for optimized cost efficiency in multi-shift corporate operations. Low carbon footprint with executive cabin comfort.
+            </p>
+            <div class="fleet-specs-grid">
+              <div class="spec-badge"><span class="emoji">🍃</span><span>Eco Efficient</span></div>
+              <div class="spec-badge"><span class="emoji">❄️</span><span>Climate AC</span></div>
+              <div class="spec-badge"><span class="emoji">🚨</span><span>SOS Panic Button</span></div>
+            </div>
+            <div class="fleet-card-actions">
+              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20a%20quote%20for%20CNG%20Executive%20Sedans." target="_blank" class="btn btn-primary btn-card-inquire">
+                <i class="fab fa-whatsapp"></i> Inquire CNG
+              </a>
+              <button class="btn btn-card-specs">Specs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Executive Sedan -->
+        <div class="fleet-card-3d" data-category="sedan">
+          <div class="fleet-media-wrap">
+            <img src="assets/images/Executive_Sedan.jpg" alt="Executive Sedan" onerror="this.src='https://images.unsplash.com/photo-1550355291-bbee04a92027?w=600&auto=format&fit=crop&q=80';">
+            <div class="fleet-media-overlay"></div>
+            <span class="fleet-category-tag">🚗 Executive Sedan</span>
+            <span class="fleet-seat-tag">4 Seater + Chauffeur</span>
+          </div>
+          <div class="fleet-card-body">
+            <h3 class="fleet-vehicle-name">Executive Sedan (Dzire / Etios)</h3>
+            <p class="fleet-vehicle-desc">
+              Maruti Dzire, Toyota Etios &amp; Honda Amaze. Plush seating, dedicated boot for business luggage, whisper-quiet cabin, and uniformed corporate chauffeurs.
+            </p>
+            <div class="fleet-specs-grid">
+              <div class="spec-badge"><span class="emoji">🧳</span><span>400L Boot</span></div>
+              <div class="spec-badge"><span class="emoji">❄️</span><span>Rapid Chill AC</span></div>
+              <div class="spec-badge"><span class="emoji">🛰️</span><span>Speed Governed</span></div>
+            </div>
+            <div class="fleet-card-actions">
+              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20Please%20provide%20rates%20for%20Executive%20Sedans." target="_blank" class="btn btn-primary btn-card-inquire">
+                <i class="fab fa-whatsapp"></i> Inquire Sedan
+              </a>
+              <button class="btn btn-card-specs">Specs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Luxury SUV / MUV -->
+        <div class="fleet-card-3d" data-category="suv">
+          <div class="fleet-media-wrap">
+            <img src="assets/images/SUV.jpg" alt="Innova Crysta SUV" onerror="this.src='https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&auto=format&fit=crop&q=80';">
+            <div class="fleet-media-overlay"></div>
+            <span class="fleet-category-tag">🚙 Luxury SUV / MUV</span>
+            <span class="fleet-seat-tag">7 Seater + Chauffeur</span>
+          </div>
+          <div class="fleet-card-body">
+            <h3 class="fleet-vehicle-name">Toyota Innova Crysta &amp; Ertiga</h3>
+            <p class="fleet-vehicle-desc">
+              High-comfort multi-utility vehicles featuring captain reclining seats, triple-row air-conditioning, USB ports, and premium shock absorption for VIPs and senior leadership.
+            </p>
+            <div class="fleet-specs-grid">
+              <div class="spec-badge"><span class="emoji">💺</span><span>Captain Seats</span></div>
+              <div class="spec-badge"><span class="emoji">❄️</span><span>3-Zone AC</span></div>
+              <div class="spec-badge"><span class="emoji">🛡️</span><span>7 Airbags</span></div>
+            </div>
+            <div class="fleet-card-actions">
+              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20am%20looking%20for%20Toyota%20Innova%20Crysta%20SUVs." target="_blank" class="btn btn-primary btn-card-inquire">
+                <i class="fab fa-whatsapp"></i> Inquire SUV
+              </a>
+              <button class="btn btn-card-specs">Specs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Tempo Traveller -->
+        <div class="fleet-card-3d" data-category="tempo">
+          <div class="fleet-media-wrap">
+            <img src="assets/images/tempo_Traveller.jpg" alt="Tempo Traveller" onerror="this.src='https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80';">
+            <div class="fleet-media-overlay"></div>
+            <span class="fleet-category-tag">🚐 Group Transit</span>
+            <span class="fleet-seat-tag">12–17 Reclining Seats</span>
+          </div>
+          <div class="fleet-card-body">
+            <h3 class="fleet-vehicle-name">Force Tempo Traveller (Executive)</h3>
+            <p class="fleet-vehicle-desc">
+              Individual push-back leatherette seats, individual roof AC vents, LED ambient lighting, multimedia system, and large rear luggage compartment for team pick-ups and offsites.
+            </p>
+            <div class="fleet-specs-grid">
+              <div class="spec-badge"><span class="emoji">🛋️</span><span>Pushback Seats</span></div>
+              <div class="spec-badge"><span class="emoji">❄️</span><span>Individual AC</span></div>
+              <div class="spec-badge"><span class="emoji">🧳</span><span>Luggage Deck</span></div>
+            </div>
+            <div class="fleet-card-actions">
+              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20We%20require%20Tempo%20Travellers%20for%20our%20workforce." target="_blank" class="btn btn-primary btn-card-inquire">
+                <i class="fab fa-whatsapp"></i> Inquire Tempo
+              </a>
+              <button class="btn btn-card-specs">Specs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Luxury Coach -->
+        <div class="fleet-card-3d" data-category="coach">
+          <div class="fleet-media-wrap">
+            <img src="assets/images/Luxury_Coach.jpg" alt="Volvo Scania Coach" onerror="this.src='https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=600&auto=format&fit=crop&q=80';">
+            <div class="fleet-media-overlay"></div>
+            <span class="fleet-category-tag">🚍 Luxury Intercity Coach</span>
+            <span class="fleet-seat-tag">35–45 Reclining Seats</span>
+          </div>
+          <div class="fleet-card-body">
+            <h3 class="fleet-vehicle-name">Volvo &amp; Scania Multi-Axle Coach</h3>
+            <p class="fleet-vehicle-desc">
+              Full air-suspension chassis for cloud-like ride quality. High-capacity undercarriage luggage holds, on-board Wi-Fi, microphone system, and panoramic tinted windows.
+            </p>
+            <div class="fleet-specs-grid">
+              <div class="spec-badge"><span class="emoji">☁️</span><span>Air Suspension</span></div>
+              <div class="spec-badge"><span class="emoji">📶</span><span>Wi-Fi Enabled</span></div>
+              <div class="spec-badge"><span class="emoji">🎙️</span><span>PA System</span></div>
+            </div>
+            <div class="fleet-card-actions">
+              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20book%20a%20Volvo%20Coach." target="_blank" class="btn btn-primary btn-card-inquire">
+                <i class="fab fa-whatsapp"></i> Inquire Coach
+              </a>
+              <button class="btn btn-card-specs">Specs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7. Heavy Staff Bus -->
+        <div class="fleet-card-3d" data-category="bus">
+          <div class="fleet-media-wrap">
+            <img src="assets/images/Staff_Bus.jpg" alt="Heavy Staff Bus" onerror="this.src='https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80';">
+            <div class="fleet-media-overlay"></div>
+            <span class="fleet-category-tag">🚎 High-Capacity Staff Bus</span>
+            <span class="fleet-seat-tag">50+ Passengers</span>
+          </div>
+          <div class="fleet-card-body">
+            <h3 class="fleet-vehicle-name">Enterprise Staff Commuter Bus</h3>
+            <p class="fleet-vehicle-desc">
+              TATA &amp; Ashok Leyland heavy passenger buses with pneumatic automatic doors, dual CCTV surveillance, emergency roof exits, fire extinguishers, and speed limiters.
+            </p>
+            <div class="fleet-specs-grid">
+              <div class="spec-badge"><span class="emoji">👥</span><span>50+ High Seating</span></div>
+              <div class="spec-badge"><span class="emoji">🚨</span><span>Emergency Exits</span></div>
+              <div class="spec-badge"><span class="emoji">📹</span><span>Dual CCTV</span></div>
+            </div>
+            <div class="fleet-card-actions">
+              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20We%20require%20high-capacity%20staff%20buses." target="_blank" class="btn btn-primary btn-card-inquire">
+                <i class="fab fa-whatsapp"></i> Inquire Bus
+              </a>
+              <button class="btn btn-card-specs">Specs</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Comparison Matrix -->
+      <div style="margin-top: 80px;">
+        <div class="section-tag"><i class="fas fa-th-list"></i> Detailed Comparison</div>
+        <h2 class="section-title">Fleet <em>Specification Matrix</em></h2>
+        <p class="section-sub">Quick comparative overview to match your corporate commute requirements.</p>
+
+        <div class="comparison-table-wrap">
+          <table class="fleet-table">
+            <thead>
+              <tr>
+                <th>Vehicle Class</th>
+                <th>Seating Capacity</th>
+                <th>Luggage Capacity</th>
+                <th>Fuel / Powertrain</th>
+                <th>AC Type</th>
+                <th>Live Telematics</th>
+                <th>Primary Corporate Application</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Electric Vehicle (EV)</strong></td>
+                <td><span class="table-badge">4 Passengers</span></td>
+                <td>2 Large Suitcases</td>
+                <td>100% Electric Battery</td>
+                <td>Automatic Climate</td>
+                <td>Nyletech GPS</td>
+                <td>Green CSR / Tech Park Commutes</td>
+              </tr>
+              <tr>
+                <td><strong>Eco CNG Sedan</strong></td>
+                <td><span class="table-badge">4 Passengers</span></td>
+                <td>1 Medium Suitcase</td>
+                <td>Bi-Fuel CNG</td>
+                <td>High-Output AC</td>
+                <td>Nyletech GPS</td>
+                <td>Daily Workforce Shifts</td>
+              </tr>
+              <tr>
+                <td><strong>Executive Sedan</strong></td>
+                <td><span class="table-badge">4 Passengers</span></td>
+                <td>3 Large Bags</td>
+                <td>Clean Petrol / Euro 6</td>
+                <td>Dual AC</td>
+                <td>Nyletech GPS</td>
+                <td>Managerial &amp; Airport Transfers</td>
+              </tr>
+              <tr>
+                <td><strong>Toyota Innova Crysta</strong></td>
+                <td><span class="table-badge">6–7 Passengers</span></td>
+                <td>4 Large Suitcases</td>
+                <td>High Torque Diesel</td>
+                <td>Triple Zone AC</td>
+                <td>Nyletech GPS</td>
+                <td>Executive &amp; VIP Delegations</td>
+              </tr>
+              <tr>
+                <td><strong>Force Tempo Traveller</strong></td>
+                <td><span class="table-badge">12–17 Passengers</span></td>
+                <td>Dedicated Boot Deck</td>
+                <td>Heavy Commercial Diesel</td>
+                <td>Individual Vents</td>
+                <td>Nyletech GPS</td>
+                <td>Shift Route Consolidation</td>
+              </tr>
+              <tr>
+                <td><strong>Volvo Luxury Coach</strong></td>
+                <td><span class="table-badge">35–45 Passengers</span></td>
+                <td>Underbelly Hold (80+ Bags)</td>
+                <td>Multi-Axle Euro 6</td>
+                <td>Full Central Climate</td>
+                <td>Nyletech GPS</td>
+                <td>Conventions &amp; Offsite Summits</td>
+              </tr>
+              <tr>
+                <td><strong>Enterprise Staff Bus</strong></td>
+                <td><span class="table-badge">50+ Passengers</span></td>
+                <td>Overhead Racks</td>
+                <td>TATA / Leyland Commercial</td>
+                <td>High Capacity Air Con</td>
+                <td>Nyletech GPS</td>
+                <td>Heavy Campus Transit</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       ESG & EV SUSTAINABILITY BANNER
+       ========================================================================== -->
+  <section class="section-padding" style="background: linear-gradient(135deg, rgba(74, 119, 95 , 0.08), rgba(6, 17, 12 , 0.9)); border-top: 1px solid var(--border-glass); border-bottom: 1px solid var(--border-glass);">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 30px;">
+      <div>
+        <div class="section-tag" style="background: rgba(74, 119, 95 , 0.15); border-color: rgba(74, 119, 95 , 0.3); color: #4A775F;">
+          <i class="fas fa-seedling"></i> ESG &amp; Sustainability Champion
+        </div>
+        <h2 style="font-size: 2.2rem; margin-bottom: 10px;">Transition Your Workforce to <em>Zero Emissions</em></h2>
+        <p style="max-width: 650px;">
+          Each Orange Cabs EV deployed in your employee transport ecosystem reduces approximately 5.4 metric tons of carbon dioxide annually. Accelerate your net-zero targets today.
+        </p>
+      </div>
+      <div>
+        <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20We%20would%20like%20to%20consult%20on%20transitioning%20our%20fleet%20to%20EVs." target="_blank" class="btn btn-primary btn-glow" style="background: linear-gradient(135deg, #4A775F, #4A775F); box-shadow: 0 10px 30px rgba(74, 119, 95 , 0.4);">
+          <i class="fab fa-whatsapp"></i> Inquire EV Transition
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       FOOTER (With primepro.ai developer credit)
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+
+        <div class="footer-brand">
+          <a href="index.html" class="brand-logo">
+            <div class="logo-symbol"><span>OC</span></div>
+            <div class="logo-text-group">
+              <div class="brand-title">ORANGE<span>CABS</span></div>
+              <div class="brand-subtitle">Corporate Mobility Hub</div>
+            </div>
+          </a>
+          <p>
+            Karnataka’s benchmark corporate transportation enterprise. Delivering ISO 9001:2015 certified, GPS-monitored, and safe employee transit since 2016 in association with Sri Vijay Tours &amp; Travels Pvt. Ltd.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Fleet Classes</h4>
+          <ul class="footer-links">
+            <li><a href="#fleet">Electric Vehicle (EV)</a></li>
+            <li><a href="#fleet">Eco CNG Sedans</a></li>
+            <li><a href="#fleet">Executive Dzire / Etios</a></li>
+            <li><a href="#fleet">Innova Crysta SUV</a></li>
+            <li><a href="#fleet">Tempo Travellers</a></li>
+            <li><a href="#fleet">Staff Buses</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Corporate Rigor</h4>
+          <ul class="footer-links">
+            <li><a href="index.html#about">About Us</a></li>
+            <li><a href="index.html#services">Services</a></li>
+            <li><a href="index.html#operations">Telematics Command</a></li>
+            <li><a href="index.html#calculator">Fare Estimator</a></li>
+            <li><a href="index.html#contact">RFP Desk</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Operations Desk</h4>
+          <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+            Shop No. 7, 8, 9, 1st Floor, Whitefield Main Road, Samethanahalli, Hosakote Taluk, Bengaluru – 560 067
+          </p>
+          <a href="tel:+919742588995" style="color: var(--orange-light); font-weight: 700;">+91 97425 88995</a>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-copy">
+          © 2026 Orange Cabs • Sri Vijay Tours &amp; Travels Pvt. Ltd. All rights reserved.
+        </div>
+
+        <!-- Strict user requirement: Designed and developed by primepro.ai -->
+        <a href="https://primepro.ai" target="_blank" rel="noopener noreferrer" class="developer-badge" title="AI-Driven Web Architecture">
+          <span>Designed and developed by</span>
+          <strong>primepro.ai</strong>
+          <i class="fas fa-external-link-alt" style="font-size: 0.75rem;"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating Widgets -->
+  <div class="floating-widget-bar">
+    <a href="tel:+919742588995" class="float-action-btn float-btn-call" aria-label="Call Orange Cabs" title="Instant Phone Call">
+      <i class="fas fa-phone-alt"></i>
+      <span class="float-tooltip">Call +91 97425 88995</span>
+    </a>
+    <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20inquire%20about%20your%20corporate%20fleet." target="_blank" class="float-action-btn float-btn-whatsapp" aria-label="WhatsApp Us" title="Instant WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+      <span class="float-tooltip">Chat on WhatsApp</span>
+    </a>
+    <button type="button" class="float-action-btn float-btn-ai" id="ai-chatbot-toggle" aria-label="Open AI Assistant" title="OrangeAI Concierge">
+      <div class="ai-ping-ring"></div>
+      <div class="ai-status-badge"></div>
+      <i class="fas fa-robot"></i>
+      <span class="float-tooltip">OrangeAI Concierge</span>
+    </button>
+  </div>
+
+  <!-- AI Chatbot Window -->
+  <div class="ai-chatbot-window" id="ai-chatbot-window">
+    <div class="chatbot-header">
+      <div class="chatbot-brand-head">
+        <div class="chatbot-avatar"><i class="fas fa-robot"></i></div>
+        <div class="chatbot-info">
+          <h4>OrangeAI Concierge</h4>
+          <p><span class="pulse-indicator"></span> Online &amp; Ready</p>
+        </div>
+      </div>
+      <button class="chatbot-close-btn" id="ai-chatbot-close" aria-label="Close Assistant">&times;</button>
+    </div>
+    <div class="chatbot-messages-body" id="chatbot-messages">
+      <div class="chat-bubble bot">
+        Hello! You're viewing our <strong>500+ Vehicle Fleet Portfolio</strong>. Which vehicle class or commute route would you like details or pricing for?
+        <div class="chat-quick-chips">
+          <span class="quick-chip">🌱 EV Sedan Pricing</span>
+          <span class="quick-chip">🚙 Innova Crysta</span>
+          <span class="quick-chip">🚐 Tempo Traveller</span>
+          <span class="quick-chip">💼 Enterprise Proposal</span>
+        </div>
+      </div>
+    </div>
+    <div class="chatbot-input-footer">
+      <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Ask about specs, mileage, rates...">
+      <button class="chatbot-send-btn" id="chatbot-send" aria-label="Send Message"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Modal: Fleet Specs -->
+  <div class="modal-overlay" id="modal-fleet-specs">
+    <div class="modal-container">
+      <button class="modal-close-btn">&times;</button>
+      <div class="section-tag" style="margin-bottom: 12px;"><i class="fas fa-info-circle"></i> Technical Blueprint</div>
+      <h3 id="spec-modal-title" style="font-size: 1.8rem; margin-bottom: 8px;">Vehicle Specifications</h3>
+      <p id="spec-modal-desc" style="font-size: 0.95rem; margin-bottom: 24px;">Comprehensive technical and comfort parameters for corporate fleet allocation.</p>
+      <div style="background: rgba(255,255,255,0.03); border-radius: 14px; padding: 20px; border: 1px solid var(--border-glass); margin-bottom: 24px;">
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 0.92rem;">
+          <li style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);"><i class="fas fa-satellite" style="color: var(--orange-primary); margin-right: 8px;"></i> Telematics:</span>
+            <strong>Nyletech Real-Time GPS Tracking</strong>
+          </li>
+          <li style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);"><i class="fas fa-bell" style="color: var(--orange-primary); margin-right: 8px;"></i> Emergency Alert:</span>
+            <strong>Dual In-Cabin Physical SOS Panic Buttons</strong>
+          </li>
+          <li style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);"><i class="fas fa-id-badge" style="color: var(--orange-primary); margin-right: 8px;"></i> Driver Screening:</span>
+            <strong>Police Verified &amp; POSH Trained Chauffeur</strong>
+          </li>
+          <li style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);"><i class="fas fa-certificate" style="color: var(--orange-primary); margin-right: 8px;"></i> Compliance:</span>
+            <strong>ISO 9001:2015 &amp; RTO Permitted</strong>
+          </li>
+        </ul>
+      </div>
+      <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20book%20a%20commercial%20trial%20for%20this%20vehicle%20category." target="_blank" class="btn btn-primary" style="width: 100%;">
+        <i class="fab fa-whatsapp"></i> Book Corporate Inspection / Trial
+      </a>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/chatbot.js"></script>
+</body>
+</html>

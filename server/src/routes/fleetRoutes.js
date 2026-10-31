@@ -1,7 +1,19 @@
-const express = require('express');
+import express from 'express';
+import {
+  getVehicles,
+  getVehicleById,
+  createVehicle,
+  updateVehicle,
+  deleteVehicle
+} from '../controllers/fleetController.js';
+import { protectAdmin, requireRole } from '../middleware/auth.js';
+
 const router = express.Router();
-const { getFleet } = require('../controllers/fleetController');
 
-router.get('/', getFleet);
+router.get('/', getVehicles);
+router.get('/:id', getVehicleById);
+router.post('/', protectAdmin, requireRole(['Super Admin', 'Manager']), createVehicle);
+router.put('/:id', protectAdmin, requireRole(['Super Admin', 'Manager']), updateVehicle);
+router.delete('/:id', protectAdmin, requireRole(['Super Admin']), deleteVehicle);
 
-module.exports = router;
+export default router;

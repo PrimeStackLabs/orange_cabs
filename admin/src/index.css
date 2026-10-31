@@ -1,0 +1,254 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #101010;
+    color: #FFFFFF;
+    overflow-x: hidden;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Luxury Glass & Surface Styling for Admin */
+.glass {
+  background: rgba(24, 24, 24, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.glass-card {
+  background: #181818;
+  border: 1px solid #282828;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.glass-input {
+  background: #1F1F1F;
+  border: 1px solid #333333;
+  color: #FFFFFF;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: #D92332;
+  box-shadow: 0 0 12px rgba(217, 35, 50, 0.25);
+}
+
+.admin-sidebar {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF9F7 100%);
+  border-color: #F0E2DE;
+}
+
+.admin-sidebar-brand {
+  border-color: #F0E2DE;
+}
+
+.admin-sidebar-link {
+  color: #64707F;
+}
+
+.admin-sidebar-link:hover {
+  color: #B91C2B;
+  background: #FFF0ED;
+}
+
+.admin-sidebar-link-active,
+.admin-sidebar-link-active:hover {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #E52B3B 0%, #C7192A 100%);
+  box-shadow: 0 7px 18px rgba(217, 35, 50, 0.22);
+}
+
+.admin-sidebar-avatar {
+  color: #D92332;
+  background: #FDE8E7;
+  border-color: #F8C7C4;
+}
+
+.admin-sidebar-name {
+  color: #242424;
+}
+
+.admin-sidebar-role {
+  color: #D92332;
+}
+
+.dark .admin-sidebar {
+  background: linear-gradient(180deg, #1B1B1B 0%, #151515 100%);
+  border-color: #303030;
+}
+
+.dark .admin-sidebar-brand {
+  border-color: #303030;
+}
+
+.dark .admin-sidebar-link {
+  color: #B7BEC9;
+}
+
+.dark .admin-sidebar-link:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dark .admin-sidebar-link-active,
+.dark .admin-sidebar-link-active:hover {
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #E52B3B 0%, #C7192A 100%);
+}
+
+.dark .admin-sidebar-avatar {
+  color: #FF7A84;
+  background: rgba(217, 35, 50, 0.16);
+  border-color: rgba(217, 35, 50, 0.4);
+}
+
+.dark .admin-sidebar-name {
+  color: #FFFFFF;
+}
+
+.dark .admin-sidebar-role {
+  color: #FF7A84;
+}
+
+.light body {
+  background-color: #F7F7F7;
+  color: #242424;
+  color-scheme: light;
+}
+
+.light .bg-navy,
+.light .bg-surface,
+.light .bg-surface-card {
+  background-color: #FFFFFF;
+}
+
+.light [class~="bg-navy/60"],
+.light [class~="bg-navy/70"] {
+  background-color: #F7F7F7;
+}
+
+.light [class~="bg-navy/80"],
+.light [class~="bg-navy/85"] {
+  background-color: rgb(36 36 36 / 55%);
+}
+
+.light .glass {
+  background: rgb(255 255 255 / 92%);
+  border-color: rgb(36 36 36 / 9%);
+  box-shadow: 0 8px 24px rgb(36 36 36 / 7%);
+}
+
+.light .glass-card {
+  background: #FFFFFF;
+  border-color: #E5E7EB;
+  box-shadow: 0 8px 24px rgb(36 36 36 / 6%);
+}
+
+.light .glass-input {
+  background: #FFFFFF;
+  border-color: #D1D5DB;
+  color: #242424;
+}
+
+.light .text-white,
+.light .text-softWhite {
+  color: #242424;
+}
+
+.light .text-gray-100,
+.light .text-gray-200,
+.light .text-gray-300 {
+  color: #4B5563;
+}
+
+.light .text-gray-400 {
+  color: #6B7280;
+}
+
+.light [class~="border-white/5"],
+.light [class~="border-white/10"],
+.light [class~="border-white/15"],
+.light [class~="border-white/20"] {
+  border-color: #E5E7EB;
+}
+
+.light .text-orange {
+  color: #D92332;
+}
+
+.light .bg-orange,
+.light .bg-orange-glow {
+  background-color: #D92332;
+}
+
+.light [class~="bg-orange/10"] {
+  background-color: rgb(217 35 50 / 10%);
+}
+
+.light [class~="bg-orange/20"] {
+  background-color: rgb(217 35 50 / 12%);
+}
+
+.light [class~="border-orange/40"],
+.light [class~="border-orange/50"] {
+  border-color: rgb(217 35 50 / 35%);
+}
+
+.light [class~="bg-orange"].text-white,
+.light .bg-orange-glow.text-white,
+.light [class~="bg-gradient-to-r"].text-white {
+  color: #FFFFFF;
+}
+
+.light .from-orange {
+  --tw-gradient-from: #D92332 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(217 35 50 / 0%) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.light .to-orange-glow {
+  --tw-gradient-to: #C01A28 var(--tw-gradient-to-position);
+}
+
+.light .shadow-glow-orange {
+  box-shadow: 0 0 20px -4px rgb(217 35 50 / 25%);
+}
+
+.light [class~="hover:bg-white/5"]:hover {
+  background-color: #F3F4F6;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #F1F1F1;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #C4C4C4;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #A0A0A0;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4F4F4F;
+}

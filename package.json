@@ -1,17 +1,19 @@
 {
-  "name": "skb-tours-and-travels",
+  "name": "orange-cab-monorepo",
   "version": "1.0.0",
-  "description": "SKB Tour and Travels Full-Stack Web Application",
+  "private": true,
+  "description": "Orange Cab - Premium Cab Booking Website & Admin Panel (MERN Stack)",
   "scripts": {
-    "dev": "npm run dev --prefix client",
-    "server": "npm start --prefix server",
-    "start": "npm start --prefix server",
-    "build": "npm run build --prefix client",
-    "build:client": "npm run build --prefix client",
-    "build:render": "npm install --prefix client && npm run build --prefix client && npm install --prefix server",
-    "seed": "npm run seed --prefix server"
+    "dev": "concurrently -n \"SERVER,CLIENT,ADMIN\" -c \"bgBlue.bold,bgGreen.bold,bgMagenta.bold\" \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:admin\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev:admin": "cd admin && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ../admin && npm install",
+    "seed": "cd server && npm run seed",
+    "create-admin": "cd server && npm run create-admin",
+    "build": "cd client && npm run build && cd ../admin && npm run build"
   },
-  "keywords": [],
-  "author": "SKB Tour and Travels",
-  "license": "ISC"
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
 }

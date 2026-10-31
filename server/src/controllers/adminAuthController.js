@@ -1,55 +1,51 @@
-const jwt = require('jsonwebtoken');
-const AdminUser = require('../models/AdminUser');
+import Admin from '../models/Admin.js';
+import ActivityLog from '../models/ActivityLog.js';
+import jwt from 'jsonwebtoken';
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'skb_travels_super_secure_jwt_secret_key_2026', {
-    expiresIn: '7d',
+const generateAdminToken = (id) => {
+  return jwt.sign({ id, isAdmin: true }, process.env.JWT_SECRET || 'orangecab_super_secret_jwt_key_2026_luxury_rides', {
+    expiresIn: '7d'
   });
 };
 
-// POST /api/admin/auth/login
-exports.loginAdmin = async (req, res) => {
+export const adminLogin = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide both email and password.',
-      });
+    const { email, password } = req.body || {};
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide email and password' });
     }
 
-    const admin = await AdminUser.findOne({ email: email.toLowerCase().trim() });
+    const admin = await Admin.findOne({ email: email.trim().toLowerCase() });
     if (!admin) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password.',
-      });
+      return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+    }
+
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
     }
 
     if (!admin.isActive) {
-      return res.status(403).json({
-        success: false,
-        message: 'This account has been deactivated.',
-      });
-    }
-
-    const isMatch =
-      (await admin.comparePassword(password)) ||
-      (admin.email === 'admin@skbtravels.com' && (password === 'admin123' || password === 'admin@123'));
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid email or password.',
-      });
+      return res.status(403).json({ success: false, message: 'Admin account has been disabled' });
     }
 
     admin.lastLogin = new Date();
+    admin.loginLogs.push({
+      ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
+      device: req.headers['user-agent'] || 'Browser'
+    });
     await admin.save();
 
-    const token = generateToken(admin._id);
+    await ActivityLog.create({
+      action: 'Admin Logged In',
+      details: `${admin.name} (${admin.role}) signed into admin console`,
+      adminName: admin.name,
+      ip: req.ip,
+      category: 'auth'
+    });
 
-    return res.status(200).json({
+    const token = generateAdminToken(admin._id);
+    res.json({
       success: true,
       token,
       admin: {
@@ -57,199 +53,164 @@ exports.loginAdmin = async (req, res) => {
         name: admin.name,
         email: admin.email,
         role: admin.role,
-        avatar: admin.avatar,
         phone: admin.phone,
-      },
-    });
-  } catch (error) {
-    console.error('Login error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error during login.',
-    });
-  }
-};
-
-// POST /api/admin/auth/register
-exports.registerAdmin = async (req, res) => {
-  try {
-    const adminCount = await AdminUser.countDocuments();
-    if (adminCount > 0) {
-      return res.status(403).json({
-        success: false,
-        message: 'Public registration is disabled. Administrator accounts are managed securely inside the Admin Dashboard.',
-      });
-    }
-
-    const { name, email, password, phone, role } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Name, email and password are required.',
-      });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        message: 'Password must be at least 6 characters long.',
-      });
-    }
-
-    const cleanEmail = email.toLowerCase().trim();
-    const existing = await AdminUser.findOne({ email: cleanEmail });
-    if (existing) {
-      return res.status(400).json({
-        success: false,
-        message: 'An admin account with this email already exists.',
-      });
-    }
-
-    const admin = await AdminUser.create({
-      name: name.trim(),
-      email: cleanEmail,
-      password,
-      role: role || 'super_admin',
-      phone: phone ? phone.trim() : '',
-      isActive: true,
-      lastLogin: new Date(),
-    });
-
-    const token = generateToken(admin._id);
-
-    return res.status(201).json({
-      success: true,
-      message: 'Admin account created successfully.',
-      token,
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: admin.role,
         avatar: admin.avatar,
-        phone: admin.phone,
-      },
+        lastLogin: admin.lastLogin
+      }
     });
   } catch (error) {
-    console.error('Registration error:', error);
-    return res.status(500).json({
-      success: false,
-      message: error.message || 'Server error during account creation.',
-    });
+    next(error);
   }
 };
 
-// GET /api/admin/auth/me
-exports.getMe = async (req, res) => {
+export const getAdminMe = async (req, res) => {
+  res.json({
+    success: true,
+    admin: req.admin
+  });
+};
+
+export const getAllAdmins = async (req, res, next) => {
   try {
-    return res.status(200).json({
-      success: true,
-      admin: req.admin,
-    });
+    const admins = await Admin.find().select('-password').sort({ createdAt: -1 });
+    res.json({ success: true, admins });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve profile.',
-    });
+    next(error);
   }
 };
 
-// GET /api/admin/users
-exports.getUsers = async (req, res) => {
+export const createAdminUser = async (req, res, next) => {
   try {
-    const users = await AdminUser.find().select('-password').sort({ createdAt: -1 });
-    return res.status(200).json({ success: true, users });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// POST /api/admin/users
-exports.createUser = async (req, res) => {
-  try {
-    const { name, email, password, role, phone } = req.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: 'Name, email and password are required.' });
+    const { name, email, password, role, phone } = req.body || {};
+    if (typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
+    }
+    const exists = await Admin.findOne({ email: email.toLowerCase() });
+    if (exists) {
+      return res.status(400).json({ success: false, message: 'Admin with this email already exists' });
     }
 
-    const existing = await AdminUser.findOne({ email: email.toLowerCase().trim() });
-    if (existing) {
-      return res.status(400).json({ success: false, message: 'Admin user with this email already exists.' });
-    }
-
-    const user = await AdminUser.create({
+    const newAdmin = await Admin.create({
       name,
-      email: email.toLowerCase().trim(),
+      email: email.toLowerCase(),
       password,
-      role: role || 'booking_manager',
-      phone: phone || '',
+      role: role || 'Manager',
+      phone: phone || '+91 99999 99999'
     });
 
-    return res.status(201).json({
+    await ActivityLog.create({
+      action: 'Admin Created',
+      details: `Created new admin ${name} with role ${role}`,
+      adminName: req.admin?.name || 'Super Admin',
+      category: 'system'
+    });
+
+    res.status(201).json({
       success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone,
-      },
+      admin: {
+        id: newAdmin._id,
+        name: newAdmin.name,
+        email: newAdmin.email,
+        role: newAdmin.role
+      }
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-// PUT /api/admin/users/:id
-exports.updateUser = async (req, res) => {
+export const updateAdminUser = async (req, res, next) => {
   try {
-    const { name, email, role, isActive, phone, password } = req.body;
-    const user = await AdminUser.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found.' });
+    const { name, email, password, role, phone } = req.body || {};
+    if (typeof name !== 'string' || !name.trim()) {
+      return res.status(400).json({ success: false, message: 'Name is required' });
+    }
+    if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return res.status(400).json({ success: false, message: 'A valid email address is required' });
+    }
+    if (password !== undefined && password !== '' && (typeof password !== 'string' || password.length < 6)) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long' });
     }
 
-    if (name) user.name = name;
-    if (email) user.email = email.toLowerCase().trim();
-    if (role) user.role = role;
-    if (phone !== undefined) user.phone = phone;
-    if (isActive !== undefined) user.isActive = isActive;
-    if (password && password.length >= 6) {
-      user.password = password;
+    const admin = await Admin.findById(req.params.id);
+    if (!admin) {
+      return res.status(404).json({ success: false, message: 'Admin account not found' });
     }
 
-    await user.save();
-    return res.status(200).json({
+    const updatedRole = role || admin.role;
+    if (admin._id.equals(req.admin._id) && updatedRole !== admin.role) {
+      return res.status(400).json({ success: false, message: 'You cannot change your own admin role' });
+    }
+    if (admin.role === 'Super Admin' && updatedRole !== 'Super Admin') {
+      const anotherActiveSuperAdmin = await Admin.exists({
+        _id: { $ne: admin._id },
+        role: 'Super Admin',
+        isActive: true
+      });
+      if (!anotherActiveSuperAdmin) {
+        return res.status(400).json({ success: false, message: 'At least one active Super Admin must remain' });
+      }
+    }
+
+    admin.name = name.trim();
+    admin.email = email.trim().toLowerCase();
+    admin.role = updatedRole;
+    admin.phone = typeof phone === 'string' ? phone.trim() : admin.phone;
+    if (password) admin.password = password;
+    await admin.save();
+
+    await ActivityLog.create({
+      action: 'Admin Updated',
+      details: `Updated admin ${admin.name} (${admin.email})`,
+      adminName: req.admin.name,
+      category: 'system'
+    });
+
+    res.json({
       success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        isActive: user.isActive,
-        phone: user.phone,
-      },
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+        phone: admin.phone
+      }
     });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };
 
-// DELETE /api/admin/users/:id
-exports.deleteUser = async (req, res) => {
+export const deleteAdminUser = async (req, res, next) => {
   try {
-    if (req.admin._id.toString() === req.params.id) {
-      return res.status(400).json({ success: false, message: 'You cannot delete your own admin account.' });
+    const admin = await Admin.findById(req.params.id);
+    if (!admin) {
+      return res.status(404).json({ success: false, message: 'Admin account not found' });
+    }
+    if (admin._id.equals(req.admin._id)) {
+      return res.status(400).json({ success: false, message: 'You cannot delete your own admin account' });
+    }
+    if (admin.role === 'Super Admin' && admin.isActive) {
+      const anotherActiveSuperAdmin = await Admin.exists({
+        _id: { $ne: admin._id },
+        role: 'Super Admin',
+        isActive: true
+      });
+      if (!anotherActiveSuperAdmin) {
+        return res.status(400).json({ success: false, message: 'At least one active Super Admin must remain' });
+      }
     }
 
-    const deleted = await AdminUser.findByIdAndDelete(req.params.id);
-    if (!deleted) {
-      return res.status(404).json({ success: false, message: 'User not found.' });
-    }
+    await ActivityLog.create({
+      action: 'Admin Deleted',
+      details: `Deleted admin ${admin.name} (${admin.email})`,
+      adminName: req.admin.name,
+      category: 'system'
+    });
+    await admin.deleteOne();
 
-    return res.status(200).json({ success: true, message: 'Admin user deleted successfully.' });
+    res.json({ success: true, message: 'Admin account deleted' });
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    next(error);
   }
 };

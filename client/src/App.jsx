@@ -1,101 +1,106 @@
-import React from 'react';
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import AnnouncementBar from './components/layout/AnnouncementBar';
-import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
-import FloatingActions from './components/layout/FloatingActions';
-import ScrollToTop from './components/layout/ScrollToTop';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
-// Public Pages
+import { BookingModalProvider } from './context/BookingModalContext';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+import FloatingWidgets from './components/FloatingWidgets';
+import CorporateQuotePopup from './components/CorporateQuotePopup';
+import Preloader from './components/Preloader';
+
+// Pages
 import Home from './pages/Home';
-import Fleet from './pages/Fleet';
-import Packages from './pages/Packages';
-import Booking from './pages/Booking';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import NotFound from './pages/NotFound';
+import AboutPage from './pages/AboutPage';
+import ServicesPage from './pages/ServicesPage';
+import FleetPage from './pages/FleetPage';
+import ContactPage from './pages/ContactPage';
+import CorporateTravelPage from './pages/CorporateTravelPage';
+import AirportTransportationPage from './pages/AirportTransportationPage';
+import OutstationBookingPage from './pages/OutstationBookingPage';
+import BookCabPage from './pages/BookCabPage';
+import TrackBookingPage from './pages/TrackBookingPage';
 
-// Admin Context & Layout
-import { AdminAuthProvider } from './admin/context/AdminAuthContext';
-import AdminLayout from './admin/layout/AdminLayout';
-import Login from './admin/pages/Login';
-import Dashboard from './admin/pages/Dashboard';
-import Bookings from './admin/pages/Bookings';
-import Enquiries from './admin/pages/Enquiries';
-import AdminPackages from './admin/pages/Packages';
-import Vehicles from './admin/pages/Vehicles';
-import Drivers from './admin/pages/Drivers';
-import Customers from './admin/pages/Customers';
-import Reviews from './admin/pages/Reviews';
-import Reports from './admin/pages/Reports';
-import Settings from './admin/pages/Settings';
-import Users from './admin/pages/Users';
+function AdminPortalRedirect() {
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const adminUrl = hostname === 'localhost' || hostname === '127.0.0.1'
+      ? `${window.location.protocol}//${hostname}:5174/login`
+      : 'https://admin.orangecabs.in/login';
 
-import './App.css';
+    window.location.replace(adminUrl);
+  }, []);
 
-export default function App() {
-  const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
-
-  // If in /admin, render inside AdminAuthProvider without public chrome
-  if (isAdminRoute) {
-    return (
-      <AdminAuthProvider>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/admin/login" element={<Login />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="bookings" element={<Bookings />} />
-            <Route path="enquiries" element={<Enquiries />} />
-            <Route path="packages" element={<AdminPackages />} />
-            <Route path="vehicles" element={<Vehicles />} />
-            <Route path="drivers" element={<Drivers />} />
-            <Route path="customers" element={<Customers />} />
-            <Route path="reviews" element={<Reviews />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="users" element={<Users />} />
-            {/* Redirect removed routes */}
-            <Route path="offers" element={<Navigate to="/admin/dashboard" replace />} />
-            <Route path="testimonials" element={<Navigate to="/admin/reviews" replace />} />
-            <Route path="gallery" element={<Navigate to="/admin/dashboard" replace />} />
-          </Route>
-          <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
-        </Routes>
-      </AdminAuthProvider>
-    );
-  }
-
-  // Otherwise, render Public Website
   return (
-    <div className="app-layout">
-      <ScrollToTop />
-      {/* 1. Unobtrusive 24/7 Top Announcement Bar */}
-      <AnnouncementBar />
-
-      {/* 2. Premium Frosted Glass Navbar */}
-      <Navbar />
-
-      {/* 3. Main Route Views */}
-      <main className="main-content" id="main-content">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/fleet" element={<Fleet />} />
-          <Route path="/packages" element={<Packages />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-
-      {/* 4. Shared Comprehensive Footer */}
-      <Footer />
-
-      {/* 5. Floating Quick Action Controls (WhatsApp + Phone) */}
-      <FloatingActions />
+    <div className="flex min-h-screen items-center justify-center p-6 text-center bg-[#101010] text-white">
+      <div className="space-y-3">
+        <div className="w-8 h-8 border-2 border-brandRed border-t-transparent rounded-full animate-spin mx-auto" />
+        <p className="text-sm font-medium">Opening the Orange Cabs Centralized Admin Console...</p>
+      </div>
     </div>
   );
 }
+
+function App() {
+  return (
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BookingModalProvider>
+        <div className="site-luxury-theme relative min-h-screen flex flex-col bg-[#F7F7F7] text-[#242424] selection:bg-brandRed selection:text-white">
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#101010',
+                color: '#FFFFFF',
+                border: '1px solid rgba(217, 35, 50, 0.4)',
+                boxShadow: '0 12px 35px rgba(0, 0, 0, 0.4)',
+                borderRadius: '16px',
+                fontSize: '13px'
+              }
+            }}
+          />
+
+          <Preloader />
+          <Navbar />
+          <CorporateQuotePopup />
+
+          <main className="flex-1">
+            <Routes>
+              {/* Core Public Pages */}
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/fleet" element={<FleetPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+
+              {/* Dedicated Vertical Pages */}
+              <Route path="/corporate" element={<CorporateTravelPage />} />
+              <Route path="/services/corporate" element={<CorporateTravelPage />} />
+              <Route path="/airport" element={<AirportTransportationPage />} />
+              <Route path="/services/airport" element={<AirportTransportationPage />} />
+              <Route path="/outstation" element={<OutstationBookingPage />} />
+              <Route path="/services/outstation" element={<OutstationBookingPage />} />
+
+              {/* Dedicated Booking & Tracking Pages */}
+              <Route path="/book" element={<BookCabPage />} />
+              <Route path="/track" element={<TrackBookingPage />} />
+              <Route path="/my-bookings" element={<TrackBookingPage />} />
+
+              {/* Admin Portal Redirect */}
+              <Route path="/admin/*" element={<AdminPortalRedirect />} />
+
+              {/* Catch-all to Home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+
+          <Footer />
+          <FloatingWidgets />
+        </div>
+      </BookingModalProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;

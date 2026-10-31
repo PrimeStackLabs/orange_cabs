@@ -1,53 +1,14 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const reviewSchema = new mongoose.Schema(
-  {
-    customerName: {
-      type: String,
-      required: [true, 'Customer name is required'],
-      trim: true,
-    },
-    phoneNumber: {
-      type: String,
-      default: '',
-    },
-    rating: {
-      type: Number,
-      min: 1,
-      max: 5,
-      required: true,
-      default: 5,
-    },
-    comment: {
-      type: String,
-      required: [true, 'Review comment is required'],
-    },
-    tripCategory: {
-      type: String,
-      default: 'Airport Transfer',
-    },
-    isTestimonial: {
-      type: Boolean,
-      default: false,
-    },
-    isFeatured: {
-      type: Boolean,
-      default: false,
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'approved',
-    },
-    source: {
-      type: String,
-      enum: ['google', 'website', 'whatsapp', 'admin_entry'],
-      default: 'website',
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+const reviewSchema = new mongoose.Schema({
+  authorName: { type: String, required: true },
+  authorCity: { type: String, default: 'Bangalore' },
+  avatar: { type: String, default: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80' },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, required: true },
+  routeOrService: { type: String, default: 'Outstation Cab' },
+  status: { type: String, enum: ['approved', 'pending', 'rejected'], default: 'approved' },
+  featured: { type: Boolean, default: true }
+}, { timestamps: true });
 
-module.exports = mongoose.model('Review', reviewSchema);
+export default mongoose.model('Review', reviewSchema);

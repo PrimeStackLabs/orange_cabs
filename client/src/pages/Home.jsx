@@ -1,1081 +1,1224 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import {
-  Plane,
-  Car,
-  Compass,
-  Users,
-  Clock,
-  ShieldCheck,
-  MapPin,
-  ArrowRight,
-  Sparkles,
-  MessageCircle,
-  UserCheck,
-  Calendar,
-  Hourglass,
-  ArrowLeftRight,
-  Moon,
-  FileText,
-  ChevronDown,
-  Phone,
-  Star,
-  Quote,
-  CheckCircle2,
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Car, 
+  ShieldCheck, 
+  Clock, 
+  MapPin, 
+  ChevronRight, 
   ChevronLeft,
-  ChevronRight,
+  Star, 
+  Award, 
+  PhoneCall, 
+  CheckCircle2, 
+  ArrowRight, 
+  Sparkles, 
+  ChevronDown,
+  Navigation,
+  Headphones,
+  Users,
+  User,
+  Compass,
+  Building2,
+  Plane,
+  Briefcase,
+  Luggage,
+  Wind,
+  Phone,
+  MessageCircle,
+  HelpCircle,
+  Calendar,
+  Layers,
+  HeartHandshake,
+  Check
 } from 'lucide-react';
-import { FLEET_DATA } from '../data/fleetData';
-import { BUSINESS_INFO } from '../data/businessInfo';
-import { FAQ_DATA } from '../data/faqData';
-import { REVIEWS_DATA, REVIEWS_STATS } from '../data/reviewsData';
-import QuickEnquiryModal from '../components/ui/QuickEnquiryModal';
-import './Home.css';
+import BookingWidget from '../components/BookingWidget';
+import { useBookingModal } from '../context/BookingModalContext';
+import api from '../services/api';
+import { VEHICLE_IMAGES, VEHICLE_IMAGE_FALLBACK } from '../constants/vehicleImages';
 
-// Official Authentic WhatsApp Icon SVG
-function WhatsAppSvgIcon({ size = 16, className = '' }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width={size}
-      height={size}
-      fill="currentColor"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
-    </svg>
-  );
-}
+// 9 Required Fleet Vehicles
+const FLEET_DATA = [
+  {
+    id: 'premium-sedan',
+    name: 'Maruti Dzire / Honda City',
+    category: 'Premium Sedan',
+    image: VEHICLE_IMAGES.dzire,
+    passengers: 4,
+    luggage: 2,
+    ac: true,
+    price: '₹13 / km',
+    baseFare: '₹800 base',
+    features: ['Plush Ergonomic Seats', 'Dual Airbags & ABS', 'Fast USB Charger', 'Pristine Sanitized Cabin'],
+    popular: false
+  },
+  {
+    id: 'executive-sedan',
+    name: 'Skoda Superb / Toyota Camry',
+    category: 'Executive Sedan',
+    image: VEHICLE_IMAGES.superb,
+    passengers: 4,
+    luggage: 3,
+    ac: true,
+    price: '₹18 / km',
+    baseFare: '₹1,500 base',
+    features: ['Rear Executive Armrest', 'Sun Blinds & Quiet Cabin', 'Bottled Spring Water', 'High Speed Wi-Fi'],
+    popular: true
+  },
+  {
+    id: 'innova-crysta',
+    name: 'Toyota Innova Crysta ZX',
+    category: 'Toyota Innova Crysta',
+    image: VEHICLE_IMAGES.crysta,
+    passengers: 7,
+    luggage: 4,
+    ac: true,
+    price: '₹22 / km',
+    baseFare: '₹1,800 base',
+    features: ['Captain Comfort Seats', 'Independent Roof AC', 'Superior Highway Balance', 'Premium Sound'],
+    popular: true
+  },
+  {
+    id: 'innova-hycross',
+    name: 'Toyota Innova Hycross Hybrid',
+    category: 'Toyota Innova Hycross',
+    image: VEHICLE_IMAGES.hycross,
+    passengers: 7,
+    luggage: 4,
+    ac: true,
+    price: '₹24 / km',
+    baseFare: '₹2,000 base',
+    features: ['Ottoman Executive Lounge', 'Panoramic Roof View', 'Whisper Silent EV Drive', 'JBL Surround Sound'],
+    popular: false
+  },
+  {
+    id: 'toyota-fortuner',
+    name: 'Toyota Fortuner 4x4 Luxury',
+    category: 'Toyota Fortuner',
+    image: VEHICLE_IMAGES.fortuner,
+    passengers: 7,
+    luggage: 4,
+    ac: true,
+    price: '₹28 / km',
+    baseFare: '₹2,600 base',
+    features: ['Commanding High View', 'All-Terrain 4x4 Ride', 'Leather Upholstery', 'Dual Climate Zones'],
+    popular: false
+  },
+  {
+    id: 'luxury-suv',
+    name: 'BMW X5 / Audi Q7 Chauffeur',
+    category: 'Luxury SUV',
+    image: VEHICLE_IMAGES.bmwX5,
+    passengers: 5,
+    luggage: 4,
+    ac: true,
+    price: '₹48 / km',
+    baseFare: '₹4,500 base',
+    features: ['Air Suspension Comfort', 'Panoramic Ambient Lighting', 'VIP Boardroom Standard', 'Trained Uniformed Chauffeur'],
+    popular: false
+  },
+  {
+    id: 'mercedes-benz',
+    name: 'Mercedes-Benz E-Class VIP',
+    category: 'Mercedes-Benz',
+    image: VEHICLE_IMAGES.mercedesEClass,
+    passengers: 4,
+    luggage: 3,
+    ac: true,
+    price: '₹52 / km',
+    baseFare: '₹5,000 base',
+    features: ['Burmester Sound System', 'Chilled Refreshments', 'White-Glove Etiquette', 'Celebrity Protocol Service'],
+    popular: false
+  },
+  {
+    id: 'tempo-traveller',
+    name: 'Force Urbania Executive Cruiser',
+    category: 'Tempo Traveller',
+    image: VEHICLE_IMAGES.urbania,
+    passengers: 13,
+    luggage: 12,
+    ac: true,
+    price: '₹28 / km',
+    baseFare: '₹3,200 base',
+    features: ['Individual Air Vents', 'Individual Recliners', 'High Roof Walkthrough', 'Smart TV & Mic System'],
+    popular: false
+  },
+  {
+    id: 'luxury-mini-bus',
+    name: 'BharatBenz AC Tourist Coach',
+    category: 'Luxury Mini Bus',
+    image: VEHICLE_IMAGES.bharatbenzCoach,
+    passengers: 26,
+    luggage: 25,
+    ac: true,
+    price: '₹45 / km',
+    baseFare: '₹5,500 base',
+    features: ['Pneumatic Air Suspension', 'Wide Velvet Pushback Seats', 'Overhead Luggage Racks', 'First Aid & Speed Governor'],
+    popular: false
+  }
+];
+
+// 6 Required Services
+const SERVICES_DATA = [
+  {
+    id: 'corporate-ets',
+    title: 'Corporate Employee Transportation',
+    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=80',
+    description: 'Tech-enabled safe, punctual employee commutes for IT hubs and multinationals with automated GPS tracking and 24/7 control room.',
+    badge: 'Enterprise Choice',
+    link: '/corporate'
+  },
+  {
+    id: 'airport-transfer',
+    title: 'Airport Pickup & Drop',
+    image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80',
+    description: 'Guaranteed curbside meet-and-greet at Kempegowda International Airport with automatic flight tracking and zero cancellation guarantee.',
+    badge: 'Zero Surge',
+    link: '/airport'
+  },
+  {
+    id: 'outstation-travel',
+    title: 'Outstation Travel',
+    image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=900&q=80',
+    description: 'Scenic intercity journeys across Mysore, Coorg, Ooty, Chikmagalur, and Chennai with highway-expert certified chauffeurs.',
+    badge: 'Most Popular',
+    link: '/outstation'
+  },
+  {
+    id: 'one-way-drop',
+    title: 'One-Way Drop',
+    image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
+    description: 'Pay only for one-way distance with zero return fare penalties for swift intercity travel between major business corridors.',
+    badge: 'Economical',
+    link: '/outstation'
+  },
+  {
+    id: 'wedding-events',
+    title: 'Wedding & Event Transportation',
+    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80',
+    description: 'Luxury bridal Mercedes sedans, VIP guest convoys, and coordinated group shuttles for grand destination celebrations.',
+    badge: 'Luxury Convoy',
+    link: '/services'
+  },
+  {
+    id: 'vip-chauffeur',
+    title: 'VIP Chauffeur Services',
+    image: '/images/fleet/mercedes-vip.jpg',
+    description: 'White-glove executive chauffeur service for C-suite directors, high-profile delegations, and diplomats with non-disclosure protocol.',
+    badge: 'White Glove',
+    link: '/services'
+  }
+];
+
+// Testimonials
+const TESTIMONIALS = [
+  {
+    name: 'Karthik Subramanian',
+    company: 'VP Engineering, Tech Global',
+    comment: 'Orange Cabs has handled our international client delegations for 3 years. The Innova Crystas are spotlessly maintained, and chauffeurs always arrive 15 minutes ahead of schedule.',
+    rating: 5,
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80'
+  },
+  {
+    name: 'Ananya Deshmukh',
+    company: 'Creative Director, Studio 9',
+    comment: 'Booked an outstation trip from Bangalore to Coorg for our leadership offsite. Chauffeur Anand navigated the hill curves with extreme care. Fixed pricing, no surprises, impeccable experience!',
+    rating: 5,
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80'
+  },
+  {
+    name: 'Dr. Arvind Nambiar',
+    company: 'Senior Consultant Cardiologist',
+    comment: 'I take early morning flights twice a week. With Orange Cabs, I never experience driver cancellations or airport surge pricing. Truly a gold standard in automotive transport.',
+    rating: 5,
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80'
+  },
+  {
+    name: 'Sneha Hegde',
+    company: 'Head of Operations, FinTech Solutions',
+    comment: 'Their Force Urbania was outstanding for our team excursion. Comfortable reclining captain seats, dual AC, and courteous hospitality throughout.',
+    rating: 5,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+  }
+];
+
+// Exactly 6 FAQs as required
+const FAQS = [
+  {
+    q: 'How can I book a cab?',
+    a: 'You can book a ride seamlessly using our online booking widget on the homepage, clicking "Book Your Ride" at the top of any page, or calling our 24/7 hotline at +91 97425 88995. Instant confirmation with a unique booking reference ID is sent to your screen and via WhatsApp.'
+  },
+  {
+    q: 'Which cities do you serve?',
+    a: 'We operate primary corporate, airport, and luxury fleet hubs in Bangalore, serving all Karnataka districts (Mysore, Coorg, Ooty, Chikmagalur, Hampi, Mangalore) as well as interstate highways connecting Chennai, Hyderabad, Coimbatore, and Goa.'
+  },
+  {
+    q: 'Can I book an airport transfer?',
+    a: 'Yes. We specialize in 24/7 Kempegowda International Airport (BLR) transfers for both Terminal 1 and Terminal 2. Our dispatch engine automatically tracks your flight number, adjusting pickup times for delays, with complimentary waiting time and terminal curbside assistance.'
+  },
+  {
+    q: 'Do you provide corporate transportation?',
+    a: 'Absolutely. Orange Cabs manages enterprise employee transportation (ETS), daily office shuttles, executive boardroom chauffeur cars, and event mobility for 100+ corporate clients with centralized billing, GST compliance, and GPS telematics.'
+  },
+  {
+    q: 'How can I cancel a booking?',
+    a: 'Cancellations are completely hassle-free and free of charge when requested up to 2 hours prior to your scheduled pickup. You can cancel by contacting our 24/7 dispatch desk on WhatsApp or calling +91 97425 88995.'
+  },
+  {
+    q: 'How can I contact customer support?',
+    a: 'Our dispatch command center is available 24/7, 365 days a year. You can call our direct helpline at +91 97425 88995, chat with us on WhatsApp, or email us at info@orangecab.in.'
+  }
+];
 
 export default function Home() {
-  const navigate = useNavigate();
+  const { openBookingModal } = useBookingModal();
 
-  // Quick Trip Enquiry State
-  const [tripType, setTripType] = useState('airport_transfer');
-  const [pickup, setPickup] = useState('');
-  const [destination, setDestination] = useState('');
-  const [travelDate, setTravelDate] = useState('');
+  // Testimonial Carousel Index
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
-  // Quick Enquiry Modal State
-  const [enquiryModal, setEnquiryModal] = useState({ isOpen: false, prefill: {} });
+  // FAQ Accordion Active Index
+  const [openFaq, setOpenFaq] = useState(0);
 
-  const handleOpenVehicleEnquiry = (vehicleName) => {
-    setEnquiryModal({
-      isOpen: true,
-      prefill: {
-        preferredVehicle: vehicleName,
-        tripType: `${vehicleName} Rental Enquiry`,
-        message: `I would like to enquire about availability and rates for ${vehicleName}.`,
-      },
-    });
-  };
-
-  // FAQ Accordion State (first item open by default)
-  const [openFaqIndex, setOpenFaqIndex] = useState(0);
-
-  // Reviews Carousel State (Only 3 visible, auto-scrolling with pause on hover)
-  const [reviewSlideIndex, setReviewSlideIndex] = useState(0);
-  const [isReviewPaused, setIsReviewPaused] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1200
-  );
+  // Stats Counter Animation
+  const [counts, setCounts] = useState({ customers: 0, trips: 0, punctuality: 0, partners: 0 });
+  const [statsVisible, setStatsVisible] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const handleScroll = () => {
+      const statsElem = document.getElementById('stats-section');
+      if (statsElem) {
+        const rect = statsElem.getBoundingClientRect();
+        if (rect.top <= window.innerHeight * 0.85) {
+          setStatsVisible(true);
+        }
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const visibleReviewsCount = windowWidth > 1024 ? 3 : windowWidth > 640 ? 2 : 1;
-  const maxReviewIndex = Math.max(0, REVIEWS_DATA.length - visibleReviewsCount);
-
   useEffect(() => {
-    if (isReviewPaused) return;
+    if (!statsVisible) return;
+    const duration = 1600;
+    const frameRate = 30;
+    const totalFrames = Math.round(duration / (1000 / frameRate));
+    let frame = 0;
+
     const timer = setInterval(() => {
-      setReviewSlideIndex((prev) => (prev >= maxReviewIndex ? 0 : prev + 1));
-    }, 4000);
+      frame++;
+      const progress = frame / totalFrames;
+      const ease = 1 - Math.pow(1 - progress, 3);
+
+      setCounts({
+        customers: Math.round(ease * 500),
+        trips: Math.round(ease * 10000),
+        punctuality: (ease * 99.8).toFixed(1),
+        partners: Math.round(ease * 100)
+      });
+
+      if (frame >= totalFrames) clearInterval(timer);
+    }, 1000 / frameRate);
+
     return () => clearInterval(timer);
-  }, [isReviewPaused, maxReviewIndex]);
-
-  const handlePrevReview = () => {
-    setReviewSlideIndex((prev) => (prev <= 0 ? maxReviewIndex : prev - 1));
-  };
-
-  const handleNextReview = () => {
-    setReviewSlideIndex((prev) => (prev >= maxReviewIndex ? 0 : prev + 1));
-  };
-
-  const handleSearchEnquiry = (e) => {
-    e.preventDefault();
-    navigate('/booking', {
-      state: {
-        prefill: {
-          tripType,
-          pickupLocation: pickup,
-          destination,
-          travelDate,
-        },
-      },
-    });
-  };
-
-  const popularVehicles = FLEET_DATA.slice(0, 4);
+  }, [statsVisible]);
 
   return (
-    <div className="home-page-root">
-      {/* 1. Hero Section ("Every Mile, Made Memorable.") */}
-      <section className="home-hero-dark" aria-label="Hero Banner">
-        <div className="container hero-split-container">
-          {/* Left Column: Headline & Action Buttons */}
-          <div className="hero-left-col">
-            <div className="hero-logo-emblem">
-              <img src="/assets/images/skb-logo.jpeg" alt="SKB Crest" className="emblem-img" />
-              <div className="emblem-text">
-                <span className="emblem-skb">SKB</span>
-                <span className="emblem-sub">TOUR AND TRAVELS</span>
-              </div>
-            </div>
+    <div className="bg-[#F7F7F7] text-[#242424] overflow-hidden">
+      
+      {/* ======================================================== */}
+      {/* B. CINEMATIC AUTOMOTIVE HERO SECTION                     */}
+      {/* ======================================================== */}
+      <section className="page-hero-surface relative min-h-[95vh] lg:min-h-screen flex flex-col justify-between text-white pt-28 pb-14 px-4 sm:px-6 lg:px-8 overflow-hidden">
 
-            <h1 className="hero-main-heading">
-              Every Mile,<br />
-              <span className="hero-gold-text">Made Memorable.</span>
-            </h1>
+        {/* Hero Content Wrapper */}
+        <div className="relative z-10 max-w-7xl mx-auto w-full pt-8 lg:pt-16">
+          <div className="max-w-2xl space-y-6">
+            
+            {/* Trust Pill */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="badge-pill-orange inline-flex items-center gap-2"
+            >
+              <Award className="w-3.5 h-3.5 text-accentOrange" />
+              <span>South India's Premier Mobility Company</span>
+            </motion.div>
 
-            <p className="hero-main-subtext">
-              Airport transfers, city rides and outstation escapes — travel with comfort, confidence and a team that cares.
-            </p>
+            {/* Left-Aligned Bold Headline */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] text-white"
+            >
+              Every Journey <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brandRed via-accentOrange to-amber-400">
+                Deserves Excellence.
+              </span>
+            </motion.h1>
 
-            <div className="hero-button-pair">
-              <Link to="/booking" className="btn-hero-gold">
-                Plan Your Journey
-              </Link>
-              <Link to="/fleet" className="btn-hero-dark-outline">
-                Explore Our Fleet
-              </Link>
-            </div>
-          </div>
+            {/* Short Professional Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-base sm:text-lg text-gray-300 font-normal leading-relaxed max-w-xl"
+            >
+              Experience premium cab services with professional chauffeurs, exceptional comfort, and reliable transportation across every destination.
+            </motion.p>
 
-          {/* Right Column: Sharp High-Resolution Airport Chauffeur Hero Visual */}
-          <div className="hero-right-col">
-            <div className="hero-visual-frame">
-              <img
-                src="/assets/images/hero-airport-uhd.jpg"
-                alt="SKB Tour and Travels Premium Airport Transfer Fleet"
-                className="hero-airport-fleet-img"
-              />
-              <div className="hero-visual-glass-badge">
-                <span className="badge-dot-live" />
-                <span>Kempegowda International Airport (BLR) & PAN India Service</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Four Quick Service Highlights Row (White Strip) */}
-      <section className="services-strip-white" aria-label="Services Highlights">
-        <div className="container">
-          <div className="services-strip-grid">
-            <div className="service-strip-item">
-              <div className="strip-gold-icon">
-                <Plane size={20} />
-              </div>
-              <div className="strip-info">
-                <h4 className="strip-title">Airport Transfers</h4>
-                <p className="strip-sub">Hassle-free pickup & drop</p>
-              </div>
-            </div>
-
-            <div className="service-strip-item">
-              <div className="strip-gold-icon">
-                <Car size={20} />
-              </div>
-              <div className="strip-info">
-                <h4 className="strip-title">Local City Rides</h4>
-                <p className="strip-sub">Comfortable city travel</p>
-              </div>
-            </div>
-
-            <div className="service-strip-item">
-              <div className="strip-gold-icon">
-                <Compass size={20} />
-              </div>
-              <div className="strip-info">
-                <h4 className="strip-title">Outstation Journeys</h4>
-                <p className="strip-sub">One-way & round trips</p>
-              </div>
-            </div>
-
-            <div className="service-strip-item">
-              <div className="strip-gold-icon">
-                <Users size={20} />
-              </div>
-              <div className="strip-info">
-                <h4 className="strip-title">Family & Group Travel</h4>
-                <p className="strip-sub">Perfect for families & groups</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Quick Trip Enquiry Box (Dark Navy Card with Gold Border) */}
-      <section className="quick-enquiry-section" aria-label="Quick Trip Enquiry">
-        <div className="container">
-          <div className="quick-enquiry-card-navy">
-            <h3 className="enquiry-card-title">Quick Trip Enquiry</h3>
-
-            <form onSubmit={handleSearchEnquiry} className="enquiry-form-row">
-              <div className="enquiry-field">
-                <select
-                  value={tripType}
-                  onChange={(e) => setTripType(e.target.value)}
-                  className="enquiry-select"
-                >
-                  <option value="airport_transfer">Trip Type: Airport Transfer</option>
-                  <option value="local_4h_40km">Local City Trip (4H / 8H)</option>
-                  <option value="outstation_oneway">Outstation One-Way</option>
-                  <option value="outstation_round">Outstation Round Trip</option>
-                  <option value="group_travel">Family & Group Travel</option>
-                </select>
-              </div>
-
-              <div className="enquiry-field">
-                <input
-                  type="text"
-                  placeholder="Pickup Location"
-                  value={pickup}
-                  onChange={(e) => setPickup(e.target.value)}
-                  className="enquiry-input"
-                />
-              </div>
-
-              <div className="enquiry-field">
-                <input
-                  type="text"
-                  placeholder="Destination"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
-                  className="enquiry-input"
-                />
-              </div>
-
-              <div className="enquiry-field date-field">
-                <input
-                  type="date"
-                  value={travelDate}
-                  onChange={(e) => setTravelDate(e.target.value)}
-                  className="enquiry-input"
-                />
-              </div>
-
-              <button type="submit" className="btn-search-enquire-gold">
-                Search / Enquire
+            {/* Primary & Secondary CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-wrap items-center gap-4 pt-2"
+            >
+              <button
+                onClick={() => openBookingModal()}
+                className="btn-primary text-sm sm:text-base !py-3.5 !px-8 shadow-glow-red"
+              >
+                <span>Book Your Ride</span>
               </button>
-            </form>
+
+              <a
+                href="#fleet-section"
+                className="btn-outline-white text-sm sm:text-base !py-3.5 !px-7"
+              >
+                <span>Explore Our Fleet</span>
+                <ChevronRight className="w-4 h-4" />
+              </a>
+            </motion.div>
+
+            {/* Small Trust Indicators */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-white/10 text-xs text-gray-300"
+            >
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Verified Chauffeurs</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-accentOrange shrink-0" />
+                <span>99.8% On-Time</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-brandRed shrink-0" />
+                <span>Fixed Transparent Tariff</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Headphones className="w-4 h-4 text-sky-400 shrink-0" />
+                <span>24/7 Command Support</span>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Luxury Hero Booking Widget */}
+        <div className="relative z-20 max-w-7xl mx-auto w-full mt-10">
+          <BookingWidget />
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* C. TRUST STATISTICS SECTION                              */}
+      {/* ======================================================== */}
+      <section id="stats-section" className="py-16 sm:py-20 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            
+            {/* Stat Card 1 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-brandRed/10 text-brandRed flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6" />
+              </div>
+              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
+                {counts.customers}+
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
+                Happy Customers
+              </p>
+            </motion.div>
+
+            {/* Stat Card 2 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-accentOrange/10 text-accentOrange flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Navigation className="w-6 h-6" />
+              </div>
+              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
+                {counts.trips}+
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
+                Successful Trips
+              </p>
+            </motion.div>
+
+            {/* Stat Card 3 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
+                {counts.punctuality}%
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
+                On-Time Reliability
+              </p>
+            </motion.div>
+
+            {/* Stat Card 4 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
+                {counts.partners}+
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
+                Corporate Partners
+              </p>
+            </motion.div>
+
           </div>
         </div>
       </section>
 
-      {/* 4. Explore Our Packages ("Travel Your Way" - Matching Reference Image) */}
-      <section className="home-packages-section" aria-label="Explore Our Packages">
-        <div className="container">
-          {/* Centered Heading with Gold Underline */}
-          <div className="packages-heading-center">
-            <div className="packages-tagline-gold">
-              <span className="tagline-dash" />
-              <span>EXPLORE OUR PACKAGES</span>
-              <span className="tagline-dash" />
-            </div>
-            <h2 className="packages-section-title">
-              Travel Your <span className="packages-title-gold">Way</span>
-            </h2>
-            <div className="packages-gold-underline" />
-          </div>
-
-          {/* 4 Equal-Height Luxury Package Cards */}
-          <div className="home-packages-grid">
-            {/* Card 1: Local 4 Hours / 40 KM */}
-            <div className="pkg-gold-card">
-              <div className="pkg-card-media">
-                <img
-                  src="/assets/images/pkg-local-4h.jpg"
-                  alt="SKB Local 4 Hours 40 KM Travel Package"
-                  className="pkg-car-img"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="pkg-card-content">
-                <h3 className="pkg-card-title">Local 4 Hours / 40 KM</h3>
-
-                <div className="pkg-price-panel">
-                  <div className="pkg-price-row">
-                    <span className="pkg-currency">₹</span>
-                    <span className="pkg-amount">1,200</span>
-                  </div>
-                  <span className="pkg-price-type">FIXED BASE PACKAGE</span>
-                </div>
-
-                <ul className="pkg-specs-list">
-                  <li className="pkg-spec-item">
-                    <Clock size={16} className="spec-icon-gold" />
-                    <span>Duration: <strong>4 Hours</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <MapPin size={16} className="spec-icon-gold" />
-                    <span>Included Distance: <strong>40 KM</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <Hourglass size={16} className="spec-icon-gold" />
-                    <span>Additional Hour: <strong>₹ 150 / hr</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <MapPin size={16} className="spec-icon-gold" />
-                    <span>Additional KM: <strong>₹ 13 / km</strong></span>
-                  </li>
-                </ul>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate('/booking', {
-                      state: {
-                        prefill: {
-                          tripType: 'local_4h_40km',
-                          preferredVehicle: 'Toyota Innova Crysta',
-                          additionalInstructions: 'Booking enquiry for Local 4 Hours / 40 KM Package (₹1,200)',
-                        },
-                      },
-                    })
-                  }
-                  className="pkg-btn-navy"
-                  aria-label="Book Local 4 Hours Package"
-                >
-                  <Calendar size={16} />
-                  <span>Book This Package</span>
-                  <ArrowRight size={15} />
-                </button>
-              </div>
-            </div>
-
-            {/* Card 2: Local 8 Hours / 80 KM (MOST POPULAR) */}
-            <div className="pkg-gold-card pkg-card-featured">
-              <div className="pkg-card-media">
-                <img
-                  src="/assets/images/pkg-local-8h.jpg"
-                  alt="SKB Local 8 Hours 80 KM Travel Package - Most Popular"
-                  className="pkg-car-img"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="pkg-card-content">
-                <h3 className="pkg-card-title">Local 8 Hours / 80 KM</h3>
-
-                <div className="pkg-price-panel pkg-price-featured">
-                  <div className="pkg-price-row">
-                    <span className="pkg-currency">₹</span>
-                    <span className="pkg-amount">1,900</span>
-                  </div>
-                  <span className="pkg-price-type">FIXED BASE PACKAGE</span>
-                </div>
-
-                <ul className="pkg-specs-list">
-                  <li className="pkg-spec-item">
-                    <Clock size={16} className="spec-icon-gold" />
-                    <span>Duration: <strong>8 Hours</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <MapPin size={16} className="spec-icon-gold" />
-                    <span>Included Distance: <strong>80 KM</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <Hourglass size={16} className="spec-icon-gold" />
-                    <span>Additional Hour: <strong>₹ 150 / hr</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <MapPin size={16} className="spec-icon-gold" />
-                    <span>Additional KM: <strong>₹ 13 / km</strong></span>
-                  </li>
-                </ul>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate('/booking', {
-                      state: {
-                        prefill: {
-                          tripType: 'local_8h_80km',
-                          preferredVehicle: 'Toyota Innova Crysta',
-                          additionalInstructions: 'Booking enquiry for Local 8 Hours / 80 KM Most Popular Package (₹1,900)',
-                        },
-                      },
-                    })
-                  }
-                  className="pkg-btn-navy"
-                  aria-label="Book Local 8 Hours Package"
-                >
-                  <Calendar size={16} />
-                  <span>Book This Package</span>
-                  <ArrowRight size={15} />
-                </button>
-              </div>
-            </div>
-
-            {/* Card 3: Outstation Trips */}
-            <div className="pkg-gold-card">
-              <div className="pkg-card-media">
-                <img
-                  src="/assets/images/pkg-outstation.jpg"
-                  alt="SKB Outstation Trips Travel Package"
-                  className="pkg-car-img"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="pkg-card-content">
-                <h3 className="pkg-card-title">Outstation Trips</h3>
-
-                <div className="pkg-price-panel">
-                  <div className="pkg-price-row">
-                    <span className="pkg-currency">₹</span>
-                    <span className="pkg-amount">13</span>
-                    <span className="pkg-per-unit">/ km</span>
-                  </div>
-                  <span className="pkg-price-type">INDICATIVE STARTING FARE</span>
-                </div>
-
-                <ul className="pkg-specs-list">
-                  <li className="pkg-spec-item">
-                    <MapPin size={16} className="spec-icon-gold" />
-                    <span>4+1 Dzire: <strong>₹13/km</strong> | 6+1 Innova: <strong>₹22/km</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <ArrowLeftRight size={16} className="spec-icon-gold" />
-                    <span>Min. Billing: <strong>300 KM / Day Average</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <Moon size={16} className="spec-icon-gold" />
-                    <span>Driver Beta: <strong>₹400 (Sedan) / ₹500 (Innova)</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <FileText size={16} className="spec-icon-gold" />
-                    <span>Tolls, Parking & Interstate Extra</span>
-                  </li>
-                </ul>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate('/booking', {
-                      state: {
-                        prefill: {
-                          tripType: 'outstation_round',
-                          preferredVehicle: 'Toyota Innova Crysta',
-                          additionalInstructions: 'Booking enquiry for Outstation Trips (Starting ₹13/km)',
-                        },
-                      },
-                    })
-                  }
-                  className="pkg-btn-navy"
-                  aria-label="Book Outstation Trips Package"
-                >
-                  <Calendar size={16} />
-                  <span>Book This Package</span>
-                  <ArrowRight size={15} />
-                </button>
-              </div>
-            </div>
-
-            {/* Card 4: Airport Transfers */}
-            <div className="pkg-gold-card">
-              <div className="pkg-card-media">
-                <img
-                  src="/assets/images/pkg-airport.jpg"
-                  alt="SKB Airport Transfers Travel Package"
-                  className="pkg-car-img"
-                  loading="lazy"
-                />
-              </div>
-
-              <div className="pkg-card-content">
-                <h3 className="pkg-card-title">Airport Transfers</h3>
-
-                <div className="pkg-price-panel">
-                  <div className="pkg-price-row">
-                    <span className="pkg-currency">₹</span>
-                    <span className="pkg-amount">21</span>
-                    <span className="pkg-per-unit">/ km</span>
-                  </div>
-                  <span className="pkg-price-type">INDICATIVE STARTING FARE</span>
-                </div>
-
-                <ul className="pkg-specs-list">
-                  <li className="pkg-spec-item">
-                    <MapPin size={16} className="spec-icon-gold" />
-                    <span>4+1 Dzire: <strong>₹21/km</strong> | 6+1 Innova: <strong>₹40/km</strong></span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <Plane size={16} className="spec-icon-gold" />
-                    <span>Pickup & Drop Available 24/7</span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <Clock size={16} className="spec-icon-gold" />
-                    <span>On-Time Flight Tracking</span>
-                  </li>
-                  <li className="pkg-spec-item">
-                    <FileText size={16} className="spec-icon-gold" />
-                    <span>Tolls & Terminal Parking Separate</span>
-                  </li>
-                </ul>
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    navigate('/booking', {
-                      state: {
-                        prefill: {
-                          tripType: 'airport_transfer',
-                          preferredVehicle: 'Toyota Innova Crysta',
-                          additionalInstructions: 'Booking enquiry for Airport Transfers (Starting ₹21/km)',
-                        },
-                      },
-                    })
-                  }
-                  className="pkg-btn-navy"
-                  aria-label="Book Airport Transfers Package"
-                >
-                  <Calendar size={16} />
-                  <span>Book This Package</span>
-                  <ArrowRight size={15} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Our Popular Vehicles (Matching Uploaded Mockup) */}
-      <section className="popular-vehicles-section" aria-label="Our Popular Vehicles">
-        <div className="container">
-          {/* Header Row with Tagline, Headline and "View All Vehicles" Button */}
-          <div className="popular-vehicles-header-row">
-            <div className="popular-header-left">
-              <div className="popular-tagline-gold">
-                <span className="gold-dash" />
-                <span>OUR FLEET</span>
-              </div>
-              <h2 className="popular-section-title">
-                Our Popular <span className="gold-serif">Vehicles</span>
+      {/* ======================================================== */}
+      {/* D. PREMIUM FLEET SHOWCASE                                */}
+      {/* ======================================================== */}
+      <section id="fleet-section" className="py-20 sm:py-28 bg-[#F7F7F7]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Section Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+            <div>
+              <span className="badge-pill-red mb-3">World-Class Automotive Roster</span>
+              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
+                Find Your Perfect Ride
               </h2>
-              <p className="popular-section-desc">
-                Choose from our premium and well-maintained vehicles for a comfortable, safe and memorable journey. Perfect for airport transfers, local trips, outstation travel and more.
+              <p className="mt-3 text-base text-gray-600 max-w-xl">
+                Travel in comfort and style with our carefully selected fleet. Real photography, transparent tariffs, and immaculate vehicle maintenance.
               </p>
             </div>
-            <div className="popular-header-right">
-              <Link to="/fleet" className="btn-view-all-fleet-gold">
-                <span>View All Vehicles</span>
-                <ArrowRight size={16} />
-              </Link>
-            </div>
+
+            <Link
+              to="/fleet"
+              className="btn-outline-dark text-xs sm:text-sm self-start md:self-end"
+            >
+              <span>View Full Fleet Specs</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
-          {/* 4 Evenly Sized Vehicle Cards Grid */}
-          <div className="popular-vehicles-grid">
-            {popularVehicles.map((vehicle) => (
-              <div key={vehicle.id} className="vehicle-card-white">
-                {/* 16:10 Aspect Ratio Image Container */}
-                <div className="vehicle-card-img-wrap">
+          {/* 9 Vehicle Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {FLEET_DATA.map((vehicle, idx) => (
+              <motion.div
+                key={vehicle.id}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: idx * 0.05 }}
+                className="luxury-card overflow-hidden flex flex-col group"
+              >
+                {/* Real Vehicle Image Area */}
+                <div className="relative h-60 w-full overflow-hidden bg-gray-100">
                   <img
                     src={vehicle.image}
                     alt={vehicle.name}
-                    className="vehicle-photo"
-                    loading="lazy"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = VEHICLE_IMAGE_FALLBACK;
+                    }}
                   />
-                  {/* Category Badge top right */}
-                  <span className="vehicle-badge-gold">{vehicle.badge}</span>
-                </div>
-
-                {/* Details */}
-                <div className="vehicle-card-text">
-                  <h3 className="vehicle-name-dark">{vehicle.name}</h3>
-
-                  <div className="vehicle-seater-row">
-                    <Users size={15} className="seater-icon-gold" />
-                    <span>{vehicle.capacity}</span>
+                  <div className="absolute top-4 left-4">
+                    <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#101010]/90 text-white backdrop-blur-md">
+                      {vehicle.category}
+                    </span>
                   </div>
 
-                  {(vehicle.airportRate || vehicle.outstationRate) && (
-                    <div className="vehicle-rates-chips">
-                      {vehicle.airportRate && (
-                        <div className="rate-chip highlight">
-                          <span className="rate-chip-label">Airport:</span>
-                          <span className="rate-chip-val">{vehicle.airportRate}</span>
-                        </div>
-                      )}
-                      {vehicle.outstationRate && (
-                        <div className="rate-chip">
-                          <span className="rate-chip-label">Outstation:</span>
-                          <span className="rate-chip-val">{vehicle.outstationRate}</span>
-                        </div>
-                      )}
+                  {vehicle.popular && (
+                    <div className="absolute top-4 right-4">
+                      <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-brandRed text-white shadow-md">
+                        Executive Pick
+                      </span>
                     </div>
                   )}
 
-                  <p className="vehicle-tagline-text">{vehicle.description}</p>
-
-                  {/* Direct WhatsApp Enquiry Button */}
-                  <button
-                    type="button"
-                    onClick={() => handleOpenVehicleEnquiry(vehicle.name)}
-                    className="btn-enquire-now-pill"
-                    aria-label={`Enquire about ${vehicle.name} on WhatsApp`}
-                  >
-                    <WhatsAppSvgIcon size={16} />
-                    <span>Enquire Now</span>
-                    <ArrowRight size={14} />
-                  </button>
+                  <div className="absolute bottom-3 right-4 px-3 py-1 rounded-xl bg-white/95 text-charcoal font-bold text-xs shadow-sm">
+                    {vehicle.price}
+                  </div>
                 </div>
-              </div>
+
+                {/* Card Content */}
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div>
+                    <h3 className="font-heading font-bold text-xl text-charcoal group-hover:text-brandRed transition-colors">
+                      {vehicle.name}
+                    </h3>
+                    
+                    {/* Specifications */}
+                    <div className="grid grid-cols-3 gap-2 py-3 mt-2 border-y border-gray-100 text-xs text-gray-500">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-accentOrange" />
+                        <span>{vehicle.passengers} Seats</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Luggage className="w-3.5 h-3.5 text-brandRed" />
+                        <span>{vehicle.luggage} Bags</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Wind className="w-3.5 h-3.5 text-sky-500" />
+                        <span>Climate AC</span>
+                      </div>
+                    </div>
+
+                    {/* Features list */}
+                    <ul className="mt-3 space-y-1.5 text-xs text-gray-600">
+                      {vehicle.features.slice(0, 2).map((feat, fidx) => (
+                        <li key={fidx} className="flex items-center gap-2">
+                          <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                          <span>{feat}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-2 flex items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider text-gray-400 block">Starting From</span>
+                      <strong className="text-sm font-bold text-charcoal">{vehicle.baseFare}</strong>
+                    </div>
+
+                    <button
+                      onClick={() => openBookingModal({ cabType: vehicle.name, category: vehicle.category })}
+                      className="btn-primary text-xs font-bold !py-2.5 !px-5"
+                    >
+                      <span>Book This Ride</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
             ))}
           </div>
-
-          {/* Bottom Fleet Features Strip */}
-          <div className="popular-features-strip-card">
-            <div className="popular-feature-col">
-              <div className="popular-feature-icon-circle">
-                <Car size={20} className="text-gold" />
-              </div>
-              <div className="popular-feature-info">
-                <h4 className="popular-feature-title">Well Maintained Vehicles</h4>
-                <p className="popular-feature-desc">Clean, safe and reliable</p>
-              </div>
-            </div>
-
-            <div className="popular-feature-col">
-              <div className="popular-feature-icon-circle">
-                <UserCheck size={20} className="text-gold" />
-              </div>
-              <div className="popular-feature-info">
-                <h4 className="popular-feature-title">Experienced Drivers</h4>
-                <p className="popular-feature-desc">Professional and polite</p>
-              </div>
-            </div>
-
-            <div className="popular-feature-col">
-              <div className="popular-feature-icon-circle">
-                <ShieldCheck size={20} className="text-gold" />
-              </div>
-              <div className="popular-feature-info">
-                <h4 className="popular-feature-title">Comfortable Seating</h4>
-                <p className="popular-feature-desc">For families and groups</p>
-              </div>
-            </div>
-
-            <div className="popular-feature-col">
-              <div className="popular-feature-icon-circle">
-                <Compass size={20} className="text-gold" />
-              </div>
-              <div className="popular-feature-info">
-                <h4 className="popular-feature-title">All India Travel</h4>
-                <p className="popular-feature-desc">Your journey, our priority</p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* 6. "Your Next Journey Starts Here." Banner (Cinematic Large Luxury Banner) */}
-      <section className="journey-banner-section" aria-label="Your Next Journey Banner">
-        <div className="container">
-          <div className="journey-cta-navy-card">
-            {/* Left: Premium Framed Vehicle Visual */}
-            <div className="journey-card-left-img">
-              <div className="journey-img-frame">
-                <img
-                  src="/assets/images/card-sedan.png"
-                  alt="SKB Tour and Travels Premium Fleet"
-                  className="journey-car-img"
-                  loading="lazy"
-                />
-                <div className="journey-img-glass-pill">
-                  <span className="journey-live-dot" />
-                  <span>Verified Chauffeurs</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Center: Large Luxury Typography & Highlights */}
-            <div className="journey-card-center-text">
-              <div className="journey-tagline-gold">
-                <span className="journey-tagline-dash" />
-                <span>EXPERIENCE EXCELLENCE IN TRAVEL</span>
-              </div>
-              <h2 className="journey-title">
-                Your Next Journey <span className="journey-title-gold">Starts Here.</span>
-              </h2>
-              <p className="journey-sub">
-                Comfort <span className="journey-dot">•</span> Safety <span className="journey-dot">•</span> Reliability <span className="journey-dot">•</span> Affordable Travel
-              </p>
-              <div className="journey-perks-row">
-                <span className="journey-perk-item">✓ 24/7 Availability</span>
-                <span className="journey-perk-item">✓ BLR Airport & PAN India</span>
-                <span className="journey-perk-item">✓ Sanitized Premium Cabs</span>
-              </div>
-            </div>
-
-            {/* Right: Prominent Action Button & Contact */}
-            <div className="journey-card-right-btn">
-              <Link to="/booking" className="btn-book-your-ride-gold">
-                <span>Book Your Ride</span>
-                <ArrowRight size={18} />
-              </Link>
-              <div className="journey-call-links-wrap">
-                <a
-                  href="tel:7338140524"
-                  className="journey-quick-call-link"
-                  aria-label="Call Helpline on 7338140524"
-                >
-                  Call: +91 73381 40524
-                </a>
-                <span className="journey-dot">•</span>
-                <a
-                  href="tel:9035897960"
-                  className="journey-quick-call-link"
-                  aria-label="Call Vicky on 9035897960"
-                >
-                  +91 90358 97960
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Why Choose SKB Tour and Travels (Luxury Advantage Section After Journey Banner) */}
-      <section className="why-choose-luxury-section" aria-label="Why Choose SKB Tour and Travels">
-        <div className="container">
-          <div className="why-choose-header-center">
-            <div className="why-tagline-gold">
-              <span className="tagline-dash" />
-              <span>THE SKB ADVANTAGE</span>
-              <span className="tagline-dash" />
-            </div>
-            <h2 className="why-section-title">
-              Why Choose <span className="why-gold-serif">SKB Tour and Travels</span>
+      {/* ======================================================== */}
+      {/* E. SERVICES SECTION                                      */}
+      {/* ======================================================== */}
+      <section className="py-20 sm:py-28 bg-white border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="badge-pill-orange mb-3">Comprehensive Mobility Solutions</span>
+            <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
+              Crafted For Every Occasion
             </h2>
-            <div className="why-gold-underline" />
-          </div>
-
-          <div className="why-choose-cards-grid">
-            <div className="why-card-item">
-              <div className="why-icon-bubble">
-                <Car size={26} className="why-icon-navy" />
-              </div>
-              <h3 className="why-item-title">Multiple Vehicle Options</h3>
-              <p className="why-item-desc">Sedans, Innova, TT & Urbania</p>
-            </div>
-
-            <div className="why-card-item">
-              <div className="why-icon-bubble">
-                <Clock size={26} className="why-icon-navy" />
-              </div>
-              <h3 className="why-item-title">24/7 Booking Support</h3>
-              <p className="why-item-desc">Round-the-clock help & enquiry</p>
-            </div>
-
-            <div className="why-card-item">
-              <div className="why-icon-bubble">
-                <Plane size={26} className="why-icon-navy" />
-              </div>
-              <h3 className="why-item-title">Airport & Outstation</h3>
-              <p className="why-item-desc">BLR Airport & PAN India trips</p>
-            </div>
-
-            <div className="why-card-item">
-              <div className="why-icon-bubble">
-                <ShieldCheck size={26} className="why-icon-navy" />
-              </div>
-              <h3 className="why-item-title">Affordable & Fair Pricing</h3>
-              <p className="why-item-desc">Transparent with zero hidden fees</p>
-            </div>
-
-            <div className="why-card-item">
-              <div className="why-icon-bubble">
-                <Users size={26} className="why-icon-navy" />
-              </div>
-              <h3 className="why-item-title">Family & Group Service</h3>
-              <p className="why-item-desc">Spacious & safe tourist travel</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. Frequently Asked Questions (Matching Reference Image) */}
-      <section className="faq-luxury-section" aria-label="Frequently Asked Questions">
-        <div className="container">
-          <div className="faq-header-center">
-            <div className="faq-tagline-gold">
-              <span className="tagline-dash" />
-              <span>GOT QUESTIONS?</span>
-              <span className="tagline-dash" />
-            </div>
-            <h2 className="faq-section-title">
-              Frequently Asked <span className="faq-gold-serif">Questions</span>
-            </h2>
-            <div className="faq-gold-underline" />
-            <p className="faq-section-subtitle">
-              Clear, transparent answers to help you plan your journey with total confidence and peace of mind.
+            <p className="mt-3 text-base text-gray-600">
+              From corporate daily rosters to VIP airport delegations, Orange Cabs delivers bespoke transportation services backed by punctuality and hospitality.
             </p>
           </div>
 
-          <div className="faq-accordion-container">
-            {FAQ_DATA.map((item, idx) => {
-              const isOpen = openFaqIndex === idx;
+          {/* 6 Professional Service Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {SERVICES_DATA.map((service, idx) => (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: idx * 0.08 }}
+                className="luxury-card overflow-hidden flex flex-col group"
+              >
+                <div className="relative h-56 overflow-hidden bg-gray-100">
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span className="badge-pill-red !bg-white/90 !text-brandRed !border-none shadow-sm backdrop-blur-sm">
+                      {service.badge}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div>
+                    <h3 className="font-heading font-bold text-xl text-charcoal group-hover:text-brandRed transition-colors">
+                      {service.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 mt-2 leading-relaxed">
+                      {service.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                    <Link
+                      to={service.link}
+                      className="text-xs font-bold text-gray-700 hover:text-brandRed flex items-center gap-1"
+                    >
+                      <span>Learn More</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+
+                    <button
+                      onClick={() => openBookingModal({ serviceType: service.title })}
+                      className="btn-accent text-xs font-bold !py-2 !px-4"
+                    >
+                      <span>Book Now</span>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* F. WHY CHOOSE Orange Cabs? (Split Layout)                 */}
+      {/* ======================================================== */}
+      <section className="py-20 sm:py-28 bg-[#F7F7F7]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left: Real Luxury Cab Photograph */}
+            <motion.div
+              initial={{ opacity: 0, x: -25 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 relative"
+            >
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200">
+                <video
+                  src="/videos/hero_animation.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover object-center max-h-[680px]"
+                />
+              </div>
+            </motion.div>
+
+            {/* Right: Heading, Description & 4 Benefits */}
+            <motion.div
+              initial={{ opacity: 0, x: 25 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="lg:col-span-6 space-y-6"
+            >
+              <span className="badge-pill-red">The Orange Cabs Difference</span>
+              
+              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
+                Setting The Benchmark In Premium Mobility
+              </h2>
+
+              <p className="text-base text-gray-600 leading-relaxed">
+                We combine technological precision with warm executive hospitality. Whether travelling across cities or catching an early morning international flight, our fleet and chauffeurs ensure peace of mind.
+              </p>
+
+              {/* 4 Benefits */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-2">
+                
+                {/* 1. Professional Chauffeurs */}
+                <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-brandRed/10 text-brandRed flex items-center justify-center mb-3">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-heading font-bold text-base text-charcoal">1. Professional Chauffeurs</h4>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Police-verified, commercially licensed chauffeurs trained in highway etiquette and defensive driving.
+                  </p>
+                </div>
+
+                {/* 2. Safe & Secure Journeys */}
+                <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-heading font-bold text-base text-charcoal">2. Safe & Secure Journeys</h4>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Real-time GPS telematics, speed limit governors, and 24/7 centralized SOS control room monitoring.
+                  </p>
+                </div>
+
+                {/* 3. On-Time Pickup */}
+                <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-accentOrange/10 text-accentOrange flex items-center justify-center mb-3">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-heading font-bold text-base text-charcoal">3. On-Time Pickup</h4>
+                  <p className="text-xs text-gray-500 mt-1">
+                    99.8% proven punctuality record. Drivers arrive 15 minutes ahead of scheduled dispatch.
+                  </p>
+                </div>
+
+                {/* 4. Transparent Pricing */}
+                <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-3">
+                    <Award className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-heading font-bold text-base text-charcoal">4. Transparent Pricing</h4>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Fixed per-km billing with zero surge pricing anxiety, clear GST invoicing, and no hidden charges.
+                  </p>
+                </div>
+
+              </div>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => openBookingModal()}
+                  className="btn-primary text-sm !py-3 !px-7 shadow-glow-red"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Experience The Difference</span>
+                </button>
+              </div>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* G. CORPORATE TRANSPORTATION SECTION (Dark Background)   */}
+      {/* ======================================================== */}
+      <section className="py-20 sm:py-28 bg-[#101010] text-white relative overflow-hidden">
+        {/* Subtle Ambient Glows */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brandRed/10 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accentOrange/10 rounded-full blur-[150px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <div className="lg:col-span-7 space-y-6">
+              <span className="badge-pill-orange">Enterprise Mobility Hub</span>
+              
+              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight">
+                Your Trusted Corporate Mobility Partner
+              </h2>
+
+              <p className="text-base text-gray-300 leading-relaxed max-w-xl">
+                Streamline employee transit, executive business trips, and client delegations with enterprise-grade mobility solutions built for operational scale.
+              </p>
+
+              {/* 6 Features List */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                {[
+                  'Employee transportation (ETS)',
+                  'Enterprise mobility management',
+                  'Kempegowda Airport transfers',
+                  'Monthly consolidated GST billing',
+                  'Dedicated account manager',
+                  'Customized travel solutions'
+                ].map((feat, fidx) => (
+                  <div key={fidx} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-accentOrange/20 text-accentOrange flex items-center justify-center shrink-0">
+                      <Check className="w-3.5 h-3.5 font-bold" />
+                    </div>
+                    <span className="text-sm text-gray-200 font-medium">{feat}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-4 flex flex-wrap items-center gap-4">
+                <button
+                  onClick={() => window.dispatchEvent(new CustomEvent('openCorporateProposal'))}
+                  className="btn-accent text-sm sm:text-base !py-3.5 !px-8 shadow-glow-orange"
+                >
+                  <Briefcase className="w-4 h-4" />
+                  <span>Request Corporate Proposal</span>
+                </button>
+
+                <a
+                  href="tel:+919742588995"
+                  className="btn-outline-white text-sm sm:text-base !py-3.5 !px-7"
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>Speak to Key Accounts</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Corporate Fleet SLA Console */}
+            <div className="lg:col-span-5">
+              <div className="rounded-3xl p-7 bg-[#181818] border border-white/10 shadow-2xl space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                  <span className="text-xs font-bold text-accentOrange uppercase tracking-wider">Enterprise Mobility SLA</span>
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    Tier-1 Certified
+                  </span>
+                </div>
+
+                <div className="space-y-4 text-xs">
+                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/5">
+                    <strong className="text-white font-bold block text-sm">20-Minute Replacement Guarantee</strong>
+                    <span className="text-gray-400 mt-0.5 block">Dedicated reserve vehicles stationed on standby near major tech hubs.</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/5">
+                    <strong className="text-white font-bold block text-sm">100% Statutory &amp; Police Compliance</strong>
+                    <span className="text-gray-400 mt-0.5 block">Background-verified chauffeurs with annual biometric and health clearance.</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/5">
+                    <strong className="text-white font-bold block text-sm">Centralized GST &amp; MIS Invoicing</strong>
+                    <span className="text-gray-400 mt-0.5 block">Automated trip logs, route telemetry, and itemized monthly invoices.</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center justify-between text-xs text-gray-400 border-t border-white/10">
+                  <span>Duty Manager Hotline:</span>
+                  <a href="tel:+919742588995" className="text-white font-bold hover:text-accentOrange transition-colors">
+                    +91 97425 88995
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* H. ABOUT THE COMPANY / FOUNDER                           */}
+      {/* ======================================================== */}
+      <section className="py-20 sm:py-28 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Executive Statement Box (No Personal Photo) */}
+            <div className="lg:col-span-5">
+              <div className="rounded-3xl p-8 bg-[#101010] text-white shadow-2xl border border-gray-800 space-y-6 max-w-md mx-auto">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brandRed to-accentOrange flex items-center justify-center text-white shadow-glow-red">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+
+                <div className="space-y-3">
+                  <span className="text-[11px] font-bold uppercase tracking-widest text-accentOrange block">
+                    Executive Commitment
+                  </span>
+                  <p className="text-sm text-gray-300 italic leading-relaxed">
+                    "Every guest deserves a spotless vehicle, an impeccably trained chauffeur, and absolute peace of mind."
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-white/10">
+                  <h4 className="font-heading font-black text-lg text-white">Vikramaditya Rao</h4>
+                  <p className="text-xs text-gray-400 font-medium mt-0.5">
+                    Founder &amp; Chief Executive Officer
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
+                  <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <span className="text-brandRed font-black text-lg block">10k+</span>
+                    <span className="text-gray-400 text-[10px] uppercase tracking-wider">Completed Trips</span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-center">
+                    <span className="text-accentOrange font-black text-lg block">99.8%</span>
+                    <span className="text-gray-400 text-[10px] uppercase tracking-wider">On-Time Record</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content & Vision */}
+            <div className="lg:col-span-7 space-y-6">
+              <span className="badge-pill-orange">Leadership &amp; Vision</span>
+              
+              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
+                Pioneering Safety &amp; Integrity in Indian Mobility
+              </h2>
+
+              <p className="text-base text-gray-600 leading-relaxed">
+                Founded with a mission to eliminate surge anxiety and transport unreliability, Orange Cabs was established to provide institutional corporate fleets and discerning private travelers with chauffeur service of international caliber.
+              </p>
+
+              <div className="space-y-4 text-sm text-gray-600">
+                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                  <h4 className="font-heading font-bold text-sm text-charcoal mb-1">Our Core Vision</h4>
+                  <p className="text-xs text-gray-500">
+                    To deliver frictionless, verified, and eco-conscious mobility that respects passenger time, ensures driver dignity, and fosters corporate efficiency.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+                  <h4 className="font-heading font-bold text-sm text-charcoal mb-1">Experience &amp; Operational Excellence</h4>
+                  <p className="text-xs text-gray-500">
+                    Over a decade of logistics leadership, managing 10,000+ flawless intercity journeys and maintaining a 99.8% on-time dispatch record across South India's busiest transit corridors.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center gap-4">
+                <Link
+                  to="/about"
+                  className="btn-primary text-xs sm:text-sm !py-3 !px-6"
+                >
+                  <span>Read Full Company Story</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* I. CLIENT TESTIMONIALS (Carousel)                        */}
+      {/* ======================================================== */}
+      <section className="py-20 sm:py-28 bg-[#F7F7F7]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+            <div>
+              <span className="badge-pill-red mb-3">Verified Traveler Reviews</span>
+              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
+                Trusted by Discerning Guests
+              </h2>
+              <p className="mt-3 text-base text-gray-600 max-w-xl">
+                Authentic testimonials from corporate directors, frequent flyers, and family vacationers who choose Orange Cabs.
+              </p>
+            </div>
+
+            {/* Carousel navigation buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setActiveTestimonial(prev => (prev === 0 ? TESTIMONIALS.length - 1 : prev - 1))}
+                className="w-11 h-11 rounded-full bg-white border border-gray-200 text-charcoal hover:bg-gray-100 flex items-center justify-center shadow-sm transition-all"
+                aria-label="Previous testimonial"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setActiveTestimonial(prev => (prev === TESTIMONIALS.length - 1 ? 0 : prev + 1))}
+                className="w-11 h-11 rounded-full bg-[#101010] text-white hover:bg-black flex items-center justify-center shadow-md transition-all"
+                aria-label="Next testimonial"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Testimonial Cards Slider */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              TESTIMONIALS[activeTestimonial],
+              TESTIMONIALS[(activeTestimonial + 1) % TESTIMONIALS.length]
+            ].map((review, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.35 }}
+                className="luxury-card p-8 flex flex-col justify-between space-y-6"
+              >
+                <div className="space-y-4">
+                  {/* Star Rating */}
+                  <div className="flex items-center gap-1 text-amber-400">
+                    {[...Array(review.rating)].map((_, sidx) => (
+                      <Star key={sidx} className="w-4 h-4 fill-amber-400" />
+                    ))}
+                  </div>
+
+                  {/* Review Text */}
+                  <p className="text-base text-charcoal italic leading-relaxed">
+                    "{review.comment}"
+                  </p>
+                </div>
+
+                {/* Author Info */}
+                <div className="flex items-center gap-4 pt-4 border-t border-gray-100">
+                  <img
+                    src={review.avatar}
+                    alt={review.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-brandRed/20"
+                  />
+                  <div>
+                    <h4 className="font-heading font-bold text-base text-charcoal">{review.name}</h4>
+                    <p className="text-xs text-gray-500 font-medium">{review.company}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* J. FREQUENTLY ASKED QUESTIONS (Accordion)                */}
+      {/* ======================================================== */}
+      <section className="py-20 sm:py-28 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-14">
+            <span className="badge-pill-orange mb-3">Clear &amp; Transparent Answers</span>
+            <h2 className="font-heading font-black text-3xl sm:text-4xl text-[#101010] tracking-tight">
+              Frequently Asked Questions
+            </h2>
+            <p className="mt-3 text-sm text-gray-600">
+              Everything you need to know about our luxury booking, tariffs, fleet options, and policies.
+            </p>
+          </div>
+
+          {/* Accordion List */}
+          <div className="space-y-4">
+            {FAQS.map((faq, fidx) => {
+              const isOpen = openFaq === fidx;
               return (
                 <div
-                  key={item.id}
-                  className={`faq-accordion-item ${isOpen ? 'active' : ''}`}
+                  key={fidx}
+                  className={`rounded-2xl border transition-all overflow-hidden ${
+                    isOpen ? 'border-brandRed bg-brandRed/5 shadow-sm' : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
                 >
                   <button
                     type="button"
-                    className="faq-accordion-header"
-                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-answer-${item.id}`}
+                    onClick={() => setOpenFaq(isOpen ? -1 : fidx)}
+                    className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4"
                   >
-                    <div className="faq-header-left">
-                      <span className="faq-item-number">
-                        {String(idx + 1).padStart(2, '0')}
-                      </span>
-                      <span className="faq-item-question">{item.question}</span>
-                    </div>
-                    <span className="faq-toggle-circle">
-                      <ChevronDown
-                        size={19}
-                        strokeWidth={2.4}
-                        className={`faq-chevron-icon ${isOpen ? 'rotated' : ''}`}
-                      />
+                    <span className="font-heading font-bold text-base text-charcoal">
+                      {faq.q}
                     </span>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform ${
+                      isOpen ? 'bg-brandRed text-white rotate-180' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
                   </button>
 
-                  {isOpen && (
-                    <div
-                      id={`faq-answer-${item.id}`}
-                      className="faq-accordion-body"
-                    >
-                      <p>{item.answer}</p>
-                    </div>
-                  )}
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="px-5 pb-6 sm:px-6 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3"
+                      >
+                        {faq.a}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
           </div>
 
-          {/* Bottom Direct Enquiry Strip Card */}
-          <div className="faq-support-strip-card">
-            <div className="faq-support-left">
-              <div className="faq-support-icon-wrap">
-                <MessageCircle size={24} className="faq-support-icon" />
-              </div>
-              <div className="faq-support-text">
-                <h4 className="faq-support-title">Still have questions or special requirements?</h4>
-                <p className="faq-support-desc">
-                  Contact Vicky directly for custom tour packages, corporate billing, or immediate airport taxi dispatch.
-                </p>
-              </div>
-            </div>
-            <div className="faq-support-actions">
-              <a
-                href={`https://wa.me/917338140524?text=${encodeURIComponent(
-                  'Hello Vicky, I have a question regarding cab booking with SKB Tour and Travels.'
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="faq-btn-whatsapp"
-                aria-label="Chat on WhatsApp"
-              >
-                <WhatsAppSvgIcon size={18} />
-                <span>Chat on WhatsApp</span>
-              </a>
-              <a
-                href="tel:7338140524"
-                className="faq-btn-call"
-                aria-label="Call Helpline on 7338140524"
-              >
-                <Phone size={15} />
-                <span>Call 73381 40524</span>
-              </a>
-              <a
-                href="tel:9035897960"
-                className="faq-btn-call"
-                aria-label="Call Vicky on 9035897960"
-              >
-                <Phone size={15} />
-                <span>Call 90358 97960</span>
-              </a>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* 9. Customer Testimonials & Reviews (Placed Directly After FAQ) */}
-      <section className="reviews-luxury-section" aria-label="Customer Reviews and Testimonials">
-        <div className="container">
-          {/* Header */}
-          <div className="reviews-header-center">
-            <div className="reviews-tagline-gold">
-              <span className="tagline-dash" />
-              <span>WHAT OUR TRAVELERS SAY</span>
-              <span className="tagline-dash" />
-            </div>
-            <h2 className="reviews-section-title">
-              Client <span className="reviews-gold-serif">Testimonials</span> & Reviews
+      {/* ======================================================== */}
+      {/* K. FINAL CTA BANNER                                      */}
+      {/* ======================================================== */}
+      <section className="relative mb-12 mx-6 sm:mx-10 lg:mx-16 rounded-2xl py-12 sm:py-14 bg-[#101010] text-white overflow-hidden">
+        {/* Automotive Background */}
+        <div className="absolute inset-0 z-0 rounded-2xl overflow-hidden">
+          <img
+            src="/images/fleet/mercedes-vip.jpg"
+            alt="Orange Cabs Chauffeur Experience"
+            className="w-full h-full object-cover object-center filter brightness-[0.25] contrast-[1.1]"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1920&q=80';
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#101010]/95 via-[#101010]/75 to-[#101010]/40" />
+        </div>
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 flex flex-col lg:flex-row items-center gap-8">
+          {/* Left: Text Content */}
+          <div className="flex-1 text-center lg:text-left space-y-4">
+            <span className="badge-pill-orange text-xs">Reserve In Seconds</span>
+
+            <h2 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+              Your Next Journey Starts Here.
             </h2>
-            <div className="reviews-gold-underline" />
-            <p className="reviews-section-subtitle">
-              Real journeys, genuine experiences. Trusted by families, business executives, and groups across Bengaluru and PAN India.
+
+            <p className="text-sm sm:text-base text-gray-300 max-w-md leading-relaxed">
+              Book your next ride with Orange Cabs and experience transportation without compromise.
             </p>
 
-            {/* Google Rating Trust Pill */}
-            <div className="reviews-trust-badge">
-              <div className="trust-stars-row">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={16} className="trust-star-gold" fill="#F59E0B" />
-                ))}
-              </div>
-              <span className="trust-score-bold">{REVIEWS_STATS.averageRating} / 5.0</span>
-              <span className="trust-dot">•</span>
-              <span className="trust-source-text">Over {REVIEWS_STATS.totalReviews} Verified Journeys</span>
-            </div>
-          </div>
-
-          {/* Reviews Carousel (Shows exactly 3 reviews on desktop, auto-scrolling) */}
-          <div
-            className="reviews-carousel-wrapper"
-            onMouseEnter={() => setIsReviewPaused(true)}
-            onMouseLeave={() => setIsReviewPaused(false)}
-          >
-            {/* Left Navigation Arrow */}
-            <button
-              type="button"
-              onClick={handlePrevReview}
-              className="reviews-nav-arrow prev"
-              aria-label="Previous Review"
-              title="Previous Review"
-            >
-              <ChevronLeft size={24} strokeWidth={2.6} />
-            </button>
-
-            {/* Slider Viewport & Track */}
-            <div className="reviews-carousel-viewport">
-              <div
-                className="reviews-slider-track"
-                style={{
-                  transform: `translateX(-${reviewSlideIndex * (100 / visibleReviewsCount)}%)`,
-                }}
+            <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+              <button
+                onClick={() => openBookingModal()}
+                className="btn-primary text-xs sm:text-sm !py-2.5 !px-6 shadow-glow-red"
               >
-                {REVIEWS_DATA.map((review) => (
-                  <div key={review.id} className="review-slide-col">
-                    <div className="review-card-luxury">
-                      {/* Top Row: Stars + Verified Badge */}
-                      <div className="review-card-top">
-                        <div className="review-stars-group">
-                          {[...Array(review.rating)].map((_, i) => (
-                            <Star key={i} size={15} className="star-gold-fill" fill="#F59E0B" />
-                          ))}
-                        </div>
-                        <span className="review-trip-tag">
-                          <CheckCircle2 size={13} className="tag-check-icon" />
-                          <span>{review.tripType}</span>
-                        </span>
-                      </div>
+                <span>Book Your Ride</span>
+              </button>
 
-                      {/* Decorative Quote Icon */}
-                      <div className="review-quote-icon-wrap">
-                        <Quote size={26} className="review-quote-svg" />
-                      </div>
-
-                      {/* Review Text */}
-                      <p className="review-quote-text">"{review.text}"</p>
-
-                      {/* Author Info */}
-                      <div className="review-author-row">
-                        <div className="review-avatar-circle">
-                          <span>{review.initials}</span>
-                        </div>
-                        <div className="review-author-meta">
-                          <h4 className="review-author-name">{review.name}</h4>
-                          <span className="review-author-sub">
-                            {review.role} • {review.city}
-                          </span>
-                        </div>
-                        <span className="review-time-ago">{review.date}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <Link
+                to="/contact"
+                className="btn-outline-white text-xs sm:text-sm !py-2.5 !px-6"
+              >
+                <span>Contact Us</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
 
-            {/* Right Navigation Arrow */}
-            <button
-              type="button"
-              onClick={handleNextReview}
-              className="reviews-nav-arrow next"
-              aria-label="Next Review"
-              title="Next Review"
-            >
-              <ChevronRight size={24} strokeWidth={2.6} />
-            </button>
-
-            {/* Pagination Dots Row */}
-            <div className="reviews-dots-row">
-              {Array.from({ length: maxReviewIndex + 1 }).map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setReviewSlideIndex(idx)}
-                  className={`reviews-dot-pill ${reviewSlideIndex === idx ? 'active' : ''}`}
-                  aria-label={`Go to slide ${idx + 1}`}
-                />
-              ))}
-            </div>
+            <p className="text-xs text-gray-400 pt-1">
+              24/7 Telephone Hotline: <a href="tel:+919742588995" className="text-white font-semibold underline underline-offset-4">+91 97425 88995</a>
+            </p>
           </div>
 
-          {/* Bottom Trust Counter Strip */}
-          <div className="reviews-bottom-stats-card">
-            <div className="stats-col-item">
-              <span className="stats-number-gold">4.9 ★</span>
-              <span className="stats-label-dark">Average Traveler Rating</span>
-            </div>
-            <div className="stats-divider-vert" />
-            <div className="stats-col-item">
-              <span className="stats-number-gold">{REVIEWS_STATS.totalReviews}</span>
-              <span className="stats-label-dark">Completed Safe Trips</span>
-            </div>
-            <div className="stats-divider-vert" />
-            <div className="stats-col-item">
-              <span className="stats-number-gold">{REVIEWS_STATS.punctualityRate}</span>
-              <span className="stats-label-dark">Punctuality Commitment</span>
-            </div>
-            <div className="stats-divider-vert" />
-            <div className="stats-col-item">
-              <span className="stats-number-gold">24 / 7</span>
-              <span className="stats-label-dark">Dedicated Support</span>
-            </div>
+          {/* Right: Car Image */}
+          <div className="flex-shrink-0 hidden lg:block w-[300px]">
+            <img
+              src="/images/fleet/innova-hycross.jpg"
+              alt="Orange Cabs Premium Fleet"
+              className="w-full h-[200px] rounded-xl shadow-2xl border border-white/10 object-cover"
+            />
           </div>
         </div>
       </section>
 
-      {/* Quick Enquiry Modal for Instant WhatsApp Capture */}
-      <QuickEnquiryModal
-        isOpen={enquiryModal.isOpen}
-        onClose={() => setEnquiryModal({ isOpen: false, prefill: {} })}
-        prefill={enquiryModal.prefill}
-      />
     </div>
   );
 }

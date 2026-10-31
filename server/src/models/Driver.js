@@ -1,65 +1,31 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const driverSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Driver name is required'],
-      trim: true,
-    },
-    phoneNumber: {
-      type: String,
-      required: [true, 'Phone number is required'],
-      trim: true,
-    },
-    alternateNumber: {
-      type: String,
-      default: '',
-    },
-    licenceNumber: {
-      type: String,
-      required: [true, 'Licence number is required'],
-      trim: true,
-      uppercase: true,
-    },
-    licenceExpiryDate: {
-      type: Date,
-      required: [true, 'Licence expiry date is required'],
-    },
-    assignedVehicle: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Vehicle',
-      default: null,
-    },
-    assignedVehicleName: {
-      type: String,
-      default: '',
-    },
-    availabilityStatus: {
-      type: String,
-      enum: ['available', 'on_duty', 'off_duty', 'on_leave'],
-      default: 'available',
-    },
-    experienceYears: {
-      type: Number,
-      default: 5,
-    },
-    address: {
-      type: String,
-      default: '',
-    },
-    notes: {
-      type: String,
-      default: '',
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
+const driverSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  phone: { type: String, required: true, unique: true },
+  email: { type: String },
+  licenseNumber: { type: String, required: true },
+  avatar: { type: String, default: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80' },
+  experienceYears: { type: Number, default: 5 },
+  rating: { type: Number, default: 4.8 },
+  totalTrips: { type: Number, default: 0 },
+  earnings: { type: Number, default: 0 },
+  assignedVehicle: { type: mongoose.Schema.Types.ObjectId, ref: 'Vehicle' },
+  status: { 
+    type: String, 
+    enum: ['available', 'on_trip', 'off_duty', 'suspended'], 
+    default: 'available' 
   },
-  {
-    timestamps: true,
+  documents: {
+    licenseDoc: String,
+    aadhaarDoc: String,
+    policeVerification: Boolean
+  },
+  currentLocation: {
+    city: { type: String, default: 'Bangalore' },
+    lat: Number,
+    lng: Number
   }
-);
+}, { timestamps: true });
 
-module.exports = mongoose.model('Driver', driverSchema);
+export default mongoose.model('Driver', driverSchema);

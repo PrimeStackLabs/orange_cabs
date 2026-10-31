@@ -1,62 +1,28 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const vehicleSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'Vehicle name is required'],
-      trim: true,
-    },
-    category: {
-      type: String,
-      required: true,
-      enum: ['Toyota Innova Crysta', 'Sedan 4+1', 'Force Traveller', 'TT', 'Urbania', 'Other'],
-      default: 'Toyota Innova Crysta',
-    },
-    registrationNumber: {
-      type: String,
-      required: [true, 'Registration number is required'],
-      trim: true,
-      uppercase: true,
-    },
-    passengerCapacity: {
-      type: String,
-      default: '6+1 Seater',
-    },
-    hasAc: {
-      type: Boolean,
-      default: true,
-    },
-    description: {
-      type: String,
-      default: '',
-    },
-    image: {
-      type: String,
-      default: '/assets/images/card-innova.png',
-    },
-    availabilityStatus: {
-      type: String,
-      enum: ['available', 'on_trip', 'maintenance', 'inactive'],
-      default: 'available',
-    },
-    indicativePrice: {
-      type: String,
-      default: 'Indicative fare upon request',
-    },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    assignedDriver: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Driver',
-      default: null,
-    },
+const vehicleSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // e.g. "Toyota Innova Crysta ZX"
+  category: { 
+    type: String, 
+    required: true, 
+    trim: true
   },
-  {
-    timestamps: true,
-  }
-);
+  registrationNumber: { type: String, required: true, unique: true },
+  seatingCapacity: { type: Number, required: true },
+  luggageCapacity: { type: Number, default: 2 },
+  ac: { type: Boolean, default: true },
+  perKmRate: { type: Number, required: true },
+  baseFare: { type: Number, required: true },
+  features: [{ type: String }],
+  image: { type: String, required: true },
+  fuelType: { type: String, enum: ['Petrol', 'Diesel', 'CNG', 'Electric'], default: 'Diesel' },
+  modelYear: { type: Number, default: 2024 },
+  status: { 
+    type: String, 
+    enum: ['available', 'on_trip', 'maintenance', 'inactive'], 
+    default: 'available' 
+  },
+  order: { type: Number, default: 0 }
+}, { timestamps: true });
 
-module.exports = mongoose.model('Vehicle', vehicleSchema);
+export default mongoose.model('Vehicle', vehicleSchema);

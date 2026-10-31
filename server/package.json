@@ -1,24 +1,30 @@
 {
-  "name": "server",
+  "name": "orange-cab-server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Orange Cab API Server",
+  "main": "src/server.js",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "build": "npm install --prefix ../client && npm run build --prefix ../client",
-    "seed": "node -e \"require('dotenv').config(); require('./src/config/db')().then(() => require('./src/controllers/seedController').seedDatabase({}, { status: () => ({ json: (d) => { console.log(d.message); process.exit(0); } }) }));\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node src/seeds/seed.js",
+    "create-admin": "node src/scripts/createAdmin.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^18.0.8",
-    "express": "^5.3.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.11.2"
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.10.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
