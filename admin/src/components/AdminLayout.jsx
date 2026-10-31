@@ -25,6 +25,9 @@ export default function AdminLayout() {
   const { admin, logout, darkMode, toggleTheme, notifications } = useAdminAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const publicSiteUrl = import.meta.env.DEV
+    ? `${window.location.protocol}//${window.location.hostname}:5173`
+    : '/';
 
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -148,7 +151,7 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             {/* View Live Website Button */}
             <a
-              href="http://localhost:5173"
+              href={publicSiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl glass hover:border-orange/50 text-xs font-semibold text-gray-300 hover:text-white transition-all"

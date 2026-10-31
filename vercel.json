@@ -1,8 +1,17 @@
 {
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/dist",
+  "installCommand": "npm run install:apps",
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "deployment/vercel-output/client",
   "framework": "vite",
   "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin/index.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

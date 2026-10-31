@@ -18,11 +18,11 @@
 
 | Application | Production Domain | Local Development URL | Description |
 |---|---|---|---|
-| **Public Website** | `https://orangecab.in` | [http://localhost:5173](http://localhost:5173) | Customer booking portal, price calculator, tour packages, tracking |
-| **Admin Console** | `https://admin.orangecab.in` | [http://localhost:5174/login](http://localhost:5174/login) | Fleet management, bookings dispatch, analytics, CRM, CMS |
+| **Public Website** | `https://orangecabs.in` | [http://localhost:5173](http://localhost:5173) | Customer booking portal, price calculator, tour packages, tracking |
+| **Admin Console** | `https://orangecabs.in/admin/login` | [http://localhost:5174/login](http://localhost:5174/login) | Fleet management, bookings dispatch, analytics, CRM, CMS |
 | **Backend REST API** | `https://api.orangecab.in` | [http://localhost:5000/api](http://localhost:5000/api) | Express + Mongoose + Socket.io API |
 
-*Also supports fallback paths `http://localhost:5173/admin` and `http://localhost:5173/admin/login`, which redirect to the Admin Console. Both the public website and admin app must be running (`npm run dev`).*
+The public website and admin console share one production domain. In local development they remain separate Vite servers; opening `/admin` on the public server redirects to the admin dev server.
 
 ---
 
@@ -128,11 +128,29 @@ Output:
 - **Client (Public Web):** `http://localhost:5173`
 - **Admin Panel:** `http://localhost:5174/login`
 
+### Vercel: Public Website and Admin on One Domain
+
+Connect the repository to Vercel with the repository root (`.`) as the project root and attach `orangecabs.in`. The root `vercel.json` configures the app builds and output:
+
+- Install command: `npm run install:apps`
+- Build command: `npm run build:vercel`
+- Output directory: `deployment/vercel-output/client`
+
+The build produces the public app at the output root and copies the admin app into `deployment/vercel-output/client/admin`. The admin Vite base path is `/admin/`; Vercel routes `/admin` and `/admin/*` to that app before the public SPA fallback. Static files are served from the output when present, and both apps support direct route refresh. The dedicated output folder keeps local tracked `dist` directories untouched.
+
+Set this Vercel **Production** environment variable for both frontend builds:
+
+- `VITE_API_URL` — backend API base URL. The current documented backend is `https://api.orangecab.in/api`.
+
+The API remains on the existing backend host; this deployment does not move MongoDB or Express to Vercel. Configure backend-only variables on the backend host, never in the frontend: `MONGODB_URI`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `PORT`, `NODE_ENV`, `CLIENT_URL`, `ADMIN_URL`, `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`. `.env.example` files contain names and safe local defaults; do not commit real `.env` files.
+
+For a local production build, install app dependencies once with `npm run install:apps`, then run `npm run build:vercel`. The combined static output is `deployment/vercel-output/client`.
+
 ---
 
 ## ✨ Features Checklist
 
-### Public Website (`orangecab.in`)
+### Public Website (`orangecabs.in`)
 - [x] **Page-Load Preloader:** Animated cab moving across road with glowing logo reveal.
 - [x] **Hero Section:** Animated headline reveal, moving cab on road line, floating glass cards.
 - [x] **Booking Widget:** Tabs for *Outstation One-Way*, *Round Trip*, *Airport Transfer*, and *Local Rental* with live price calculator.
@@ -149,7 +167,7 @@ Output:
 - [x] **Customer Accounts:** Login, Register, OTP option, My Bookings history, trip cancellations, post-trip review rating, and printable PDF invoices.
 - [x] **Footer:** Real brand colors for socials (Facebook, Instagram gradient, X, YouTube, LinkedIn, WhatsApp, Telegram, Pinterest) and credit link to `bookmywebsite.in`.
 
-### Operations Admin Console (`admin.orangecab.in`)
+### Operations Admin Console (`orangecabs.in/admin`)
 - [x] **Dashboard:** KPI cards (Revenue, Bookings, Active Trips, Fleet counts), Recharts monthly revenue line chart, cab type distribution donut chart, recent reservations, and live audit feed.
 - [x] **Bookings Dispatcher:** Status transition workflow (`Pending` -> `Confirmed` -> `Assigned` -> `On Trip` -> `Completed` -> `Cancelled`), driver & vehicle assignment, CSV export, printable invoice.
 - [x] **Fleet & Vehicle Manager:** CRUD operations, per-km rates, fuel types, capacities, registration plates.

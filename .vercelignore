@@ -1,0 +1,10 @@
+**/.env
+**/.env.*
+**/node_modules/
+**/dist/
+deployment/vercel-output/
+server/
+archive/
+legacy/
+design/
+deployment/nginx.conf

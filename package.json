@@ -11,7 +11,11 @@
     "install:all": "npm install && cd server && npm install && cd ../client && npm install && cd ../admin && npm install",
     "seed": "cd server && npm run seed",
     "create-admin": "cd server && npm run create-admin",
-    "build": "cd client && npm run build && cd ../admin && npm run build"
+    "install:apps": "npm ci --prefix client && npm ci --prefix admin",
+    "build:client": "npm run build --prefix client",
+    "build:admin": "npm run build --prefix admin",
+    "build:vercel": "node deployment/build-vercel.mjs",
+    "build": "npm run build:vercel"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

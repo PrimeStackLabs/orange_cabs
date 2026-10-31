@@ -24,9 +24,9 @@ import TrackBookingPage from './pages/TrackBookingPage';
 function AdminPortalRedirect() {
   useEffect(() => {
     const hostname = window.location.hostname;
-    const adminUrl = hostname === 'localhost' || hostname === '127.0.0.1'
+    const adminUrl = import.meta.env.DEV
       ? `${window.location.protocol}//${hostname}:5174/login`
-      : 'https://admin.orangecabs.in/login';
+      : '/admin/login';
 
     window.location.replace(adminUrl);
   }, []);
