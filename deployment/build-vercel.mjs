@@ -7,16 +7,14 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 function runVite(appName, outputDirectory) {
   const appRoot = resolve(root, appName);
-  const viteCli = resolve(appRoot, 'node_modules/vite/bin/vite.js');
-  const result = spawnSync(process.execPath, [
-    viteCli,
-    'build',
-    '--outDir',
-    outputDirectory,
-    '--emptyOutDir'
-  ], {
+  const result = spawnSync('npm', ['run', 'build'], {
     cwd: appRoot,
     stdio: 'inherit',
+    env: {
+      ...process.env,
+      ORANGE_CABS_BUILD_OUT_DIR: outputDirectory
+    },
+    shell: process.platform === 'win32'
   });
 
   if (result.error) {

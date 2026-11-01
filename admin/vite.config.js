@@ -5,6 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/admin/' : '/',
   plugins: [react()],
+  build: {
+    outDir: process.env.ORANGE_CABS_BUILD_OUT_DIR || 'dist',
+    emptyOutDir: true
+  },
   server: {
     port: 5174,
     strictPort: true,
