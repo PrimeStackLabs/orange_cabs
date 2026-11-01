@@ -1,9 +1,13 @@
 {
-  "installCommand": "npm run install:apps",
+  "installCommand": "npm run install:vercel",
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "deployment/vercel-output/client",
   "framework": "vite",
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
     {
       "source": "/admin",
       "destination": "/admin/index.html"

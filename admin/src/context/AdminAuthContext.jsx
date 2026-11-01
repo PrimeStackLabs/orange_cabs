@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api, { API_ORIGIN } from '../services/api';
+import api, { SOCKET_URL } from '../services/api';
 import toast from 'react-hot-toast';
 import { io } from 'socket.io-client';
 
@@ -71,7 +71,9 @@ export const AdminAuthProvider = ({ children }) => {
 
   // Real-time socket for bookings notification
   useEffect(() => {
-    const socket = io(API_ORIGIN, {
+    if (!SOCKET_URL) return undefined;
+
+    const socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling']
     });
 

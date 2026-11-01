@@ -1,9 +1,10 @@
 import Admin from '../models/Admin.js';
 import ActivityLog from '../models/ActivityLog.js';
 import jwt from 'jsonwebtoken';
+import { getJwtSecret } from '../config/jwt.js';
 
 const generateAdminToken = (id) => {
-  return jwt.sign({ id, isAdmin: true }, process.env.JWT_SECRET || 'orangecab_super_secret_jwt_key_2026_luxury_rides', {
+  return jwt.sign({ id, isAdmin: true }, getJwtSecret(), {
     expiresIn: '7d'
   });
 };

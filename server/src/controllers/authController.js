@@ -1,8 +1,9 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import { getJwtSecret } from '../config/jwt.js';
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'orangecab_super_secret_jwt_key_2026_luxury_rides', {
+  return jwt.sign({ id }, getJwtSecret(), {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d'
   });
 };

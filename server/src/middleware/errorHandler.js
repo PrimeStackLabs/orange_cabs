@@ -1,8 +1,8 @@
 export const errorHandler = (err, req, res, next) => {
   console.error('[Error Caught]:', err.stack || err.message);
 
-  let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  let message = err.message || 'Internal Server Error';
+  let statusCode = err.statusCode || err.status || (res.statusCode === 200 ? 500 : res.statusCode);
+  let message = err.publicMessage || err.message || 'Internal Server Error';
 
   if (err.name === 'CastError') {
     statusCode = 400;
@@ -23,6 +23,6 @@ export const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack
+    stack: process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' ? null : err.stack
   });
 };

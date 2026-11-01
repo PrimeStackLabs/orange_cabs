@@ -1,14 +1,15 @@
 import axios from 'axios';
 
-const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+const API_BASE_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  : '/api';
 
 const api = axios.create({
-  baseURL: isLocalHost
-    ? 'http://localhost:5000/api'
-    : import.meta.env.VITE_API_URL || 'https://api.orangecab.in/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  withCredentials: true
 });
 
 // Interceptor to attach JWT token if present in localStorage
