@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL
-    || (import.meta.env.PROD ? 'https://api.orangecab.in/api' : 'http://localhost:5000/api'),
+  baseURL: isLocalHost
+    ? 'http://localhost:5000/api'
+    : import.meta.env.VITE_API_URL || 'https://api.orangecab.in/api',
   headers: {
     'Content-Type': 'application/json'
   }
