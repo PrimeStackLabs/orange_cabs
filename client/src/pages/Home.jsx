@@ -156,7 +156,9 @@ export default function Home() {
           setVehicleCategories(settingsResult.value.data.settings.vehicleCategories || []);
           setOutstationPricing(settingsResult.value.data.settings.outstationPricing || null);
         } else {
-          const error = settingsResult.status === 'rejected' ? settingsResult.reason : null;
+          const error = settingsResult.status === 'rejected'
+            ? settingsResult.reason
+            : new Error(settingsResult.value.data?.message || 'Settings API returned an unsuccessful response.');
           console.error('Failed to load vehicle category pricing:', error);
           toast.error('Vehicle pricing could not be loaded.');
         }
@@ -164,7 +166,9 @@ export default function Home() {
         if (servicesResult.status === 'fulfilled' && servicesResult.value.data.success) {
           setServices(servicesResult.value.data.services || []);
         } else {
-          const error = servicesResult.status === 'rejected' ? servicesResult.reason : null;
+          const error = servicesResult.status === 'rejected'
+            ? servicesResult.reason
+            : new Error(servicesResult.value.data?.message || 'Services API returned an unsuccessful response.');
           console.error('Failed to load public services:', error);
           toast.error('Services could not be loaded.');
         }

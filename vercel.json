@@ -1,24 +1,43 @@
 {
+  "version": 2,
   "installCommand": "npm run install:vercel",
   "buildCommand": "npm run build:vercel",
-  "outputDirectory": "deployment/vercel-output/client",
-  "framework": "vite",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "src": "api/index.js",
+      "use": "@vercel/node"
     },
     {
-      "source": "/admin",
-      "destination": "/admin/index.html"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "deployment/vercel-output/client"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/api/(.*)$",
+      "dest": "/api/index.js?__vercel_api_path=$1"
     },
     {
-      "source": "/admin/:path*",
-      "destination": "/admin/index.html"
+      "src": "^/api/?$",
+      "dest": "/api/index.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "^/admin/?$",
+      "dest": "/admin/index.html"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/admin/(.*)$",
+      "dest": "/admin/index.html"
+    },
+    {
+      "src": "^/(.*)$",
+      "dest": "/index.html"
     }
   ]
 }

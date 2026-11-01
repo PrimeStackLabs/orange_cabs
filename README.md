@@ -77,7 +77,7 @@ orange_cabs/
 │   └── package.json
 │
 ├── api/                        # Vercel serverless API entry point
-│   ├── [...path].js
+│   ├── index.js
 │   └── package.json
 ├── design/
 │   └── reference-assets/
@@ -133,13 +133,13 @@ Output:
 
 ### Vercel: Website, Admin, and API on One Domain
 
-Connect the repository to Vercel with the repository root (`.`) as the project root. The root `vercel.json` configures the app builds and output:
+Connect the repository to Vercel with the repository root (`.`) as the project root. The root `vercel.json` explicitly builds the API as a Node serverless function and the combined frontends as a static build:
 
 - Install command: `npm run install:vercel`
 - Build command: `npm run build:vercel`
-- Output directory: `deployment/vercel-output/client`
+- Static build output: `deployment/vercel-output/client`
 
-The build produces the public app at the output root and copies the admin app into `deployment/vercel-output/client/admin`. The admin Vite base path is `/admin/`. In `vercel.json`, the `/api/*` pass-through rewrite is listed first so API requests reach the `api/[...path].js` Vercel Function instead of the public SPA fallback; the function forwards them to the reusable Express app in `server/src/app.js`. Admin rewrites follow, and the public SPA fallback is last. Static files are served from the configured output, and both apps support direct route refresh. The dedicated output folder keeps local tracked `dist` directories untouched.
+The build produces the public app at the output root and copies the admin app into `deployment/vercel-output/client/admin`. The admin Vite base path is `/admin/`. The explicit Vercel `builds` entries use `@vercel/node` for `api/index.js` and `@vercel/static-build` for the frontend output. The ordered `routes` send `/api/*` to that function first; the function restores the original API path and forwards it to the reusable Express app in `server/src/app.js`. API paths therefore cannot fall through to the SPA. `/admin` maps to the admin entry, static files are checked next, `/admin/*` falls back to the admin app for client-side routes, and other paths fall back to the public app. The dedicated output folder keeps local tracked `dist` directories untouched.
 
 #### Required Vercel environment variables
 
@@ -156,7 +156,7 @@ Vercel provides `VERCEL_URL` and `VERCEL_PROJECT_PRODUCTION_URL` automatically a
 
 #### Deploy and verify
 
-1. In Vercel, import this repository and keep the **Root Directory** as `.`. Use the commands and output directory above (already defined in `vercel.json`).
+1. In Vercel, import this repository and keep the **Root Directory** as `.`. Use the commands above; the function/static builders and output directory are defined in `vercel.json`.
 2. Set `MONGODB_URI` and `JWT_SECRET` in **Project Settings → Environment Variables** for Production (and Preview/Development if those deployments need the API). Add any optional variables above, then redeploy.
 3. Check `https://orangecab.vercel.app/api/health` for a JSON response with `"status":"online"` and `"database":"connected"`.
 4. Check `https://orangecab.vercel.app/api/settings`, `https://orangecab.vercel.app/api/services`, and `https://orangecab.vercel.app/api/vehicles?status=available` for JSON responses. Empty service/vehicle arrays are valid when the database has no records.
