@@ -1,3 +1,16 @@
+const brandAccentScale = {
+  50: '#FFF9F2',
+  100: '#FFF3CC',
+  200: '#FFE7A3',
+  300: '#FFD36B',
+  400: '#FFB900',
+  500: '#F45B0B',
+  600: '#D94308',
+  700: '#D94308',
+  800: '#B93608',
+  900: '#8F2B08'
+};
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -9,84 +22,120 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#101010',
-          dark: '#080808',
-          light: '#1A1A1A'
+          DEFAULT: '#171717',
+          dark: '#101010',
+          light: '#262626'
         },
         brandRed: {
-          DEFAULT: '#D92332',
-          hover: '#C01A28',
-          light: '#FDECEE'
+          DEFAULT: '#F45B0B',
+          hover: '#D94308',
+          light: '#FFF3CC'
         },
         accentOrange: {
-          DEFAULT: '#FF6B35',
-          hover: '#E85822',
-          light: '#FFF0EA'
+          DEFAULT: '#F45B0B',
+          hover: '#D94308',
+          light: '#FFF3CC'
+        },
+        accentYellow: {
+          DEFAULT: '#FFB900',
+          dark: '#D94308',
+          light: '#FFF3CC'
         },
         luxury: {
-          black: '#101010',
-          dark: '#161616',
-          card: '#1E1E1E',
-          surface: '#1A1A1A',
-          border: '#2E2E2E',
-          gray: '#F7F7F7',
-          lightBorder: '#E5E7EB',
-          gold: '#D4AF37'
+          black: '#171717',
+          dark: '#171717',
+          card: '#262626',
+          surface: '#262626',
+          border: '#3A3028',
+          gray: '#FFF9F2',
+          lightBorder: '#F0E7DC',
+          gold: '#FFB900'
         },
-        charcoal: '#242424',
+        charcoal: '#171717',
         muted: '#777777',
         // Fallback backward-compatible aliases
         orange: {
-          DEFAULT: '#FF6B35',
-          50: '#FFF5F0',
-          100: '#FFE6DC',
-          200: '#FFCEB9',
-          300: '#FFAF8F',
-          400: '#FF8D65',
-          500: '#FF6B35',
-          600: '#E85822',
-          700: '#C74112',
-          800: '#A4320C',
-          900: '#842609',
-          glow: '#FFAF8F'
+          DEFAULT: '#F45B0B',
+          50: '#FFF9F2',
+          100: '#FFF3CC',
+          200: '#FFE7A3',
+          300: '#FFD36B',
+          400: '#FFB900',
+          500: '#F45B0B',
+          600: '#D94308',
+          700: '#D94308',
+          800: '#B93608',
+          900: '#8F2B08',
+          glow: '#FFB900'
         },
         red: {
-          DEFAULT: '#D92332',
-          50: '#FDECEE',
-          100: '#FBD4D8',
-          200: '#F8ADB4',
-          300: '#F37D89',
-          400: '#ED4E5F',
-          500: '#D92332',
-          600: '#C01A28',
-          700: '#9E121E',
-          800: '#7E111A',
-          900: '#5F0C13'
+          DEFAULT: '#D94308',
+          50: '#FFF9F2',
+          100: '#FFF3CC',
+          200: '#FFE7A3',
+          300: '#FFD36B',
+          400: '#FFB900',
+          500: '#F45B0B',
+          600: '#D94308',
+          700: '#D94308',
+          800: '#B93608',
+          900: '#8F2B08'
         },
+        amber: {
+          50: '#FFF9F2',
+          100: '#FFF3CC',
+          200: '#FFE7A3',
+          300: '#FFD36B',
+          400: '#FFB900',
+          500: '#FFB900',
+          600: '#D94308',
+          700: '#D94308',
+          800: '#B93608',
+          900: '#8F2B08'
+        },
+        green: brandAccentScale,
+        emerald: brandAccentScale,
+        teal: brandAccentScale,
+        cyan: brandAccentScale,
+        sky: brandAccentScale,
+        blue: brandAccentScale,
+        indigo: brandAccentScale,
+        violet: brandAccentScale,
+        purple: brandAccentScale,
+        pink: brandAccentScale,
+        rose: brandAccentScale,
+        yellow: brandAccentScale,
         navy: {
-          DEFAULT: '#101010',
-          surface: '#161616',
-          card: '#1E1E1E',
-          dark: '#0A0A0A',
-          light: '#242424',
-          border: '#2E2E2E'
+          DEFAULT: '#171717',
+          surface: '#171717',
+          card: '#262626',
+          dark: '#101010',
+          light: '#302820',
+          border: '#49392D'
         },
         surface: {
-          DEFAULT: '#101010',
-          card: '#181818',
-          light: '#222222',
-          dark: '#0A0A0A'
+          DEFAULT: '#171717',
+          card: '#262626',
+          light: '#302820',
+          dark: '#101010'
         },
         softWhite: '#FFFFFF'
+      },
+      maxWidth: {
+        '7xl': '82.5rem'
+      },
+      fontSize: {
+        xs: ['0.875rem', { lineHeight: '1.25rem' }],
+        sm: ['0.9375rem', { lineHeight: '1.5rem' }]
       },
       fontFamily: {
         heading: ['Poppins', 'sans-serif'],
         sans: ['Inter', 'sans-serif']
       },
       boxShadow: {
-        'glow-orange': '0 0 25px -4px rgba(255, 107, 53, 0.4)',
-        'glow-red': '0 0 25px -4px rgba(217, 35, 50, 0.4)',
-        'glow-orange-lg': '0 0 45px -4px rgba(255, 107, 53, 0.55)',
+        'glow-orange': '0 0 25px -4px rgba(244, 91, 11, 0.4)',
+        'glow-red': '0 0 25px -4px rgba(244, 91, 11, 0.4)',
+        'glow-orange-lg': '0 0 45px -4px rgba(244, 91, 11, 0.5)',
         'glass': '0 12px 35px 0 rgba(0, 0, 0, 0.4)',
         'card-soft': '0 8px 30px -4px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02)',
         'card-hover': '0 20px 40px -10px rgba(0, 0, 0, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.06)',

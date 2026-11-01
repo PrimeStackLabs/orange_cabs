@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Car } from 'lucide-react';
 
 const Preloader = () => {
   const [loading, setLoading] = useState(true);
@@ -31,17 +30,9 @@ const Preloader = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="mb-4"
+              className="mb-4 rounded-xl bg-white p-2"
             >
-              <img
-                src="/images/orange-cab-logo.png"
-                alt="Orange Cabs"
-                className="h-14 sm:h-16 w-auto object-contain"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = '/images/logo_2.png';
-                }}
-              />
+              <img src="/images/orange-cabs-premium-logo.png" alt="Orange Cars" className="h-auto max-h-20 w-64 max-w-[80vw] object-contain" />
             </motion.div>
 
             {/* Slogan */}

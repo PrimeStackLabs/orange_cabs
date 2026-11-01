@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   MapPin, 
   Calendar, 
@@ -13,6 +13,10 @@ import {
   Repeat
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
+import api from '../services/api';
+import toast from 'react-hot-toast';
+
+const DEFAULT_VEHICLE_CATEGORIES = ['Hatchback', 'Sedan', 'SUV', 'Luxury Cars', 'Tempo Traveller'];
 
 export default function BookingWidget({ className = '' }) {
   const { openBookingModal } = useBookingModal();
@@ -23,9 +27,23 @@ export default function BookingWidget({ className = '' }) {
     drop: 'Mysore',
     date: new Date().toISOString().split('T')[0],
     time: '09:00 AM',
-    cabType: 'Toyota Innova Crysta',
+    cabType: 'SUV',
     passengers: 2
   });
+  const [vehicleCategories, setVehicleCategories] = useState(DEFAULT_VEHICLE_CATEGORIES);
+
+  useEffect(() => {
+    api.get('/settings')
+      .then(({ data }) => {
+        if (data.success && data.settings.vehicleCategories?.length) {
+          setVehicleCategories(data.settings.vehicleCategories.map(({ name }) => name));
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to load booking vehicle categories:', error);
+        toast.error('Vehicle categories could not be loaded.');
+      });
+  }, []);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -70,7 +88,7 @@ export default function BookingWidget({ className = '' }) {
       time: formData.time,
       cabType: formData.cabType,
       passengers: Number(formData.passengers) || 1,
-      serviceType: activeTab === 'airport' ? 'Airport Transfer' : activeTab === 'local' ? 'Local City Rental' : activeTab === 'corporate' ? 'Corporate Travel' : 'Outstation Travel'
+      serviceType: activeTab === 'airport' ? 'Airport Pickup & Drop' : activeTab === 'local' ? 'Local Travel' : activeTab === 'corporate' ? 'Corporate Travel' : 'Outstation Travel'
     });
   };
 
@@ -84,7 +102,7 @@ export default function BookingWidget({ className = '' }) {
           onClick={() => handleTabChange('outstation')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
             activeTab === 'outstation'
-              ? 'bg-[#101010] text-white shadow-md'
+              ? 'bg-brandRed text-white shadow-md'
               : 'text-gray-600 hover:text-charcoal hover:bg-gray-100'
           }`}
         >
@@ -97,7 +115,7 @@ export default function BookingWidget({ className = '' }) {
           onClick={() => handleTabChange('airport')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
             activeTab === 'airport'
-              ? 'bg-[#101010] text-white shadow-md'
+              ? 'bg-brandRed text-white shadow-md'
               : 'text-gray-600 hover:text-charcoal hover:bg-gray-100'
           }`}
         >
@@ -110,7 +128,7 @@ export default function BookingWidget({ className = '' }) {
           onClick={() => handleTabChange('local')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
             activeTab === 'local'
-              ? 'bg-[#101010] text-white shadow-md'
+              ? 'bg-brandRed text-white shadow-md'
               : 'text-gray-600 hover:text-charcoal hover:bg-gray-100'
           }`}
         >
@@ -123,7 +141,7 @@ export default function BookingWidget({ className = '' }) {
           onClick={() => handleTabChange('corporate')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
             activeTab === 'corporate'
-              ? 'bg-[#101010] text-white shadow-md'
+              ? 'bg-brandRed text-white shadow-md'
               : 'text-gray-600 hover:text-charcoal hover:bg-gray-100'
           }`}
         >
@@ -219,15 +237,9 @@ export default function BookingWidget({ className = '' }) {
               onChange={handleChange}
               className="w-full px-3.5 py-3 rounded-2xl border border-gray-200 bg-gray-50/50 text-xs sm:text-sm text-charcoal font-medium focus:bg-white focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none transition-all"
             >
-              <option value="Premium Sedan">Premium Sedan (Dzire / Etios &bull; 4 Seats)</option>
-              <option value="Executive Sedan">Executive Sedan (Skoda / Camry &bull; 4 Seats)</option>
-              <option value="Toyota Innova Crysta">Toyota Innova Crysta ZX (7 Seats)</option>
-              <option value="Toyota Innova Hycross">Toyota Innova Hycross Hybrid (7 Seats)</option>
-              <option value="Toyota Fortuner">Toyota Fortuner 4x4 (7 Seats)</option>
-              <option value="Luxury SUV">Luxury SUV (BMW X5 / Audi Q7 &bull; 5 Seats)</option>
-              <option value="Mercedes-Benz">Mercedes-Benz E-Class VIP (4 Seats)</option>
-              <option value="Tempo Traveller">Tempo Traveller (Force Urbania &bull; 13 Seats)</option>
-              <option value="Luxury Mini Bus">Luxury Mini Bus (BharatBenz &bull; 26 Seats)</option>
+              {vehicleCategories.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
             </select>
           </div>
 

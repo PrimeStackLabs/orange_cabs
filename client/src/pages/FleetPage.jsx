@@ -5,63 +5,114 @@ import {
   Luggage, 
   Check, 
   ShieldCheck, 
-  Sparkles, 
   ArrowRight,
   X,
   Phone,
   CheckCircle2,
   Car,
+  CarFront,
+  Clock3,
   Wind,
   Fuel,
-  Info
+  Info,
+  PlayCircle,
+  Tag
 } from 'lucide-react';
 import api from '../services/api';
 import { useBookingModal } from '../context/BookingModalContext';
 import { VEHICLE_IMAGES, VEHICLE_IMAGE_FALLBACK } from '../constants/vehicleImages';
+import toast from 'react-hot-toast';
 
 const FILTER_TABS = [
-  'All Fleet',
+  'All Vehicles',
+  'Hatchbacks',
   'Sedans',
   'Toyota Innova',
   'SUVs',
-  'Luxury VIP',
   'Tempo & Coaches'
 ];
+
+const getFleetImage = (vehicle) => {
+  const model = `${vehicle.name || ''} ${vehicle.category || ''}`.toLowerCase();
+  if (model.includes('hycross')) return VEHICLE_IMAGES.hycross;
+  if (model.includes('crysta')) return VEHICLE_IMAGES.crysta;
+  if (model.includes('ertiga')) return VEHICLE_IMAGES.ertiga;
+  if (model.includes('mercedes')) return VEHICLE_IMAGES.mercedesEClass;
+  if (model.includes('dzire') || model.includes('sedan')) {
+    return VEHICLE_IMAGES.dzire;
+  }
+  if (model.includes('urbania')) return VEHICLE_IMAGES.urbania;
+  if (model.includes('bharatbenz') || model.includes('bus') || model.includes('coach')) return VEHICLE_IMAGES.bharatbenzCoach;
+  if (model.includes('wagonr') || model.includes('swift') || model.includes('hatchback')) return VEHICLE_IMAGES.dzire;
+  return '';
+};
+
+const resolveFleetImage = (vehicle) => {
+  const selectedPhoto = getFleetImage(vehicle);
+  const configuredImage = typeof vehicle.image === 'string' ? vehicle.image.trim() : '';
+  const isPreviousHatchbackPhoto = configuredImage.includes('/images/gallery_2.jpeg');
+
+  // Keep admin-uploaded images; replace generic seeded stock photos with model-specific fleet photography.
+  if (configuredImage && !configuredImage.includes('images.unsplash.com') && !isPreviousHatchbackPhoto) return configuredImage;
+  return selectedPhoto || configuredImage || VEHICLE_IMAGE_FALLBACK;
+};
 
 const DEFAULT_FLEET = [
   {
     id: 'f-1',
-    name: 'Maruti Dzire / Honda City',
-    category: 'Sedans',
-    model: 'Premium Sedan',
+    name: 'Maruti Suzuki WagonR',
+    category: 'Hatchbacks',
+    model: 'Hatchback',
     image: VEHICLE_IMAGES.dzire,
     seatingCapacity: 4,
     luggageCapacity: 2,
     fuelType: 'CNG / Petrol',
     ac: true,
-    perKmRate: 13,
-    baseFare: 800,
-    features: ['Plush Ergonomic Seats', 'Dual Airbags & ABS', 'Fast Mobile Charger', 'Pristine Sanitized Cabin'],
-    description: 'Perfect for swift intra-city corporate travel, daily commutes, and economical outstation trips.'
+    features: ['Air-conditioned cabin', 'Verified chauffeur', 'City-friendly comfort'],
+    description: 'A practical, comfortable choice for everyday city rides and quick airport transfers.'
   },
   {
     id: 'f-2',
-    name: 'Skoda Superb / Toyota Camry',
-    category: 'Sedans',
-    model: 'Executive Sedan',
-    image: VEHICLE_IMAGES.superb,
+    name: 'Maruti Suzuki Swift',
+    category: 'Hatchbacks',
+    model: 'Hatchback',
+    image: VEHICLE_IMAGES.dzire,
     seatingCapacity: 4,
-    luggageCapacity: 3,
-    fuelType: 'Petrol / Hybrid',
+    luggageCapacity: 2,
+    fuelType: 'Petrol',
     ac: true,
-    perKmRate: 18,
-    baseFare: 1500,
-    features: ['Rear Executive Armrest', 'Sun Blinds & Quiet Cabin', 'Bottled Spring Water', 'High Speed Wi-Fi'],
-    description: 'Designed for corporate CXOs and boardroom travelers who value hushed comfort and executive poise.'
+    features: ['Compact and comfortable', 'Air-conditioned cabin', 'Professional chauffeur'],
+    description: 'A nimble hatchback for comfortable city commutes and point-to-point travel.'
   },
   {
     id: 'f-3',
-    name: 'Toyota Innova Crysta ZX',
+    name: 'Maruti Suzuki Dzire',
+    category: 'Sedans',
+    model: 'Sedan',
+    image: VEHICLE_IMAGES.dzire,
+    seatingCapacity: 4,
+    luggageCapacity: 2,
+    fuelType: 'CNG / Petrol',
+    ac: true,
+    features: ['Comfortable seating', 'Air-conditioned cabin', 'Transparent fares'],
+    description: 'A dependable sedan for airport transfers, business travel, and outstation journeys.'
+  },
+  {
+    id: 'f-4',
+    name: 'Maruti Suzuki Ertiga',
+    category: 'SUVs',
+    model: 'MPV',
+    image: VEHICLE_IMAGES.ertiga,
+    seatingCapacity: 6,
+    luggageCapacity: 4,
+    fuelType: 'CNG / Petrol',
+    ac: true,
+    features: ['Flexible seating', 'Spacious luggage area', 'Rear AC vents'],
+    description: 'A versatile family MPV with space for passengers and luggage on longer journeys.'
+  },
+  {
+    id: 'f-5',
+    name: 'Toyota Innova Crysta',
     category: 'Toyota Innova',
     model: 'Toyota Innova Crysta',
     image: VEHICLE_IMAGES.crysta,
@@ -69,14 +120,12 @@ const DEFAULT_FLEET = [
     luggageCapacity: 4,
     fuelType: 'Diesel',
     ac: true,
-    perKmRate: 22,
-    baseFare: 1800,
-    features: ['Captain Comfort Seats', 'Independent Roof AC', 'Superior Highway Ride', 'Premium Sound'],
-    description: 'The indisputable king of Indian highways. Generous legroom, robust highway safety, and supreme comfort.'
+    features: ['Comfortable captain seats', 'Rear AC', 'Spacious luggage area'],
+    description: 'A spacious, well-appointed MPV for family outstation trips and executive travel.'
   },
   {
-    id: 'f-4',
-    name: 'Toyota Innova Hycross Hybrid',
+    id: 'f-6',
+    name: 'Toyota Innova Hycross',
     category: 'Toyota Innova',
     model: 'Toyota Innova Hycross',
     image: VEHICLE_IMAGES.hycross,
@@ -84,111 +133,215 @@ const DEFAULT_FLEET = [
     luggageCapacity: 4,
     fuelType: 'Petrol Hybrid',
     ac: true,
-    perKmRate: 24,
-    baseFare: 2000,
-    features: ['Ottoman Executive Lounge', 'Panoramic Glass Roof', 'Whisper Silent EV Drive', 'JBL Surround Sound'],
-    description: 'Ultra-modern monocoque architecture with ottoman recliner legrests and whisper-quiet hybrid cruising.'
-  },
-  {
-    id: 'f-5',
-    name: 'Toyota Fortuner 4x4 Luxury',
-    category: 'SUVs',
-    model: 'Toyota Fortuner',
-    image: VEHICLE_IMAGES.fortuner,
-    seatingCapacity: 7,
-    luggageCapacity: 4,
-    fuelType: 'Diesel',
-    ac: true,
-    perKmRate: 28,
-    baseFare: 2600,
-    features: ['Commanding High View', 'All-Terrain 4x4 Ride', 'Leather Upholstery', 'Dual Climate Zones'],
-    description: 'Imposing road presence and all-terrain prowess for hill stations, wildlife resorts, and delegation security convoys.'
-  },
-  {
-    id: 'f-6',
-    name: 'BMW X5 / Audi Q7 Chauffeur',
-    category: 'Luxury VIP',
-    model: 'Luxury SUV',
-    image: VEHICLE_IMAGES.bmwX5,
-    seatingCapacity: 5,
-    luggageCapacity: 4,
-    fuelType: 'Diesel',
-    ac: true,
-    perKmRate: 48,
-    baseFare: 4500,
-    features: ['Air Suspension Comfort', 'Panoramic Ambient Lighting', 'VIP Boardroom Standard', 'Trained Uniformed Chauffeur'],
-    description: 'Unrivaled luxury and German engineering prestige for celebrity visits, VIP summits, and high-profile milestones.'
+    features: ['Comfortable three-row seating', 'Air-conditioned cabin', 'Ample luggage space'],
+    description: 'A modern, roomy MPV suited to comfortable family, airport, and business journeys.'
   },
   {
     id: 'f-7',
-    name: 'Mercedes-Benz E-Class VIP',
-    category: 'Luxury VIP',
-    model: 'Mercedes-Benz',
+    name: 'Mercedes-Benz E-Class',
+    category: 'Sedans',
+    model: 'Executive Sedan',
     image: VEHICLE_IMAGES.mercedesEClass,
     seatingCapacity: 4,
     luggageCapacity: 3,
     fuelType: 'Diesel',
     ac: true,
-    perKmRate: 52,
-    baseFare: 5000,
-    features: ['Burmester Sound System', 'Chilled Refreshments', 'White-Glove Etiquette', 'Celebrity Protocol Service'],
-    description: 'The pinnacle of chauffeured luxury. Impeccable sound insulation, supple Nappa leather, and discreet service.'
+    features: ['Executive cabin', 'Automatic climate control', 'Chauffeur-driven comfort'],
+    description: 'A premium executive sedan for business travel and special occasions.'
   },
   {
     id: 'f-8',
-    name: 'Force Urbania Executive Cruiser',
+    name: 'Force Urbania',
     category: 'Tempo & Coaches',
-    model: 'Tempo Traveller',
+    model: 'Tempo & Coach',
     image: VEHICLE_IMAGES.urbania,
     seatingCapacity: 13,
     luggageCapacity: 12,
     fuelType: 'Diesel',
     ac: true,
-    perKmRate: 28,
-    baseFare: 3200,
-    features: ['Individual Air Vents', 'Individual Recliners', 'High Roof Walkthrough', 'Smart TV & PA System'],
-    description: 'European-standard group transport with individual reclining seats, panoramic windows, and generous boot space.'
+    features: ['Individual air vents', 'High-roof cabin', 'Group-friendly seating'],
+    description: 'Comfortable group transportation with generous headroom and space for luggage.'
   },
   {
     id: 'f-9',
     name: 'BharatBenz AC Tourist Coach',
     category: 'Tempo & Coaches',
-    model: 'Luxury Mini Bus',
+    model: 'Tempo & Coach',
     image: VEHICLE_IMAGES.bharatbenzCoach,
     seatingCapacity: 26,
     luggageCapacity: 25,
     fuelType: 'Diesel',
     ac: true,
-    perKmRate: 45,
-    baseFare: 5500,
-    features: ['Pneumatic Air Suspension', 'Wide Velvet Pushback Seats', 'Overhead Luggage Racks', 'First Aid & Speed Governor'],
-    description: 'Comfortable air-suspended coaches tailored for corporate offsites, wedding parties, and educational delegations.'
+    features: ['Air-conditioned cabin', 'Pushback passenger seats', 'Overhead luggage racks'],
+    description: 'A well-equipped coach for corporate outings, events, and larger group journeys.'
   }
 ];
 
 export default function FleetPage() {
   const { openBookingModal } = useBookingModal();
-  const [activeTab, setActiveTab] = useState('All Fleet');
+  const [activeTab, setActiveTab] = useState('All Vehicles');
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [fleet, setFleet] = useState(DEFAULT_FLEET);
+  const [categoryRates, setCategoryRates] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredFleet = activeTab === 'All Fleet'
-    ? DEFAULT_FLEET
-    : DEFAULT_FLEET.filter(v => v.category === activeTab);
+  useEffect(() => {
+    let active = true;
+
+    Promise.allSettled([api.get('/vehicles?status=available'), api.get('/settings')])
+      .then(([vehiclesResult, settingsResult]) => {
+        if (!active) return;
+
+        if (vehiclesResult.status === 'fulfilled' && vehiclesResult.value.data.success) {
+          setFleet((vehiclesResult.value.data.vehicles || []).map((vehicle) => {
+            const rawCategory = vehicle.category || '';
+            const normalizedCategory = rawCategory.toLowerCase();
+            const filterCategory = normalizedCategory.includes('hatch')
+              || normalizedCategory.includes('wagon')
+              || normalizedCategory.includes('swift')
+              ? 'Hatchbacks'
+              : normalizedCategory.includes('sedan')
+                ? 'Sedans'
+                : normalizedCategory.includes('innova')
+                  ? 'Toyota Innova'
+                  : normalizedCategory.includes('suv') || normalizedCategory.includes('ertiga') || normalizedCategory.includes('mpv')
+                    ? 'SUVs'
+                    : normalizedCategory.includes('luxury')
+                      ? 'Sedans'
+                      : normalizedCategory.includes('tempo') || normalizedCategory.includes('bus') || normalizedCategory.includes('coach') || normalizedCategory.includes('traveller')
+                        ? 'Tempo & Coaches'
+                        : rawCategory;
+
+            return {
+              id: vehicle._id,
+              name: vehicle.name,
+              category: filterCategory,
+              model: rawCategory,
+              image: resolveFleetImage(vehicle),
+              seatingCapacity: vehicle.seatingCapacity,
+              luggageCapacity: vehicle.luggageCapacity,
+              fuelType: vehicle.fuelType,
+              ac: vehicle.ac,
+              features: vehicle.features || [],
+              description: `${rawCategory} vehicle available for booking.`
+            };
+          }));
+        } else {
+          const error = vehiclesResult.status === 'rejected' ? vehiclesResult.reason : null;
+          console.error('Failed to load public fleet:', error);
+          toast.error('The fleet list could not be refreshed.');
+        }
+
+        if (settingsResult.status === 'fulfilled' && settingsResult.value.data.success) {
+          setCategoryRates(settingsResult.value.data.settings.vehicleCategories || []);
+        } else {
+          const error = settingsResult.status === 'rejected' ? settingsResult.reason : null;
+          console.error('Failed to load public vehicle rates:', error);
+          toast.error('Vehicle rates could not be loaded.');
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filteredFleet = activeTab === 'All Vehicles'
+    ? fleet
+    : fleet.filter((vehicle) => vehicle.category === activeTab);
+
+  const getCategoryRate = (vehicle) => {
+    const descriptor = `${vehicle.category} ${vehicle.model} ${vehicle.name}`.toLowerCase();
+    const categoryName = descriptor.includes('tempo') || descriptor.includes('coach') || descriptor.includes('bus')
+      ? 'Tempo Traveller'
+      : descriptor.includes('luxury') || descriptor.includes('mercedes') || descriptor.includes('bmw')
+        ? 'Luxury Cars'
+        : descriptor.includes('innova') || descriptor.includes('suv') || descriptor.includes('fortuner')
+          ? 'SUV'
+          : descriptor.includes('hatchback') || descriptor.includes('wagon') || descriptor.includes('swift')
+            ? 'Hatchback'
+            : 'Sedan';
+    return categoryRates.find(({ name }) => name.toLowerCase() === categoryName.toLowerCase());
+  };
+
+  const formatCategoryRate = (vehicle) => {
+    const rate = getCategoryRate(vehicle);
+    if (!rate) return 'Rate on request';
+    return `₹${rate.minRate}${rate.maxRate > rate.minRate ? `–₹${rate.maxRate}` : ''} / km`;
+  };
 
   return (
     <div className="pt-24 pb-20 bg-[#F7F7F7] text-charcoal">
       
       {/* Page Header */}
-      <section className="page-hero-surface relative py-20 sm:py-24 text-white overflow-hidden text-center">
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <span className="badge-pill-orange">Automotive Excellence</span>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight">
-            Our Luxury Fleet
-          </h1>
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Every vehicle in our roster is maintained to the highest safety and sanitation standards, driven exclusively by verified professional chauffeurs.
-          </p>
-        </div>
+      <section className="fleet-page-hero relative overflow-hidden">
+        <motion.div
+          className="relative z-10 mx-auto grid min-h-[460px] max-w-[1580px] grid-cols-1 items-center gap-8 px-5 py-10 sm:px-8 lg:min-h-[570px] lg:grid-cols-[0.94fr_1.06fr] lg:gap-10 lg:px-12"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <div className="relative z-10 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#FFE0A6] bg-[#FFF3D6] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-[#D94308] sm:text-xs">
+              <CarFront className="h-4 w-4" />
+              Automotive Excellence
+            </span>
+            <h1 className="mt-5 max-w-[720px] font-heading text-4xl font-black leading-[1.02] tracking-tight text-[#171717] sm:text-5xl lg:text-[60px]">
+              Our Luxury <span className="fleet-page-hero__highlight">Fleet</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-sm leading-6 text-[#4c5b73] sm:text-base sm:leading-7">
+              Find a vehicle that fits your journey, from comfortable city sedans to spacious group travel.
+            </p>
+            <div className="fleet-page-hero__trust mt-6 grid max-w-xl grid-cols-2 sm:grid-cols-4">
+              {[
+                { label: <>Safe &amp;<br />Reliable</>, Icon: ShieldCheck },
+                { label: <>Spacious &amp;<br />Comfortable</>, Icon: Users },
+                { label: <>On-Time<br />Service</>, Icon: Clock3 },
+                { label: <>Transparent<br />Pricing</>, Icon: Tag },
+              ].map(({ label, Icon }, index) => (
+                <div key={index} className="flex flex-col items-center gap-1.5 px-1 py-2 text-center sm:border-l sm:border-gray-300 sm:first:border-0 sm:px-2">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF0DD] text-[#F45B0B] sm:h-12 sm:w-12">
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </span>
+                  <span className="text-[10px] font-bold leading-tight text-[#171717] sm:text-xs">{label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={openBookingModal}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-900/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+              >
+                <CarFront className="h-5 w-5" />
+                Book Your Ride <ArrowRight className="h-4 w-4" />
+              </button>
+              <a
+                href="#fleet-vehicles"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#F45B0B] px-6 py-3 text-sm font-semibold text-[#171717] transition duration-200 hover:bg-orange-50 hover:text-[#D94308]"
+              >
+                <PlayCircle className="h-5 w-5 text-[#F45B0B]" /> Explore Our Fleet
+              </a>
+            </div>
+          </div>
+          <div className="fleet-page-hero__visual relative mx-auto h-[260px] w-full max-w-[820px] sm:h-[360px] lg:h-[460px]">
+            <div className="fleet-page-hero__accent" />
+            <div className="fleet-page-hero__photo-frame">
+              <img
+                src="/images/fleet/innova-crysta-zx.webp"
+                alt="Toyota Innova Crysta from the Orange Cars fleet"
+                className="fleet-page-hero__image"
+              />
+            </div>
+            <div className="fleet-page-hero__caption">
+              <Users className="h-4 w-4 shrink-0 text-[#F45B0B]" />
+              <span>Comfort for every passenger</span>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Filter Tabs */}
@@ -202,7 +355,7 @@ export default function FleetPage() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                   activeTab === tab
-                    ? 'bg-[#101010] text-white shadow-md'
+                    ? 'bg-brandRed text-white shadow-md'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -214,7 +367,7 @@ export default function FleetPage() {
       </section>
 
       {/* Fleet Cards Grid */}
-      <section className="py-16">
+      <section id="fleet-vehicles" className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -224,61 +377,59 @@ export default function FleetPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: idx * 0.05 }}
-                className="luxury-card overflow-hidden flex flex-col group"
+                className="fleet-vehicle-card group"
               >
                 {/* Vehicle Image */}
-                <div className="relative h-64 overflow-hidden bg-gray-100">
+                <div className="fleet-vehicle-card__media">
                   <img
                     src={vehicle.image}
                     alt={vehicle.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    className="fleet-vehicle-card__image"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = VEHICLE_IMAGE_FALLBACK;
                     }}
                   />
-                  <div className="absolute top-4 left-4">
-                    <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#101010]/90 text-white backdrop-blur-md">
-                      {vehicle.model}
-                    </span>
-                  </div>
-
-                  <div className="absolute bottom-3 right-4 px-3 py-1 rounded-xl bg-white/95 text-charcoal font-bold text-xs shadow-sm">
-                    ₹{vehicle.perKmRate} / km
-                  </div>
+                  <span className="fleet-vehicle-card__category">
+                    {vehicle.category}
+                  </span>
+                  <span className="fleet-vehicle-card__rate">
+                    {formatCategoryRate(vehicle)}
+                  </span>
                 </div>
 
                 {/* Card Details */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                <div className="fleet-vehicle-card__body">
                   <div>
-                    <h3 className="font-heading font-bold text-xl text-charcoal group-hover:text-brandRed transition-colors">
+                    <h3 className="fleet-vehicle-card__title">
                       {vehicle.name}
                     </h3>
                     
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                    <p className="fleet-vehicle-card__description">
                       {vehicle.description}
                     </p>
 
                     {/* Quick Specs */}
-                    <div className="grid grid-cols-3 gap-2 py-3 mt-3 border-y border-gray-100 text-xs text-gray-600 font-medium">
-                      <div className="flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-accentOrange" />
+                    <div className="fleet-vehicle-card__specs">
+                      <div className="fleet-vehicle-card__spec">
+                        <Users aria-hidden="true" />
                         <span>{vehicle.seatingCapacity} Seats</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <Luggage className="w-3.5 h-3.5 text-brandRed" />
+                      <div className="fleet-vehicle-card__spec">
+                        <Luggage aria-hidden="true" />
                         <span>{vehicle.luggageCapacity} Bags</span>
                       </div>
-                      <div className="flex items-center gap-1.5">
-                        <Wind className="w-3.5 h-3.5 text-sky-500" />
-                        <span>Climate AC</span>
+                      <div className="fleet-vehicle-card__spec">
+                        <Wind aria-hidden="true" />
+                        <span>{vehicle.ac ? 'AC' : 'Non-AC'}</span>
                       </div>
                     </div>
 
                     {/* Features preview */}
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {vehicle.features.map((feat, fidx) => (
-                        <span key={fidx} className="text-[11px] px-2.5 py-1 rounded-md bg-gray-50 border border-gray-100 text-gray-600">
+                    <div className="fleet-vehicle-card__features">
+                      {vehicle.features.slice(0, 2).map((feat, fidx) => (
+                        <span key={fidx} className="fleet-vehicle-card__feature">
+                          <Check aria-hidden="true" />
                           {feat}
                         </span>
                       ))}
@@ -286,27 +437,33 @@ export default function FleetPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
-                    <div>
-                      <span className="text-[10px] uppercase tracking-wider text-gray-400 block">Base Rate</span>
-                      <strong className="text-sm font-bold text-charcoal">₹{vehicle.baseFare}</strong>
+                  <div className="fleet-vehicle-card__actions">
+                    <div className="fleet-vehicle-card__starting-price">
+                      <span>Per-kilometre rate</span>
+                      <strong>{formatCategoryRate(vehicle)}</strong>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="fleet-vehicle-card__buttons">
                       <button
+                        type="button"
                         onClick={() => setSelectedVehicle(vehicle)}
-                        className="p-2.5 rounded-xl border border-gray-200 text-gray-600 hover:text-charcoal hover:border-gray-300 transition-colors"
+                        className="fleet-vehicle-card__info"
                         title="View Full Specifications"
+                        aria-label={`View full specifications for ${vehicle.name}`}
                       >
                         <Info className="w-4 h-4" />
                       </button>
 
                       <button
-                        onClick={() => openBookingModal({ cabType: vehicle.name, category: vehicle.model })}
-                        className="btn-primary text-xs font-bold !py-2.5 !px-5"
+                        type="button"
+                        onClick={() => openBookingModal({
+                          cabType: getCategoryRate(vehicle)?.name || vehicle.model,
+                          category: getCategoryRate(vehicle)?.name || vehicle.model
+                        })}
+                        className="fleet-vehicle-card__book"
                       >
-                        <span>Book Ride</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <span>Book This Ride</span>
+                        <ArrowRight className="fleet-vehicle-card__arrow" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
@@ -368,7 +525,7 @@ export default function FleetPage() {
                   </div>
                   <div>
                     <span className="text-gray-400 block">Per Km Rate</span>
-                    <strong className="text-brandRed font-semibold">₹{selectedVehicle.perKmRate} / km</strong>
+                    <strong className="text-brandRed font-semibold">{formatCategoryRate(selectedVehicle)}</strong>
                   </div>
                 </div>
 
@@ -386,15 +543,16 @@ export default function FleetPage() {
 
                 <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-gray-400 block">Estimated Tariff</span>
-                    <strong className="text-base font-bold text-charcoal">₹{selectedVehicle.baseFare} base</strong>
+                    <span className="text-[10px] uppercase tracking-wider text-gray-400 block">Per-kilometre rate</span>
+                    <strong className="text-base font-bold text-charcoal">{formatCategoryRate(selectedVehicle)}</strong>
                   </div>
 
                   <button
                     onClick={() => {
                       const veh = selectedVehicle;
                       setSelectedVehicle(null);
-                      openBookingModal({ cabType: veh.name, category: veh.model });
+                      const category = getCategoryRate(veh)?.name || veh.model;
+                      openBookingModal({ cabType: category, category });
                     }}
                     className="btn-primary text-xs sm:text-sm !py-2.5 !px-6"
                   >

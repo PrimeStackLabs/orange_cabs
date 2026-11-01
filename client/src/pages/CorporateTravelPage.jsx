@@ -97,7 +97,7 @@ export default function CorporateTravelPage() {
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="badge-pill-red mb-3">Institutional Capability</span>
             <h2 className="font-heading font-black text-3xl sm:text-4xl text-[#101010] tracking-tight">
-              Why 100+ Corporates Partner With Orange Cabs
+              Why 100+ Corporates Partner With Orange Cars
             </h2>
             <p className="mt-3 text-sm text-gray-600">
               We engineer enterprise mobility with zero tolerance for delays, transparent compliance, and executive hospitality.

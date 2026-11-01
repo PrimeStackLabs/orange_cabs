@@ -1,9 +1,10 @@
 /**
- * Centralized Vehicle Image Mapping for Orange Cab Fleet
+ * Centralized vehicle image mapping for the Orange Cars fleet
  * High-resolution, real automotive photography (16:9 aspect ratio)
  */
 export const VEHICLE_IMAGES = {
   dzire: '/images/fleet/maruti-dzire.webp',
+  ertiga: '/images/fleet/innova-crysta-zx.webp',
   superb: '/images/fleet/skoda-superb.webp',
   crysta: '/images/fleet/innova-crysta-zx.webp',
   hycross: '/images/fleet/innova-hycross.webp',
@@ -15,6 +16,6 @@ export const VEHICLE_IMAGES = {
 };
 
 // Fallbacks for any image loading failures
-export const VEHICLE_IMAGE_FALLBACK = '/images/fleet/skoda-superb.webp';
+export const VEHICLE_IMAGE_FALLBACK = '/images/fleet/innova-crysta-zx.webp';
 
 export default VEHICLE_IMAGES;

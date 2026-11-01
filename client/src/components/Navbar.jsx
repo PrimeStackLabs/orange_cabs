@@ -10,7 +10,7 @@ import {
   Sparkles,
   ChevronRight,
   Shield,
-  Clock
+  Clock,
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
 
@@ -57,11 +57,11 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           
           {/* Left: Brand Identity & Logo */}
-          <Link to="/" aria-label="Orange Cabs home" className="group flex items-center transition-transform duration-200 hover:scale-[1.01]">
+          <Link to="/" aria-label="Orange Cars home" className="group flex items-center gap-2.5 transition-transform duration-200 hover:scale-[1.01]">
             <img
               src="/images/orange-cabs-premium-logo.png"
-              alt="Orange Cabs — Premium Chauffeur & Mobility"
-              className="h-12 w-36 object-contain sm:h-14 sm:w-44"
+              alt="Orange Cars"
+              className="h-auto max-h-11 w-36 object-contain sm:w-44"
             />
           </Link>
 
@@ -93,7 +93,7 @@ export default function Navbar() {
           </nav>
 
           {/* Right Action: Book Your Ride CTA */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3">
             <button
               onClick={() => openBookingModal()}
               className="btn-primary text-xs sm:text-sm font-semibold !py-2.5 !px-6 shadow-glow-red"

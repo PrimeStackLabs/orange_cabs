@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('oc_token', data.token);
         setToken(data.token);
         setUser(data.user);
-        toast.success(`Account created! Welcome to Orange Cabs.`);
+        toast.success(`Account created! Welcome to Orange Cars.`);
         setIsAuthOpen(false);
         return true;
       }

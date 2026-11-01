@@ -51,7 +51,7 @@ const LegalPage = () => {
             <>
               <h2 className="font-heading font-bold text-xl text-white">1. Service Booking Terms</h2>
               <p>
-                Orange Cabs provides on-demand intercity, airport transfer, and local chauffeur cab services across Karnataka and neighboring southern states. By creating a booking, you agree to comply with safe passenger guidelines and adhere to scheduled pickup times.
+                Orange Cars provides on-demand intercity, airport transfer, and local chauffeur cab services across Karnataka and neighboring southern states. By creating a booking, you agree to comply with safe passenger guidelines and adhere to scheduled pickup times.
               </p>
               <h2 className="font-heading font-bold text-xl text-white">2. Transparent Fare Guarantee</h2>
               <p>
@@ -59,7 +59,7 @@ const LegalPage = () => {
               </p>
               <h2 className="font-heading font-bold text-xl text-white">3. Zero Hidden Charges</h2>
               <p>
-                Our billing includes state GST and standard driver day allowances. No roadside negotiation or sudden surcharge is permitted by Orange Cabs partners.
+                Our billing includes state GST and standard driver day allowances. No roadside negotiation or sudden surcharge is permitted by Orange Cars partners.
               </p>
             </>
           )}

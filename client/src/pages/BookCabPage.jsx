@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useSearchParams, useLocation, Link } from 'react-router-dom';
 import { 
   Car, 
   MapPin, 
@@ -7,7 +7,6 @@ import {
   Clock, 
   Users, 
   CheckCircle2, 
-  CreditCard, 
   ArrowRight, 
   ArrowLeft,
   ShieldCheck, 
@@ -17,52 +16,94 @@ import {
   Sparkles,
   Copy,
   MessageCircle,
-  FileText
+  Plane,
+  BriefcaseBusiness,
+  CarFront,
+  CalendarDays,
+  Clock3,
+  Route,
+  Layers3,
+  Check
 } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
+import { VEHICLE_IMAGE_FALLBACK, VEHICLE_IMAGES } from '../constants/vehicleImages';
 
 const SERVICE_OPTIONS = [
-  { id: 'Outstation Travel', label: 'Outstation Intercity', desc: 'Doorstep pickup to other cities' },
-  { id: 'Airport Transfer', label: 'Airport Transfer', desc: 'Guaranteed BLR terminal curbside' },
-  { id: 'Local City Rental', label: 'Local City Rental', desc: 'Hourly car with dedicated driver' },
-  { id: 'Corporate Travel', label: 'Corporate Mobility', desc: 'Enterprise executive transit' },
-  { id: 'One-Way Drop', label: 'One-Way Drop', desc: 'Pay only for single direction distance' },
-  { id: 'VIP Chauffeur', label: 'VIP Chauffeur', desc: 'Luxury Mercedes / BMW chauffeur' }
+  { id: 'Airport Pickup & Drop', label: 'Airport Pickup & Drop', desc: 'Airport pickup or drop-off', icon: Plane },
+  { id: 'Local Travel', label: 'Local Travel', desc: 'Transportation within your city', icon: MapPin },
+  { id: 'Outstation Travel', label: 'Outstation Travel', desc: 'Travel between cities', icon: Route },
+  { id: 'Corporate Travel', label: 'Corporate Travel', desc: 'Business and team transportation', icon: BriefcaseBusiness },
+  { id: 'One-Way Transportation', label: 'One-Way Transportation', desc: 'Direct pickup and drop-off', icon: CarFront },
+  { id: 'Wedding & Event Transportation', label: 'Wedding & Event Transportation', desc: 'Transportation for occasions', icon: CalendarDays },
+  { id: 'One-Day Packages', label: 'One-Day Packages', desc: 'Vehicle booking for a day itinerary', icon: Layers3 },
+  { id: 'Hourly Packages', label: 'Hourly Packages', desc: 'Vehicle booking for an hourly itinerary', icon: Clock3 }
 ];
 
-const VEHICLE_OPTIONS = [
-  { id: 'Premium Sedan', name: 'Maruti Dzire / Honda City', seats: 4, bags: 2, rate: '₹13/km', base: '₹800' },
-  { id: 'Executive Sedan', name: 'Skoda Superb / Camry', seats: 4, bags: 3, rate: '₹18/km', base: '₹1,500' },
-  { id: 'Toyota Innova Crysta', name: 'Toyota Innova Crysta ZX', seats: 7, bags: 4, rate: '₹22/km', base: '₹1,800' },
-  { id: 'Toyota Innova Hycross', name: 'Toyota Innova Hycross Hybrid', seats: 7, bags: 4, rate: '₹24/km', base: '₹2,000' },
-  { id: 'Toyota Fortuner', name: 'Toyota Fortuner 4x4 Luxury', seats: 7, bags: 4, rate: '₹28/km', base: '₹2,600' },
-  { id: 'Luxury SUV', name: 'BMW X5 / Audi Q7 Chauffeur', seats: 5, bags: 4, rate: '₹48/km', base: '₹4,500' },
-  { id: 'Mercedes-Benz', name: 'Mercedes-Benz E-Class VIP', seats: 4, bags: 3, rate: '₹52/km', base: '₹5,000' },
-  { id: 'Tempo Traveller', name: 'Force Urbania Cruiser', seats: 13, bags: 12, rate: '₹28/km', base: '₹3,200' },
-  { id: 'Luxury Mini Bus', name: 'BharatBenz Luxury Coach', seats: 26, bags: 25, rate: '₹45/km', base: '₹5,500' }
+const DEFAULT_VEHICLE_CATEGORIES = [
+  { name: 'Hatchback', passengers: 4 },
+  { name: 'Sedan', passengers: 4 },
+  { name: 'SUV', passengers: 7 },
+  { name: 'Luxury Cars', passengers: 4 },
+  { name: 'Tempo Traveller', passengers: 13 }
 ];
+
+const normalizeVehicleCategory = (category = '') => {
+  const normalized = category.toLowerCase();
+  if (normalized.includes('hatch') || normalized.includes('wagon') || normalized.includes('swift')) return 'Hatchback';
+  if (normalized.includes('sedan')) return 'Sedan';
+  if (normalized.includes('innova') || normalized.includes('ertiga') || normalized.includes('suv') || normalized.includes('mpv')) return 'SUV';
+  if (normalized.includes('tempo') || normalized.includes('bus') || normalized.includes('coach') || normalized.includes('traveller')) return 'Tempo Traveller';
+  if (normalized.includes('luxury') || normalized.includes('mercedes')) return 'Luxury Cars';
+  return category;
+};
+
+const normalizeTimeInput = (time) => {
+  const value = String(time || '').trim();
+  const twelveHourTime = value.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (twelveHourTime) {
+    let hours = Number(twelveHourTime[1]) % 12;
+    if (twelveHourTime[3].toUpperCase() === 'PM') hours += 12;
+    return `${String(hours).padStart(2, '0')}:${twelveHourTime[2]}`;
+  }
+  return /^\d{2}:\d{2}$/.test(value) ? value : '09:00';
+};
+
+const getVehicleImage = (vehicle) => {
+  const name = `${vehicle.name || ''} ${vehicle.category || ''}`.toLowerCase();
+  if (name.includes('ertiga')) return VEHICLE_IMAGES.ertiga;
+  if (name.includes('crysta')) return VEHICLE_IMAGES.crysta;
+  if (name.includes('hycross')) return VEHICLE_IMAGES.hycross;
+  if (name.includes('urbania')) return VEHICLE_IMAGES.urbania;
+  if (name.includes('bharatbenz') || name.includes('bus') || name.includes('coach')) return VEHICLE_IMAGES.bharatbenzCoach;
+  if (name.includes('wagonr') || name.includes('swift') || name.includes('hatchback')) return '/images/gallery_2.jpeg';
+  if (name.includes('dzire') || name.includes('sedan')) return VEHICLE_IMAGES.dzire;
+  return vehicle.image || VEHICLE_IMAGE_FALLBACK;
+};
 
 export default function BookCabPage() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const initialData = location.state || {};
 
   const requestedService = searchParams.get('service') || initialData.serviceType || '';
   const normalizedService = requestedService.toLowerCase();
   const serviceType = normalizedService.includes('airport')
-    ? 'Airport Transfer'
+    ? 'Airport Pickup & Drop'
     : normalizedService.includes('one-way') || normalizedService.includes('one way')
-      ? 'One-Way Drop'
-      : normalizedService.includes('local') || normalizedService.includes('hourly')
-        ? 'Local City Rental'
+      ? 'One-Way Transportation'
+      : normalizedService.includes('wedding') || normalizedService.includes('event')
+        ? 'Wedding & Event Transportation'
+        : normalizedService.includes('one-day') || normalizedService.includes('oneday')
+          ? 'One-Day Packages'
+          : normalizedService.includes('hourly')
+            ? 'Hourly Packages'
+            : normalizedService.includes('local')
+              ? 'Local Travel'
         : normalizedService.includes('corporate') || normalizedService.includes('employee')
           ? 'Corporate Travel'
-          : normalizedService.includes('vip') || normalizedService.includes('chauffeur')
-            ? 'VIP Chauffeur'
-            : 'Outstation Travel';
+          : 'Outstation Travel';
 
   // Multi-step: 1 = Service & Route, 2 = Date & Vehicle, 3 = Passenger & Review, 4 = Confirmation
   const [step, setStep] = useState(1);
@@ -72,8 +113,8 @@ export default function BookCabPage() {
     pickup: searchParams.get('pickup') || initialData.pickup || 'Bangalore City',
     drop: searchParams.get('drop') || initialData.drop || 'Mysore',
     date: searchParams.get('date') || initialData.date || new Date().toISOString().split('T')[0],
-    time: searchParams.get('time') || initialData.time || '09:00 AM',
-    cabType: searchParams.get('vehicle') || initialData.cabType || initialData.category || 'Toyota Innova Crysta',
+    time: normalizeTimeInput(searchParams.get('time') || initialData.time || '09:00'),
+    cabType: normalizeVehicleCategory(searchParams.get('vehicle') || initialData.cabType || initialData.category || 'SUV'),
     passengers: Number(searchParams.get('passengers') || initialData.passengers) || 2,
     name: '',
     phone: '',
@@ -84,6 +125,79 @@ export default function BookCabPage() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [vehicleCategories, setVehicleCategories] = useState(DEFAULT_VEHICLE_CATEGORIES);
+  const [outstationPricing, setOutstationPricing] = useState(null);
+  const [availableVehicles, setAvailableVehicles] = useState([]);
+  const [vehiclesLoading, setVehiclesLoading] = useState(true);
+  const [selectedVehicleId, setSelectedVehicleId] = useState('');
+  const bookingVehicles = availableVehicles.filter((vehicle) => (
+    normalizeVehicleCategory(vehicle.category || vehicle.name) !== 'Luxury Cars'
+  ));
+  const selectedVehicle = bookingVehicles.find((vehicle) => vehicle._id === selectedVehicleId);
+  const selectedVehicleCapacity = Number(
+    selectedVehicle?.seatingCapacity || selectedVehicle?.passengers || 4
+  );
+  const pricingCategory = vehicleCategories.find((category) => (
+    normalizeVehicleCategory(category.name) === normalizeVehicleCategory(selectedVehicle?.category || formData.cabType)
+  ));
+  const selectedVehicleRate = Number(selectedVehicle?.perKmRate ?? pricingCategory?.minRate);
+
+  useEffect(() => {
+    let active = true;
+
+    Promise.allSettled([api.get('/settings'), api.get('/vehicles?status=available')])
+      .then(([settingsResult, vehiclesResult]) => {
+        if (!active) return;
+
+        if (settingsResult.status === 'fulfilled' && settingsResult.value.data.success) {
+          const settings = settingsResult.value.data.settings;
+          const categories = settings.vehicleCategories || [];
+          if (categories.length) {
+            setVehicleCategories(categories);
+            setFormData((current) => ({
+              ...current,
+              cabType: categories.some(({ name }) => name === current.cabType)
+                ? current.cabType
+                : normalizeVehicleCategory(categories[0].name)
+            }));
+          }
+          setOutstationPricing(settings.outstationPricing || null);
+        } else {
+          const error = settingsResult.status === 'rejected' ? settingsResult.reason : null;
+          console.error('Failed to load booking categories and outstation terms:', error);
+          toast.error('Current vehicle categories and pricing terms could not be loaded.');
+        }
+
+        if (vehiclesResult.status === 'fulfilled' && vehiclesResult.value.data.success) {
+          const vehicles = vehiclesResult.value.data.vehicles || [];
+          const bookableVehicles = vehicles.filter((vehicle) => (
+            normalizeVehicleCategory(vehicle.category || vehicle.name) !== 'Luxury Cars'
+          ));
+          setAvailableVehicles(bookableVehicles);
+          const initialVehicle = bookableVehicles.find((vehicle) => (
+            normalizeVehicleCategory(vehicle.category) === normalizeVehicleCategory(formData.cabType)
+          )) || bookableVehicles[0];
+          if (initialVehicle) {
+            setSelectedVehicleId(initialVehicle._id);
+            setFormData((current) => ({
+              ...current,
+              cabType: normalizeVehicleCategory(initialVehicle.category)
+            }));
+          }
+        } else {
+          const error = vehiclesResult.status === 'rejected' ? vehiclesResult.reason : null;
+          console.error('Failed to load available booking vehicles:', error);
+          toast.error('Available vehicles could not be loaded.');
+        }
+      })
+      .finally(() => {
+        if (active) setVehiclesLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const triggerCelebration = () => {
     try {
@@ -91,7 +205,7 @@ export default function BookCabPage() {
         particleCount: 100,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#D92332', '#FF6B35', '#101010', '#FFFFFF']
+        colors: ['#F45B0B', '#FFB900', '#171717', '#FFFFFF']
       });
     } catch (e) {}
   };
@@ -110,6 +224,14 @@ export default function BookCabPage() {
     e.preventDefault();
     if (!formData.date) {
       toast.error('Please select travel date');
+      return;
+    }
+    if (!selectedVehicleId || !selectedVehicle) {
+      toast.error('Please select an available vehicle');
+      return;
+    }
+    if (Number(formData.passengers) > selectedVehicleCapacity) {
+      toast.error(`This vehicle accommodates up to ${selectedVehicleCapacity} passengers`);
       return;
     }
     setStep(3);
@@ -139,8 +261,9 @@ export default function BookCabPage() {
         date: formData.date,
         time: formData.time,
         cabType: formData.cabType,
+        vehicle: selectedVehicleId,
         passengers: Number(formData.passengers) || 1,
-        message: `[${formData.serviceType}] ${formData.message || ''}`,
+        message: `[${formData.serviceType}] ${selectedVehicle?.name || formData.cabType}${formData.message ? ` - ${formData.message}` : ''}`,
         source: 'Dedicated Booking Page'
       };
 
@@ -171,139 +294,177 @@ export default function BookCabPage() {
     }
   };
 
+  const steps = [
+    { number: 1, title: 'Service & Route' },
+    { number: 2, title: 'Date & Vehicle' },
+    { number: 3, title: 'Passenger & Confirm' }
+  ];
+
   return (
-    <div className="pt-24 pb-20 bg-[#F7F7F7] text-charcoal">
-      
-      {/* Header */}
-      <section className="page-hero-surface relative py-16 sm:py-20 text-white overflow-hidden text-center">
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-3">
-          <span className="badge-pill-orange">Centralized Online Dispatch</span>
-          <h1 className="font-heading font-black text-3xl sm:text-5xl text-white tracking-tight">
-            Reserve Your Journey
-          </h1>
-          <p className="text-sm sm:text-base text-gray-300 max-w-xl mx-auto">
-            Book certified chauffeurs, fixed tariffs, and pristine luxury vehicles with instant database confirmation.
-          </p>
-        </div>
-      </section>
-
-      {/* Main Stepper Container */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Step Progress Bar */}
-          {step < 4 && (
-            <div className="mb-10 bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between text-xs font-bold">
-                
-                <div className={`flex items-center gap-2 ${step >= 1 ? 'text-brandRed' : 'text-gray-400'}`}>
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-brandRed text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}>
-                    1
-                  </span>
-                  <span className="hidden sm:inline">Service &amp; Route</span>
-                </div>
-
-                <div className={`h-0.5 flex-1 mx-3 ${step >= 2 ? 'bg-brandRed' : 'bg-gray-200'}`} />
-
-                <div className={`flex items-center gap-2 ${step >= 2 ? 'text-brandRed' : 'text-gray-400'}`}>
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-brandRed text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}>
-                    2
-                  </span>
-                  <span className="hidden sm:inline">Date &amp; Vehicle</span>
-                </div>
-
-                <div className={`h-0.5 flex-1 mx-3 ${step >= 3 ? 'bg-brandRed' : 'bg-gray-200'}`} />
-
-                <div className={`flex items-center gap-2 ${step >= 3 ? 'text-brandRed' : 'text-gray-400'}`}>
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-brandRed text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}>
-                    3
-                  </span>
-                  <span className="hidden sm:inline">Passenger &amp; Confirm</span>
-                </div>
-
+    <div className="booking-page min-h-screen bg-[#FFF9F2] pt-20 text-[#171717]">
+      {step < 4 && (
+        <section className="relative overflow-hidden bg-white">
+          <div className="absolute -right-20 top-0 h-80 w-80 rounded-full bg-[#FFF3D6] blur-2xl" />
+          <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-[#F45B0B]/5 blur-2xl" />
+          <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:py-16">
+            <div className="relative z-10 max-w-xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#F45B0B]/15 bg-[#FFF3D6] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#D94308]">
+                <span className="h-2 w-2 rounded-full bg-[#F45B0B]" />
+                Centralized Online Dispatch
+              </span>
+              <h1 className="mt-5 font-heading text-4xl font-extrabold leading-[1.08] tracking-tight text-[#171717] sm:text-5xl lg:text-[56px]">
+                Reserve Your <span className="text-[#F45B0B]">Journey</span>
+              </h1>
+              <p className="mt-5 max-w-lg text-base leading-7 text-gray-600 sm:text-lg">
+                Book certified chauffeurs, clear tariffs, and pristine vehicles with instant database confirmation.
+              </p>
+              <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold text-gray-700">
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-[#F45B0B]" /> Certified chauffeurs</span>
+                <span className="inline-flex items-center gap-2"><Phone className="h-5 w-5 text-[#F45B0B]" /> 24/7 booking support</span>
               </div>
             </div>
-          )}
+            <div className="relative mx-auto w-full max-w-2xl lg:pl-5">
+              <div className="absolute inset-x-7 bottom-2 top-7 rounded-[2rem] bg-gradient-to-br from-[#FFB900] to-[#F45B0B] sm:inset-x-10 sm:top-10" />
+              <div className="relative overflow-hidden rounded-[1.6rem] border border-white/80 bg-[#FFF3D6] p-3 shadow-[0_24px_70px_rgba(115,63,20,0.18)] sm:rounded-[2rem] sm:p-5">
+                <img
+                  src={VEHICLE_IMAGES.crysta}
+                  alt="White Toyota Innova Crysta ready for your journey"
+                  className="h-56 w-full rounded-[1.2rem] object-cover sm:h-72 lg:h-[350px]"
+                />
+                <div className="absolute bottom-6 left-6 flex items-center gap-3 rounded-2xl border border-white/80 bg-white/95 px-4 py-3 shadow-lg sm:bottom-9 sm:left-9">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF3D6] text-[#F45B0B]"><Car className="h-6 w-6" /></span>
+                  <span><strong className="block text-sm font-bold text-[#171717]">Comfort, at every turn</strong><small className="text-xs text-gray-500">A vehicle for your kind of journey</small></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
-          {/* Form Card */}
-          <div className="luxury-card p-6 sm:p-10 border border-gray-200">
+      <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6 sm:pb-20 lg:px-8">
+        <div className="pointer-events-none absolute -left-20 top-56 h-60 w-60 rounded-full bg-[#FFB900]/10 blur-3xl" />
+
+        {step < 4 && (
+          <div className="relative z-10 mb-7 rounded-2xl border border-orange-100 bg-white px-4 py-5 shadow-[0_12px_36px_rgba(71,45,24,0.08)] sm:px-8">
+            <div className="flex items-center justify-between">
+              {steps.map((item, index) => {
+                const isComplete = step > item.number;
+                const isActive = step === item.number;
+                return (
+                  <React.Fragment key={item.number}>
+                    <div className={`flex min-w-0 items-center gap-2.5 ${isActive || isComplete ? 'text-[#D94308]' : 'text-gray-400'}`}>
+                      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-all duration-300 ${
+                        isActive ? 'bg-[#F45B0B] text-white shadow-md shadow-orange-200' : isComplete ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-500'
+                      }`}>
+                        {isComplete ? <Check className="h-4 w-4" /> : item.number}
+                      </span>
+                      <span className="hidden text-sm font-semibold sm:inline">{item.title}</span>
+                      <span className="text-xs font-semibold sm:hidden">{item.number}/3</span>
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`mx-2 h-0.5 min-w-5 flex-1 rounded-full transition-colors duration-300 sm:mx-5 ${step > item.number ? 'bg-emerald-400' : 'bg-gray-200'}`} />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <section className="relative z-10 overflow-hidden rounded-[1.75rem] border border-orange-100 bg-white p-5 shadow-[0_18px_60px_rgba(71,45,24,0.09)] sm:p-8 lg:p-10">
             
             {/* STEP 1: SERVICE & ROUTE */}
             {step === 1 && (
-              <form onSubmit={handleNextStep1} className="space-y-6">
+              <form onSubmit={handleNextStep1} className="animate-fade-in space-y-7">
                 <div>
-                  <h3 className="font-heading font-black text-xl text-charcoal mb-1">
+                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#F45B0B]">Plan your ride</span>
+                  <h3 className="mt-1 font-heading text-2xl font-bold text-[#171717] sm:text-3xl">
                     Step 1: Select Service &amp; Route
                   </h3>
-                  <p className="text-xs text-gray-500">Choose your transportation category and enter pickup/drop points.</p>
+                  <p className="mt-2 text-sm leading-6 text-gray-500 sm:text-base">Choose your transportation category and enter pickup and drop points.</p>
                 </div>
 
-                {/* Service Options */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {SERVICE_OPTIONS.map(svc => {
                     const isSelected = formData.serviceType === svc.id;
+                    const ServiceIcon = svc.icon;
                     return (
-                      <div
+                      <button
                         key={svc.id}
-                        onClick={() => setFormData({ ...formData, serviceType: svc.id })}
-                        className={`p-4 rounded-2xl border cursor-pointer transition-all ${
+                        type="button"
+                        onClick={() => setFormData((current) => ({ ...current, serviceType: svc.id }))}
+                        aria-pressed={isSelected}
+                        className={`group min-h-32 rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[#F45B0B]/50 hover:shadow-md ${
                           isSelected
-                            ? 'border-brandRed bg-brandRed/5 ring-1 ring-brandRed shadow-sm'
-                            : 'border-gray-200 bg-white hover:border-gray-300'
+                            ? 'border-[#F45B0B] bg-[#FFF3D6] ring-1 ring-[#F45B0B]/20 shadow-sm'
+                            : 'border-gray-200 bg-white'
                         }`}
                       >
-                        <h4 className="font-heading font-bold text-sm text-charcoal">{svc.label}</h4>
-                        <p className="text-[11px] text-gray-500 mt-1">{svc.desc}</p>
-                      </div>
+                        <span className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl transition-colors ${isSelected ? 'bg-[#F45B0B] text-white' : 'bg-[#FFF3D6] text-[#F45B0B] group-hover:bg-[#F45B0B] group-hover:text-white'}`}>
+                          <ServiceIcon className="h-5 w-5" />
+                        </span>
+                        <h4 className="font-heading text-sm font-bold text-[#171717] sm:text-base">{svc.label}</h4>
+                        <p className="mt-1.5 text-sm leading-5 text-gray-500">{svc.desc}</p>
+                      </button>
                     );
                   })}
                 </div>
 
-                {/* Locations */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-accentOrange" />
-                      Pickup Location <span className="text-brandRed">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.pickup}
-                      onChange={(e) => setFormData({ ...formData, pickup: e.target.value })}
-                      placeholder="e.g. Bangalore Airport, Indiranagar, Electronic City"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-brandRed" />
-                      Drop Location <span className="text-brandRed">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.drop}
-                      onChange={(e) => setFormData({ ...formData, drop: e.target.value })}
-                      placeholder="e.g. Mysore, Coorg, Ooty, Whitefield"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none"
-                    />
+                <div className="rounded-2xl border border-[#FFB900]/50 bg-[#FFF8E7] p-5 sm:p-6">
+                  <div className="flex items-start gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#D94308] shadow-sm"><ShieldCheck className="h-5 w-5" /></span>
+                    <div className="min-w-0">
+                      <h4 className="font-heading text-base font-bold text-[#171717] sm:text-lg">Transparent pricing, no surprises</h4>
+                      {outstationPricing ? (
+                        <div className="mt-3 grid gap-x-6 gap-y-2 text-sm leading-6 text-gray-700 sm:grid-cols-2">
+                          {['Outstation Travel', 'One-Way Transportation'].includes(formData.serviceType) && outstationPricing.minimumBillingDistance && (
+                            <p><strong>Minimum billing distance:</strong> {outstationPricing.minimumBillingDistance} km, where applicable.</p>
+                          )}
+                          {outstationPricing.tollParkingInfo && <p>{outstationPricing.tollParkingInfo}</p>}
+                          {outstationPricing.driverAllowanceInfo && <p>{outstationPricing.driverAllowanceInfo}</p>}
+                          {outstationPricing.otherChargesInfo && <p>{outstationPricing.otherChargesInfo}</p>}
+                          {outstationPricing.paymentDueInfo && <p>{outstationPricing.paymentDueInfo}</p>}
+                        </div>
+                      ) : (
+                        <p className="mt-2 text-sm leading-6 text-gray-600">
+                          Pricing terms are currently unavailable. Please contact dispatch to confirm applicable charges before booking.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    <span>Fixed Tariff &bull; Zero Surge</span>
+                <div className="grid gap-4 pt-1 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <MapPin className="h-4 w-4 text-[#F45B0B]" />
+                      Pickup Location <span className="text-[#F45B0B]">*</span>
+                    </label>
+                    <div className="relative">
+                      <MapPin className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <input type="text" required value={formData.pickup} onChange={(e) => setFormData({ ...formData, pickup: e.target.value })} placeholder="Enter pickup city" className="w-full rounded-xl border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
+                    </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    className="btn-primary text-sm !py-3 !px-7 shadow-glow-red"
-                  >
-                    <span>Proceed to Vehicle Selection</span>
-                    <ArrowRight className="w-4 h-4" />
+                  <div>
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <MapPin className="h-4 w-4 text-[#F45B0B]" />
+                      Drop Location <span className="text-[#F45B0B]">*</span>
+                    </label>
+                    <div className="relative">
+                      <MapPin className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+                      <input type="text" required value={formData.drop} onChange={(e) => setFormData({ ...formData, drop: e.target.value })} placeholder="Enter drop city" className="w-full rounded-xl border border-gray-200 bg-white py-3.5 pl-12 pr-4 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-600" />
+                    <span>Secure booking · Clear quote before travel</span>
+                  </div>
+                  <button type="submit" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:shadow-xl">
+                    Proceed to Vehicle Selection <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               </form>
@@ -311,112 +472,113 @@ export default function BookCabPage() {
 
             {/* STEP 2: DATE, TIME & VEHICLE SELECTION */}
             {step === 2 && (
-              <form onSubmit={handleNextStep2} className="space-y-6">
+              <form onSubmit={handleNextStep2} className="animate-fade-in space-y-7">
                 <div>
-                  <h3 className="font-heading font-black text-xl text-charcoal mb-1">
-                    Step 2: Choose Schedule &amp; Vehicle
+                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#F45B0B]">Make it yours</span>
+                  <h3 className="mt-1 font-heading text-2xl font-bold text-[#171717] sm:text-3xl">
+                    Step 2: Date &amp; Vehicle
                   </h3>
-                  <p className="text-xs text-gray-500">Select when you wish to travel and choose from our premium fleet.</p>
+                  <p className="mt-2 text-sm leading-6 text-gray-500 sm:text-base">Choose your pickup schedule and the right vehicle for your trip.</p>
                 </div>
 
-                {/* Date & Time */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid gap-4 sm:grid-cols-3">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                      Travel Date <span className="text-brandRed">*</span>
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <Calendar className="h-4 w-4 text-[#F45B0B]" /> Journey Date <span className="text-[#F45B0B]">*</span>
                     </label>
-                    <input
-                      type="date"
-                      required
-                      value={formData.date}
-                      min={new Date().toISOString().split('T')[0]}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed outline-none"
-                    />
+                    <input type="date" required value={formData.date} min={new Date().toISOString().split('T')[0]} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
                   </div>
-
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-gray-400" />
-                      Pickup Time
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <Clock className="h-4 w-4 text-[#F45B0B]" /> Pickup Time <span className="text-[#F45B0B]">*</span>
                     </label>
-                    <input
-                      type="text"
-                      value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      placeholder="e.g. 09:30 AM"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed outline-none"
-                    />
+                    <input type="time" required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
                   </div>
-
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-gray-400" />
-                      Passengers
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <Users className="h-4 w-4 text-[#F45B0B]" /> Passengers
                     </label>
-                    <select
-                      value={formData.passengers}
-                      onChange={(e) => setFormData({ ...formData, passengers: Number(e.target.value) })}
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed outline-none bg-white"
-                    >
-                      {[1, 2, 3, 4, 5, 6, 7, 10, 13, 16, 26].map(n => (
-                        <option key={n} value={n}>{n} {n === 1 ? 'Passenger' : 'Passengers'}</option>
+                    <select value={formData.passengers} onChange={(e) => setFormData({ ...formData, passengers: Number(e.target.value) })} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10">
+                      {Array.from({ length: Math.min(26, selectedVehicleCapacity) }, (_, index) => index + 1).map((count) => (
+                        <option key={count} value={count}>{count} {count === 1 ? 'Passenger' : 'Passengers'}</option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                {/* Vehicle Selection Grid */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-2">
-                    Select Vehicle Class <span className="text-brandRed">*</span>
-                  </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {VEHICLE_OPTIONS.map(veh => {
-                      const isSelected = formData.cabType === veh.id || formData.cabType === veh.name;
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-end justify-between gap-2">
+                    <div>
+                      <h4 className="font-heading text-lg font-bold text-[#171717]">Choose your vehicle</h4>
+                      <p className="mt-1 text-sm text-gray-500">Rates are loaded from current fleet and admin pricing settings.</p>
+                    </div>
+                    {selectedVehicle && <span className="text-sm font-semibold text-[#D94308]">{selectedVehicle.name} selected</span>}
+                  </div>
+
+                  {vehiclesLoading ? (
+                    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-500">Loading available vehicles…</div>
+                  ) : bookingVehicles.length === 0 ? (
+                    <div className="rounded-2xl border border-orange-200 bg-orange-50 p-6 text-center text-sm text-gray-700">
+                      No vehicles are currently available to book. Please contact dispatch for assistance.
+                    </div>
+                  ) : (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {bookingVehicles.map((vehicle) => {
+                      const isSelected = vehicle._id === selectedVehicleId;
+                      const vehicleCategory = vehicleCategories.find((category) => (
+                        normalizeVehicleCategory(category.name) === normalizeVehicleCategory(vehicle.category || vehicle.name)
+                      ));
+                      const hasVehicleRate = vehicle.perKmRate !== null && vehicle.perKmRate !== undefined && vehicle.perKmRate !== '';
+                      const rate = Number(hasVehicleRate ? vehicle.perKmRate : vehicleCategory?.minRate);
+                      const maxRate = hasVehicleRate ? Number.NaN : Number(vehicleCategory?.maxRate);
+                      const capacity = Number(vehicle.seatingCapacity || vehicle.passengers || vehicleCategory?.passengers);
+                      const hasAc = vehicle.acAvailable === true || vehicle.features?.some((feature) => /\bac\b|a\/c|air.?conditioning/i.test(feature)) || /ac/i.test(vehicle.name);
                       return (
-                        <div
-                          key={veh.id}
-                          onClick={() => setFormData({ ...formData, cabType: veh.id })}
-                          className={`p-4 rounded-2xl border cursor-pointer transition-all ${
-                            isSelected
-                              ? 'border-brandRed bg-brandRed/5 ring-1 ring-brandRed shadow-sm'
-                              : 'border-gray-200 bg-white hover:border-gray-300'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-heading font-bold text-sm text-charcoal">{veh.id}</span>
-                            <span className="text-xs font-bold text-brandRed">{veh.rate}</span>
+                        <article key={vehicle._id} className={`overflow-hidden rounded-2xl border bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${isSelected ? 'border-[#F45B0B] ring-2 ring-[#F45B0B]/20 shadow-md' : 'border-gray-200 hover:border-orange-200'}`}>
+                          <div className="relative h-40 overflow-hidden bg-[#FFF3D6]">
+                            <img src={getVehicleImage(vehicle)} alt={vehicle.name} className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = VEHICLE_IMAGE_FALLBACK; }} />
+                            <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-[#D94308] shadow-sm">{normalizeVehicleCategory(vehicle.category || vehicle.name)}</span>
                           </div>
-                          <p className="text-[11px] text-gray-500 mt-0.5">{veh.name}</p>
-                          <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-400">
-                            <span>{veh.seats} Seats</span>
-                            <span>&bull;</span>
-                            <span>{veh.bags} Bags</span>
+                          <div className="p-4">
+                            <div className="flex items-start justify-between gap-2">
+                              <h5 className="font-heading text-base font-bold leading-5 text-[#171717]">{vehicle.name}</h5>
+                              <span className="shrink-0 text-right text-sm font-extrabold text-[#D94308]">
+                                {Number.isFinite(rate) ? <>₹{rate}{Number.isFinite(maxRate) && maxRate > rate ? `–₹${maxRate}` : ''}<small className="block text-xs font-medium text-gray-500">per km</small></> : <small className="font-semibold text-gray-500">Quote on request</small>}
+                              </span>
+                            </div>
+                            <div className="mt-3 flex flex-wrap gap-2 text-xs font-medium text-gray-600">
+                              <span className="rounded-lg bg-gray-50 px-2.5 py-1.5">{capacity || '—'} seats</span>
+                              <span className="rounded-lg bg-gray-50 px-2.5 py-1.5">{vehicle.luggageCapacity || '—'} bags</span>
+                              <span className="rounded-lg bg-gray-50 px-2.5 py-1.5">{hasAc ? 'AC available' : 'AC on request'}</span>
+                            </div>
+                            <button type="button" onClick={() => {
+                              setSelectedVehicleId(vehicle._id);
+                              setFormData((current) => ({
+                                ...current,
+                                cabType: normalizeVehicleCategory(vehicle.category || vehicle.name),
+                                passengers: Math.min(Number(current.passengers) || 1, capacity || Number(current.passengers) || 1)
+                              }));
+                            }} aria-pressed={isSelected} className={`mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition ${isSelected ? 'bg-[#FFF3D6] text-[#D94308]' : 'bg-[#F45B0B] text-white hover:bg-[#D94308]'}`}>
+                              {isSelected ? <><Check className="h-4 w-4" /> Selected</> : 'Select Vehicle'}
+                            </button>
                           </div>
-                        </div>
+                        </article>
                       );
                     })}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-charcoal"
+                    className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 px-5 text-sm font-semibold text-gray-600 transition hover:border-[#F45B0B] hover:text-[#D94308] sm:justify-start"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Back to Route</span>
+                    <ArrowLeft className="h-4 w-4" /> Back to Route
                   </button>
-
-                  <button
-                    type="submit"
-                    className="btn-primary text-sm !py-3 !px-7 shadow-glow-red"
-                  >
-                    <span>Proceed to Passenger Details</span>
-                    <ArrowRight className="w-4 h-4" />
+                  <button type="submit" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:shadow-xl">
+                    Proceed to Passenger Details <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               </form>
@@ -424,132 +586,92 @@ export default function BookCabPage() {
 
             {/* STEP 3: PASSENGER DETAILS & SUMMARY REVIEW */}
             {step === 3 && (
-              <form onSubmit={handleSubmitBooking} className="space-y-6">
+              <form onSubmit={handleSubmitBooking} className="animate-fade-in space-y-7">
                 <div>
-                  <h3 className="font-heading font-black text-xl text-charcoal mb-1">
-                    Step 3: Passenger Details &amp; Booking Summary
+                  <span className="text-xs font-bold uppercase tracking-[0.16em] text-[#F45B0B]">Almost there</span>
+                  <h3 className="mt-1 font-heading text-2xl font-bold text-[#171717] sm:text-3xl">
+                    Step 3: Passenger &amp; Confirm
                   </h3>
-                  <p className="text-xs text-gray-500">Confirm your details and receive your unique dispatch reference ID.</p>
+                  <p className="mt-2 text-sm leading-6 text-gray-500 sm:text-base">Review your trip and share passenger details to request the booking.</p>
                 </div>
 
-                {/* Summary Card */}
-                <div className="p-5 rounded-2xl bg-gray-50 border border-gray-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Itinerary Overview</span>
-                    <button
-                      type="button"
-                      onClick={() => setStep(1)}
-                      className="text-xs font-semibold text-brandRed hover:underline"
-                    >
-                      Modify Route
-                    </button>
+                <div className="rounded-2xl border border-orange-100 bg-[#FFF9F2] p-5 sm:p-6">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <span className="text-sm font-bold uppercase tracking-wider text-gray-500">Booking summary</span>
+                    <button type="button" onClick={() => setStep(1)} className="text-sm font-semibold text-[#D94308] hover:underline">Edit trip</button>
                   </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-                    <div>
-                      <span className="text-gray-400 block font-medium">Service:</span>
-                      <strong className="text-charcoal font-bold">{formData.serviceType}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-400 block font-medium">Pickup &rarr; Drop:</span>
-                      <strong className="text-charcoal font-bold">{formData.pickup} &rarr; {formData.drop}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-400 block font-medium">Vehicle Class:</span>
-                      <strong className="text-charcoal font-bold">{formData.cabType}</strong>
-                    </div>
-                    <div>
-                      <span className="text-gray-400 block font-medium">Date &amp; Time:</span>
-                      <strong className="text-charcoal font-bold">{formData.date} &bull; {formData.time}</strong>
-                    </div>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {[
+                      ['Service', formData.serviceType],
+                      ['Pickup', formData.pickup],
+                      ['Drop', formData.drop],
+                      ['Travel date', formData.date],
+                      ['Pickup time', formData.time],
+                      ['Vehicle', selectedVehicle?.name || formData.cabType],
+                      ['Passengers', String(formData.passengers)],
+                      ['Per-kilometre rate', Number.isFinite(selectedVehicleRate) ? `₹${selectedVehicleRate}/km` : 'To be confirmed by dispatch']
+                    ].map(([label, value]) => (
+                      <div key={label} className="min-w-0 rounded-xl border border-white bg-white p-3.5">
+                        <span className="block text-xs font-medium text-gray-500">{label}</span>
+                        <strong className="mt-1 block break-words text-sm font-bold text-[#171717]">{value}</strong>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Passenger Inputs */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-gray-400" />
-                      Full Name <span className="text-brandRed">*</span>
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <User className="h-4 w-4 text-[#F45B0B]" /> Full Name <span className="text-[#F45B0B]">*</span>
                     </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Ramesh Chandra"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none"
-                    />
+                    <input type="text" required autoComplete="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Your full name" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
+                  </div>
+                  <div>
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <Phone className="h-4 w-4 text-[#F45B0B]" /> Mobile Number <span className="text-[#F45B0B]">*</span>
+                    </label>
+                    <input type="tel" required autoComplete="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 98765 43210" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-accentOrange" />
-                      Mobile Number <span className="text-brandRed">*</span>
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <Mail className="h-4 w-4 text-[#F45B0B]" /> Email Address
                     </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="e.g. +91 98450 12345"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none"
-                    />
+                    <input type="email" autoComplete="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="you@example.com" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
+                  </div>
+                  <div>
+                    <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
+                      <Users className="h-4 w-4 text-[#F45B0B]" /> Number of Passengers
+                    </label>
+                    <select value={formData.passengers} onChange={(e) => setFormData({ ...formData, passengers: Number(e.target.value) })} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10">
+                      {Array.from({ length: Math.min(26, selectedVehicleCapacity) }, (_, index) => index + 1).map((count) => (
+                        <option key={count} value={count}>{count} {count === 1 ? 'Passenger' : 'Passengers'}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="mb-2 block text-sm font-semibold text-[#171717]">Special Instructions</label>
+                    <textarea rows={3} value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} placeholder="Any accessibility needs or special requests?" className="w-full resize-y rounded-xl border border-gray-200 px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-gray-400" />
-                    Email Address (for GST receipt and driver credentials)
-                  </label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="e.g. ramesh@company.com"
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-charcoal mb-1">
-                    Special Instructions / Flight Number / Landmarking
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={formData.message}
-                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    placeholder="e.g. Landmarking near Metro Pillar, infant passenger, need luggage carrier..."
-                    className="w-full px-4 py-2 rounded-xl border border-gray-200 text-sm focus:border-brandRed outline-none resize-none"
-                  />
-                </div>
-
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex flex-col-reverse gap-3 border-t border-gray-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-charcoal"
+                    className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 px-5 text-sm font-semibold text-gray-600 transition hover:border-[#F45B0B] hover:text-[#D94308] sm:justify-start"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span>Back to Vehicle</span>
+                    <ArrowLeft className="h-4 w-4" /> Back
                   </button>
-
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="btn-primary text-sm !py-3 !px-8 shadow-glow-red disabled:opacity-60 flex items-center gap-2"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {submitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Saving Booking...</span>
-                      </>
+                      <><div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> Confirming booking…</>
                     ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        <span>Confirm &amp; Reserve Ride</span>
-                      </>
+                      <><Sparkles className="h-4 w-4" /> Confirm Booking</>
                     )}
                   </button>
                 </div>
@@ -569,14 +691,14 @@ export default function BookCabPage() {
                     Booking Confirmed, {confirmedBooking.name}!
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500 max-w-md mx-auto mt-1">
-                    Your ride has been logged into the Orange Cabs dispatch command server. A chauffeur assignment update will be transmitted to your phone.
+                    Your ride has been logged into the Orange Cars dispatch command server. A chauffeur assignment update will be transmitted to your phone.
                   </p>
                 </div>
 
                 {/* Reference ID Box */}
                 <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 max-w-md mx-auto flex items-center justify-between">
                   <div className="text-left">
-                    <span className="text-[10px] uppercase tracking-wider text-gray-400 block font-semibold">Booking Reference ID</span>
+                    <span className="text-xs uppercase tracking-wider text-gray-500 block font-semibold">Booking Reference ID</span>
                     <strong className="text-xl font-mono text-brandRed font-black">
                       {confirmedBooking.bookingId}
                     </strong>
@@ -651,11 +773,8 @@ export default function BookCabPage() {
               </div>
             )}
 
-          </div>
-
-        </div>
-      </section>
-
+        </section>
+      </div>
     </div>
   );
 }

@@ -5,6 +5,10 @@ import {
   Mail, 
   MapPin, 
   Clock, 
+  Clock3,
+  CalendarCheck,
+  Users,
+  ArrowRight,
   Send, 
   MessageCircle, 
   Sparkles,
@@ -16,6 +20,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { VEHICLE_IMAGES } from '../constants/vehicleImages';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -94,20 +99,76 @@ export default function ContactPage() {
     <div className="pt-24 pb-20 bg-[#F7F7F7] text-charcoal">
       
       {/* Page Header */}
-      <section className="page-hero-surface relative py-20 sm:py-24 text-white overflow-hidden text-center">
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <span className="badge-pill-orange">24/7 Dispatch &amp; Concierge</span>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight">
-            Connect With Our Team
-          </h1>
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Whether booking an executive chauffeur, reserving outstation travel, or initiating corporate RFP inquiries, we are at your service 24/7.
-          </p>
-        </div>
+      <section className="contact-page-hero relative overflow-hidden">
+        <motion.div
+          className="relative z-10 mx-auto grid min-h-[460px] max-w-[1580px] grid-cols-1 items-center gap-8 px-5 py-10 sm:px-8 lg:min-h-[570px] lg:grid-cols-[0.94fr_1.06fr] lg:gap-10 lg:px-12"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <div className="relative z-10 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#FFD5A0] bg-[#FFF3E2] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.1em] text-[#D94308] sm:text-xs">
+              <Headphones className="h-4 w-4" />
+              24/7 Dispatch &amp; Concierge
+            </span>
+            <h1 className="mt-5 max-w-[720px] font-heading text-4xl font-black leading-[1.02] tracking-tight text-[#171717] sm:text-5xl lg:text-[60px]">
+              Connect With <span className="contact-page-hero__highlight">Our Team</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-sm leading-6 text-[#4c5b73] sm:text-base sm:leading-7">
+              For bookings, outstation plans, or corporate travel, our Bangalore team is ready to help around the clock.
+            </p>
+            <div className="contact-page-hero__trust mt-6 grid max-w-xl grid-cols-2 sm:grid-cols-4">
+              {[
+                { label: <>24/7<br />Support</>, Icon: Clock3 },
+                { label: <>Quick<br />Bookings</>, Icon: CalendarCheck },
+                { label: <>Dedicated<br />Travel Team</>, Icon: Users },
+                { label: <>Clear Travel<br />Guidance</>, Icon: ShieldCheck },
+              ].map(({ label, Icon }, index) => (
+                <div key={index} className="flex flex-col items-center gap-1.5 px-1 py-2 text-center sm:border-l sm:border-gray-300 sm:first:border-0 sm:px-2">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF0DD] text-[#F45B0B] sm:h-12 sm:w-12">
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </span>
+                  <span className="text-[10px] font-bold leading-tight text-[#171717] sm:text-xs">{label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="tel:+919742588995"
+                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-900/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl sm:px-8"
+              >
+                <Phone className="h-5 w-5" />
+                Call our 24/7 team
+                <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="#contact-details"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#F45B0B] px-6 py-3 text-sm font-semibold text-[#171717] transition duration-200 hover:bg-orange-50 hover:text-[#D94308]"
+              >
+                <Send className="h-4 w-4 text-[#F45B0B]" />
+                Send an Inquiry
+              </a>
+            </div>
+          </div>
+          <div className="contact-page-hero__visual relative mx-auto h-[260px] w-full max-w-[820px] sm:h-[360px] lg:h-[460px]">
+            <div className="contact-page-hero__accent" />
+            <div className="contact-page-hero__photo-frame">
+              <img
+                src={VEHICLE_IMAGES.crysta}
+                alt="Comfortable Toyota Innova ready for Orange Cars passengers"
+                className="contact-page-hero__image"
+              />
+            </div>
+            <div className="contact-page-hero__caption">
+              <MapPin className="h-4 w-4 shrink-0 text-[#F45B0B]" />
+              <span>Here for you, every day and every mile</span>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Main Split Grid */}
-      <section className="py-20">
+      <section id="contact-details" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -132,9 +193,9 @@ export default function ContactPage() {
               </div>
 
               {/* WhatsApp Support Card */}
-              <div className="luxury-card p-6 border-l-4 border-l-emerald-500">
+              <div className="luxury-card p-6 border-l-4 border-l-accentOrange">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-accentOrange/10 text-accentOrange flex items-center justify-center shrink-0">
                     <MessageCircle className="w-6 h-6" />
                   </div>
                   <div>
@@ -143,7 +204,7 @@ export default function ContactPage() {
                       href="https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20inquire%20about%20a%20ride."
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-lg font-heading font-black text-charcoal hover:text-emerald-600 transition-colors block mt-0.5"
+                      className="text-lg font-heading font-black text-charcoal hover:text-accentOrange transition-colors block mt-0.5"
                     >
                       Chat on +91 97425 88995
                     </a>
@@ -199,7 +260,7 @@ export default function ContactPage() {
                     Send Us an Inquiry
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                    Fill out the form below and an Orange Cabs operations manager will contact you within 15 minutes.
+                    Fill out the form below and an Orange Cars operations manager will contact you within 15 minutes.
                   </p>
                 </div>
 
@@ -210,7 +271,7 @@ export default function ContactPage() {
                     </div>
                     <h4 className="font-heading font-bold text-xl text-charcoal">Message Dispatched!</h4>
                     <p className="text-sm text-gray-600 max-w-sm mx-auto">
-                      Thank you for contacting Orange Cabs. Our duty travel concierge is reviewing your request and will connect with you immediately.
+                      Thank you for contacting Orange Cars. Our duty travel concierge is reviewing your request and will connect with you immediately.
                     </p>
                     <button
                       type="button"

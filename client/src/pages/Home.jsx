@@ -31,192 +31,34 @@ import {
   Calendar,
   Layers,
   HeartHandshake,
-  Check
+  Check,
+  FileText,
+  Headset,
+  CarFront,
+  Handshake,
+  BadgeCheck,
+  Quote,
+  Target,
+  BarChart3,
+  IndianRupee,
+  Route,
+  BriefcaseBusiness,
+  Fuel,
+  Armchair,
+  Crown
 } from 'lucide-react';
 import BookingWidget from '../components/BookingWidget';
 import { useBookingModal } from '../context/BookingModalContext';
 import api from '../services/api';
 import { VEHICLE_IMAGES, VEHICLE_IMAGE_FALLBACK } from '../constants/vehicleImages';
-
-// 9 Required Fleet Vehicles
-const FLEET_DATA = [
-  {
-    id: 'premium-sedan',
-    name: 'Maruti Dzire / Honda City',
-    category: 'Premium Sedan',
-    image: VEHICLE_IMAGES.dzire,
-    passengers: 4,
-    luggage: 2,
-    ac: true,
-    price: '₹13 / km',
-    baseFare: '₹800 base',
-    features: ['Plush Ergonomic Seats', 'Dual Airbags & ABS', 'Fast USB Charger', 'Pristine Sanitized Cabin'],
-    popular: false
-  },
-  {
-    id: 'executive-sedan',
-    name: 'Skoda Superb / Toyota Camry',
-    category: 'Executive Sedan',
-    image: VEHICLE_IMAGES.superb,
-    passengers: 4,
-    luggage: 3,
-    ac: true,
-    price: '₹18 / km',
-    baseFare: '₹1,500 base',
-    features: ['Rear Executive Armrest', 'Sun Blinds & Quiet Cabin', 'Bottled Spring Water', 'High Speed Wi-Fi'],
-    popular: true
-  },
-  {
-    id: 'innova-crysta',
-    name: 'Toyota Innova Crysta ZX',
-    category: 'Toyota Innova Crysta',
-    image: VEHICLE_IMAGES.crysta,
-    passengers: 7,
-    luggage: 4,
-    ac: true,
-    price: '₹22 / km',
-    baseFare: '₹1,800 base',
-    features: ['Captain Comfort Seats', 'Independent Roof AC', 'Superior Highway Balance', 'Premium Sound'],
-    popular: true
-  },
-  {
-    id: 'innova-hycross',
-    name: 'Toyota Innova Hycross Hybrid',
-    category: 'Toyota Innova Hycross',
-    image: VEHICLE_IMAGES.hycross,
-    passengers: 7,
-    luggage: 4,
-    ac: true,
-    price: '₹24 / km',
-    baseFare: '₹2,000 base',
-    features: ['Ottoman Executive Lounge', 'Panoramic Roof View', 'Whisper Silent EV Drive', 'JBL Surround Sound'],
-    popular: false
-  },
-  {
-    id: 'toyota-fortuner',
-    name: 'Toyota Fortuner 4x4 Luxury',
-    category: 'Toyota Fortuner',
-    image: VEHICLE_IMAGES.fortuner,
-    passengers: 7,
-    luggage: 4,
-    ac: true,
-    price: '₹28 / km',
-    baseFare: '₹2,600 base',
-    features: ['Commanding High View', 'All-Terrain 4x4 Ride', 'Leather Upholstery', 'Dual Climate Zones'],
-    popular: false
-  },
-  {
-    id: 'luxury-suv',
-    name: 'BMW X5 / Audi Q7 Chauffeur',
-    category: 'Luxury SUV',
-    image: VEHICLE_IMAGES.bmwX5,
-    passengers: 5,
-    luggage: 4,
-    ac: true,
-    price: '₹48 / km',
-    baseFare: '₹4,500 base',
-    features: ['Air Suspension Comfort', 'Panoramic Ambient Lighting', 'VIP Boardroom Standard', 'Trained Uniformed Chauffeur'],
-    popular: false
-  },
-  {
-    id: 'mercedes-benz',
-    name: 'Mercedes-Benz E-Class VIP',
-    category: 'Mercedes-Benz',
-    image: VEHICLE_IMAGES.mercedesEClass,
-    passengers: 4,
-    luggage: 3,
-    ac: true,
-    price: '₹52 / km',
-    baseFare: '₹5,000 base',
-    features: ['Burmester Sound System', 'Chilled Refreshments', 'White-Glove Etiquette', 'Celebrity Protocol Service'],
-    popular: false
-  },
-  {
-    id: 'tempo-traveller',
-    name: 'Force Urbania Executive Cruiser',
-    category: 'Tempo Traveller',
-    image: VEHICLE_IMAGES.urbania,
-    passengers: 13,
-    luggage: 12,
-    ac: true,
-    price: '₹28 / km',
-    baseFare: '₹3,200 base',
-    features: ['Individual Air Vents', 'Individual Recliners', 'High Roof Walkthrough', 'Smart TV & Mic System'],
-    popular: false
-  },
-  {
-    id: 'luxury-mini-bus',
-    name: 'BharatBenz AC Tourist Coach',
-    category: 'Luxury Mini Bus',
-    image: VEHICLE_IMAGES.bharatbenzCoach,
-    passengers: 26,
-    luggage: 25,
-    ac: true,
-    price: '₹45 / km',
-    baseFare: '₹5,500 base',
-    features: ['Pneumatic Air Suspension', 'Wide Velvet Pushback Seats', 'Overhead Luggage Racks', 'First Aid & Speed Governor'],
-    popular: false
-  }
-];
-
-// 6 Required Services
-const SERVICES_DATA = [
-  {
-    id: 'corporate-ets',
-    title: 'Corporate Employee Transportation',
-    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=80',
-    description: 'Tech-enabled safe, punctual employee commutes for IT hubs and multinationals with automated GPS tracking and 24/7 control room.',
-    badge: 'Enterprise Choice',
-    link: '/corporate'
-  },
-  {
-    id: 'airport-transfer',
-    title: 'Airport Pickup & Drop',
-    image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80',
-    description: 'Guaranteed curbside meet-and-greet at Kempegowda International Airport with automatic flight tracking and zero cancellation guarantee.',
-    badge: 'Zero Surge',
-    link: '/airport'
-  },
-  {
-    id: 'outstation-travel',
-    title: 'Outstation Travel',
-    image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=900&q=80',
-    description: 'Scenic intercity journeys across Mysore, Coorg, Ooty, Chikmagalur, and Chennai with highway-expert certified chauffeurs.',
-    badge: 'Most Popular',
-    link: '/outstation'
-  },
-  {
-    id: 'one-way-drop',
-    title: 'One-Way Drop',
-    image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
-    description: 'Pay only for one-way distance with zero return fare penalties for swift intercity travel between major business corridors.',
-    badge: 'Economical',
-    link: '/outstation'
-  },
-  {
-    id: 'wedding-events',
-    title: 'Wedding & Event Transportation',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80',
-    description: 'Luxury bridal Mercedes sedans, VIP guest convoys, and coordinated group shuttles for grand destination celebrations.',
-    badge: 'Luxury Convoy',
-    link: '/services'
-  },
-  {
-    id: 'vip-chauffeur',
-    title: 'VIP Chauffeur Services',
-    image: '/images/fleet/mercedes-vip.jpg',
-    description: 'White-glove executive chauffeur service for C-suite directors, high-profile delegations, and diplomats with non-disclosure protocol.',
-    badge: 'White Glove',
-    link: '/services'
-  }
-];
+import toast from 'react-hot-toast';
 
 // Testimonials
 const TESTIMONIALS = [
   {
     name: 'Karthik Subramanian',
     company: 'VP Engineering, Tech Global',
-    comment: 'Orange Cabs has handled our international client delegations for 3 years. The Innova Crystas are spotlessly maintained, and chauffeurs always arrive 15 minutes ahead of schedule.',
+    comment: 'Orange Cars has handled our international client delegations for 3 years. The Innova Crystas are spotlessly maintained, and chauffeurs always arrive 15 minutes ahead of schedule.',
     rating: 5,
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80'
   },
@@ -230,7 +72,7 @@ const TESTIMONIALS = [
   {
     name: 'Dr. Arvind Nambiar',
     company: 'Senior Consultant Cardiologist',
-    comment: 'I take early morning flights twice a week. With Orange Cabs, I never experience driver cancellations or airport surge pricing. Truly a gold standard in automotive transport.',
+    comment: 'I take early morning flights twice a week. With Orange Cars, I never experience driver cancellations or airport surge pricing. Truly a gold standard in automotive transport.',
     rating: 5,
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80'
   },
@@ -259,7 +101,7 @@ const FAQS = [
   },
   {
     q: 'Do you provide corporate transportation?',
-    a: 'Absolutely. Orange Cabs manages enterprise employee transportation (ETS), daily office shuttles, executive boardroom chauffeur cars, and event mobility for 100+ corporate clients with centralized billing, GST compliance, and GPS telematics.'
+    a: 'Absolutely. Orange Cars manages enterprise employee transportation (ETS), daily office shuttles, executive boardroom chauffeur cars, and event mobility for 100+ corporate clients with centralized billing, GST compliance, and GPS telematics.'
   },
   {
     q: 'How can I cancel a booking?',
@@ -271,393 +113,459 @@ const FAQS = [
   }
 ];
 
+const HERO_VEHICLES = [
+  { name: 'Toyota Innova Crysta', category: 'Premium MPV', image: VEHICLE_IMAGES.crysta },
+  { name: 'Maruti Dzire', category: 'Sedan', image: VEHICLE_IMAGES.dzire },
+  { name: 'Maruti Ertiga', category: 'SUV / MPV', image: VEHICLE_IMAGES.ertiga },
+  { name: 'Toyota Innova Hycross', category: 'Premium MPV', image: VEHICLE_IMAGES.hycross },
+  { name: 'Force Urbania', category: 'Tempo Traveller', image: VEHICLE_IMAGES.urbania },
+  { name: 'BharatBenz Traveller', category: 'Tourist Coach', image: VEHICLE_IMAGES.bharatbenzCoach }
+];
+
 export default function Home() {
   const { openBookingModal } = useBookingModal();
 
+  const [activeHeroVehicle, setActiveHeroVehicle] = useState(0);
   // Testimonial Carousel Index
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   // FAQ Accordion Active Index
   const [openFaq, setOpenFaq] = useState(0);
 
-  // Stats Counter Animation
-  const [counts, setCounts] = useState({ customers: 0, trips: 0, punctuality: 0, partners: 0 });
-  const [statsVisible, setStatsVisible] = useState(false);
+  const [vehicleCategories, setVehicleCategories] = useState([]);
+  const [services, setServices] = useState([]);
+  const [outstationPricing, setOutstationPricing] = useState(null);
+  const [contentLoading, setContentLoading] = useState(true);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const statsElem = document.getElementById('stats-section');
-      if (statsElem) {
-        const rect = statsElem.getBoundingClientRect();
-        if (rect.top <= window.innerHeight * 0.85) {
-          setStatsVisible(true);
-        }
-      }
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    const timer = setInterval(() => {
+      setActiveHeroVehicle((current) => (current + 1) % HERO_VEHICLES.length);
+    }, 4000);
+
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    if (!statsVisible) return;
-    const duration = 1600;
-    const frameRate = 30;
-    const totalFrames = Math.round(duration / (1000 / frameRate));
-    let frame = 0;
+    let active = true;
 
-    const timer = setInterval(() => {
-      frame++;
-      const progress = frame / totalFrames;
-      const ease = 1 - Math.pow(1 - progress, 3);
+    Promise.allSettled([api.get('/settings'), api.get('/services')])
+      .then(([settingsResult, servicesResult]) => {
+        if (!active) return;
 
-      setCounts({
-        customers: Math.round(ease * 500),
-        trips: Math.round(ease * 10000),
-        punctuality: (ease * 99.8).toFixed(1),
-        partners: Math.round(ease * 100)
+        if (settingsResult.status === 'fulfilled' && settingsResult.value.data.success) {
+          setVehicleCategories(settingsResult.value.data.settings.vehicleCategories || []);
+          setOutstationPricing(settingsResult.value.data.settings.outstationPricing || null);
+        } else {
+          const error = settingsResult.status === 'rejected' ? settingsResult.reason : null;
+          console.error('Failed to load vehicle category pricing:', error);
+          toast.error('Vehicle pricing could not be loaded.');
+        }
+
+        if (servicesResult.status === 'fulfilled' && servicesResult.value.data.success) {
+          setServices(servicesResult.value.data.services || []);
+        } else {
+          const error = servicesResult.status === 'rejected' ? servicesResult.reason : null;
+          console.error('Failed to load public services:', error);
+          toast.error('Services could not be loaded.');
+        }
+      })
+      .finally(() => {
+        if (active) setContentLoading(false);
       });
 
-      if (frame >= totalFrames) clearInterval(timer);
-    }, 1000 / frameRate);
-
-    return () => clearInterval(timer);
-  }, [statsVisible]);
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
-    <div className="bg-[#F7F7F7] text-[#242424] overflow-hidden">
+    <div className="bg-[#FFF9F2] text-[#171717] overflow-hidden">
       
       {/* ======================================================== */}
-      {/* B. CINEMATIC AUTOMOTIVE HERO SECTION                     */}
+      {/* B. PREMIUM SPLIT-SCREEN HERO                             */}
       {/* ======================================================== */}
-      <section className="page-hero-surface relative min-h-[95vh] lg:min-h-screen flex flex-col justify-between text-white pt-28 pb-14 px-4 sm:px-6 lg:px-8 overflow-hidden">
-
-        {/* Hero Content Wrapper */}
-        <div className="relative z-10 max-w-7xl mx-auto w-full pt-8 lg:pt-16">
-          <div className="max-w-2xl space-y-6">
-            
-            {/* Trust Pill */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="badge-pill-orange inline-flex items-center gap-2"
-            >
-              <Award className="w-3.5 h-3.5 text-accentOrange" />
-              <span>South India's Premier Mobility Company</span>
-            </motion.div>
-
-            {/* Left-Aligned Bold Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-[1.1] text-white"
-            >
-              Every Journey <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brandRed via-accentOrange to-amber-400">
-                Deserves Excellence.
-              </span>
-            </motion.h1>
-
-            {/* Short Professional Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-base sm:text-lg text-gray-300 font-normal leading-relaxed max-w-xl"
-            >
-              Experience premium cab services with professional chauffeurs, exceptional comfort, and reliable transportation across every destination.
-            </motion.p>
-
-            {/* Primary & Secondary CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap items-center gap-4 pt-2"
-            >
-              <button
-                onClick={() => openBookingModal()}
-                className="btn-primary text-sm sm:text-base !py-3.5 !px-8 shadow-glow-red"
+      <section className="homepage-hero page-hero-surface relative overflow-hidden px-4 pb-10 pt-24 text-[#242424] sm:px-6 sm:pt-28 lg:px-8 lg:pb-12">
+        <div className="relative z-10 mx-auto w-full max-w-[1580px]">
+          <div className="homepage-hero__composition relative">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+              <div className="homepage-hero__top-swoosh absolute -right-40 -top-64 hidden h-[760px] w-[920px] rotate-[-14deg] rounded-[48%] bg-gradient-to-br from-[#FFD25D] via-[#FF9C00] to-[#F45B0B] lg:block" />
+              <div className="homepage-hero__top-swoosh-inner absolute -right-24 -top-52 hidden h-[610px] w-[760px] rotate-[-14deg] rounded-[48%] bg-gradient-to-br from-[#FFB900] to-[#F45B0B] lg:block" />
+              <svg
+                className="homepage-hero__city absolute bottom-[-1.25rem] left-[-2rem] hidden h-36 w-[38rem] text-white/65 lg:block"
+                viewBox="0 0 620 150"
+                fill="currentColor"
               >
-                <span>Book Your Ride</span>
-              </button>
-
-              <a
-                href="#fleet-section"
-                className="btn-outline-white text-sm sm:text-base !py-3.5 !px-7"
+                <path d="M0 148h620v-12h-24v-34h-15v34h-13V72h-8V49h-5V28h-5v21h-6v23h-9v64h-13v-43h-10v43h-12v-29h-10v29h-17V94h-12V77h-7V54h-4V36h-4V20h-5v16h-5v18h-6v23h-9v17h-10v43h-14v-25h-12v25h-14v-40h-13v-29h-7V76h-7V58h-4V39h-5V18h-5v21h-5v19h-7v18h-7v29h-11v38h-13v-26h-12v26h-15v-41h-12V73h-7V52h-5V31h-5V14h-5v17h-5v21h-6v21h-9v27h-12v48h-13v-28h-11v28h-16v-39h-12v-26h-8V79h-7V59h-5V40h-5V22h-5v18h-5v19h-7v20h-7v26h-12v43H0z" />
+              </svg>
+              <svg
+                className="homepage-hero__bottom-wave absolute bottom-[-1rem] left-[-5rem] hidden h-36 w-[70%] lg:block"
+                viewBox="0 0 1100 150"
+                preserveAspectRatio="none"
+                aria-hidden="true"
               >
-                <span>Explore Our Fleet</span>
-                <ChevronRight className="w-4 h-4" />
-              </a>
-            </motion.div>
-
-            {/* Small Trust Indicators */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-white/10 text-xs text-gray-300"
-            >
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Verified Chauffeurs</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-accentOrange shrink-0" />
-                <span>99.8% On-Time</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-brandRed shrink-0" />
-                <span>Fixed Transparent Tariff</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Headphones className="w-4 h-4 text-sky-400 shrink-0" />
-                <span>24/7 Command Support</span>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Luxury Hero Booking Widget */}
-        <div className="relative z-20 max-w-7xl mx-auto w-full mt-10">
-          <BookingWidget />
-        </div>
-      </section>
-
-      {/* ======================================================== */}
-      {/* C. TRUST STATISTICS SECTION                              */}
-      {/* ======================================================== */}
-      <section id="stats-section" className="py-16 sm:py-20 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            
-            {/* Stat Card 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-brandRed/10 text-brandRed flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6" />
-              </div>
-              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
-                {counts.customers}+
-              </h3>
-              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
-                Happy Customers
-              </p>
-            </motion.div>
-
-            {/* Stat Card 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-accentOrange/10 text-accentOrange flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Navigation className="w-6 h-6" />
-              </div>
-              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
-                {counts.trips}+
-              </h3>
-              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
-                Successful Trips
-              </p>
-            </motion.div>
-
-            {/* Stat Card 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Clock className="w-6 h-6" />
-              </div>
-              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
-                {counts.punctuality}%
-              </h3>
-              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
-                On-Time Reliability
-              </p>
-            </motion.div>
-
-            {/* Stat Card 4 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="p-6 sm:p-8 rounded-3xl bg-gray-50 border border-gray-100 hover:border-gray-200 transition-all text-center group"
-            >
-              <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="font-heading font-black text-3xl sm:text-4xl text-[#101010]">
-                {counts.partners}+
-              </h3>
-              <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-gray-500 mt-1">
-                Corporate Partners
-              </p>
-            </motion.div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ======================================================== */}
-      {/* D. PREMIUM FLEET SHOWCASE                                */}
-      {/* ======================================================== */}
-      <section id="fleet-section" className="py-20 sm:py-28 bg-[#F7F7F7]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Section Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
-            <div>
-              <span className="badge-pill-red mb-3">World-Class Automotive Roster</span>
-              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
-                Find Your Perfect Ride
-              </h2>
-              <p className="mt-3 text-base text-gray-600 max-w-xl">
-                Travel in comfort and style with our carefully selected fleet. Real photography, transparent tariffs, and immaculate vehicle maintenance.
-              </p>
+                <path d="M0 51C174 94 283 137 450 126c137-9 223-57 362-48 114 8 175 49 288 55v17H0z" fill="#FFB900" opacity=".58" />
+                <path d="M0 87c169 37 258 72 415 60 163-13 239-54 376-48 131 5 205 39 309 51v17H0z" fill="#F45B0B" opacity=".9" />
+              </svg>
             </div>
 
+            <div className="relative z-10 grid items-center gap-8 md:grid-cols-2 lg:min-h-[calc(100svh-12rem)] lg:grid-cols-[45fr_55fr] lg:gap-12">
+            <div className="max-w-2xl py-5 md:py-10 lg:py-8">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="mb-6 inline-flex min-h-11 items-center gap-3 rounded-full border border-[#FFD68E] bg-[#FFF1D2] px-5 py-2 text-[13px] font-extrabold tracking-wide text-[#D94308] shadow-sm sm:text-sm"
+              >
+                <CarFront className="h-5 w-5 text-accentOrange" />
+                <span>PREMIUM CAB SERVICES</span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.08 }}
+                className="max-w-[700px] font-heading text-[clamp(2.4rem,5vw,4.25rem)] font-black leading-[1.02] tracking-[-0.045em] text-[#171717]"
+              >
+                Your <span className="homepage-hero__journey relative inline-block text-accentOrange">Journey</span>,<br />
+                Our Priority.
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.16 }}
+                className="mt-5 max-w-xl text-[15px] font-medium leading-7 text-[#62666d] sm:text-[17px] sm:leading-8"
+              >
+                Experience comfortable, reliable and affordable travel with Orange Cars. Your destination, our commitment.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.24 }}
+                className="mt-7 flex flex-wrap items-center gap-3.5"
+              >
+                <button
+                  onClick={() => openBookingModal()}
+                  className="btn-primary min-h-[58px] text-sm !px-7 !py-3.5 shadow-[0_12px_24px_rgba(217,67,8,0.22)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_30px_rgba(217,67,8,0.28)] sm:text-base"
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span>Book Your Ride</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <a
+                  href="#fleet-section"
+                  className="inline-flex min-h-[58px] items-center justify-center gap-2 rounded-full border border-[#D8D8D8] bg-white/90 px-6 py-3.5 text-sm font-bold text-[#171717] shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-accentOrange hover:text-accentOrange hover:shadow-lg sm:text-base"
+                >
+                  <CarFront className="h-5 w-5 text-accentOrange" />
+                  <span>Explore Our Fleet</span>
+                  <ChevronRight className="h-4 w-4" />
+                </a>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.32 }}
+                className="mt-8 grid grid-cols-2 gap-3 border-t border-[#e9e1d8] pt-6 text-sm font-semibold text-[#33363a] min-[850px]:grid-cols-3"
+              >
+                <div className="flex min-h-12 items-center gap-3 min-[850px]:border-r min-[850px]:border-[#e4ddd5] min-[850px]:pr-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#FFF0CC] text-accentOrange sm:h-12 sm:w-12"><User className="h-5 w-5 sm:h-6 sm:w-6" /></span>
+                  <span>Verified<br className="hidden min-[850px]:block" /> Chauffeurs</span>
+                </div>
+                <div className="flex min-h-12 items-center gap-3 min-[850px]:border-r min-[850px]:border-[#e4ddd5] min-[850px]:px-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#FFF0CC] text-accentOrange sm:h-12 sm:w-12"><Headphones className="h-5 w-5 sm:h-6 sm:w-6" /></span>
+                  <span>24/7 Customer<br className="hidden min-[850px]:block" /> Support</span>
+                </div>
+                <div className="flex min-h-12 items-center gap-3 min-[850px]:pl-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#FFF0CC] text-accentOrange sm:h-12 sm:w-12"><ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" /></span>
+                  <span>Transparent<br className="hidden min-[850px]:block" /> Pricing</span>
+                </div>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.12 }}
+              className="relative mx-auto w-full max-w-[900px] min-w-0"
+            >
+              <div className="absolute -inset-5 rounded-[3.5rem] bg-gradient-to-br from-orange-200/80 via-white/20 to-amber-200/80 blur-2xl" />
+              <div className="relative aspect-[1.2/1] overflow-hidden rounded-[2rem] border-[5px] border-white bg-gradient-to-br from-[#fffdfa] to-[#eeeae5] shadow-[0_30px_75px_rgba(92,50,21,0.2)] sm:aspect-[1.4/1] sm:rounded-[2.75rem]">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.img
+                    key={HERO_VEHICLES[activeHeroVehicle].image}
+                    src={HERO_VEHICLES[activeHeroVehicle].image}
+                    alt={`${HERO_VEHICLES[activeHeroVehicle].name} ${HERO_VEHICLES[activeHeroVehicle].category} cab`}
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = VEHICLE_IMAGE_FALLBACK;
+                    }}
+                    initial={{ opacity: 0, x: 18, scale: 0.985 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: -18, scale: 0.985 }}
+                    transition={{ duration: 0.55, ease: 'easeInOut' }}
+                    className="absolute inset-0 h-full w-full object-contain"
+                  />
+                </AnimatePresence>
+
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#171717]/45 via-[#171717]/10 to-transparent" />
+
+                <div className="homepage-hero__vehicle-card absolute bottom-4 left-4 z-10 flex max-w-[78%] gap-3 rounded-2xl border border-white/80 bg-white/95 px-4 py-3 shadow-[0_12px_30px_rgba(31,25,20,0.2)] backdrop-blur-md sm:bottom-6 sm:left-6 sm:gap-4 sm:px-5 sm:py-4">
+                  <span className="w-1 shrink-0 rounded-full bg-gradient-to-b from-[#F45B0B] to-[#FFB900]" />
+                  <span className="min-w-0">
+                    <span className="block text-[10px] font-extrabold uppercase tracking-[0.12em] text-accentOrange sm:text-xs">
+                      Orange signature fleet
+                    </span>
+                    <span className="mt-0.5 block truncate text-[15px] font-extrabold leading-tight text-[#171717] sm:text-xl">
+                      {HERO_VEHICLES[activeHeroVehicle].name}
+                    </span>
+                    <span className="mt-1 block text-xs font-semibold text-gray-600 sm:text-sm">
+                      {HERO_VEHICLES[activeHeroVehicle].category}
+                    </span>
+                  </span>
+                </div>
+
+                <div className="absolute bottom-4 right-4 z-10 flex gap-2 sm:bottom-6 sm:right-6 sm:gap-3">
+                  <button
+                    type="button"
+                    aria-label="Show previous vehicle"
+                    onClick={() => setActiveHeroVehicle((current) => (current - 1 + HERO_VEHICLES.length) % HERO_VEHICLES.length)}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white text-gray-800 shadow-lg transition hover:scale-105 hover:border-accentOrange hover:bg-accentOrange hover:text-white sm:h-12 sm:w-12"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Show next vehicle"
+                    onClick={() => setActiveHeroVehicle((current) => (current + 1) % HERO_VEHICLES.length)}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white text-gray-800 shadow-lg transition hover:scale-105 hover:border-accentOrange hover:bg-accentOrange hover:text-white sm:h-12 sm:w-12"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-5 flex items-center justify-center gap-2.5" aria-label="Choose a vehicle">
+                {HERO_VEHICLES.map((vehicle, index) => (
+                  <button
+                    key={vehicle.name}
+                    type="button"
+                    aria-label={`Show ${vehicle.name}`}
+                    aria-current={index === activeHeroVehicle ? 'true' : undefined}
+                    onClick={() => setActiveHeroVehicle(index)}
+                    className={`h-2.5 rounded-full transition-all duration-300 ${
+                      index === activeHeroVehicle ? 'w-7 bg-accentOrange' : 'w-2.5 bg-gray-300 hover:bg-gray-500'
+                    }`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          </div>
+          </div>
+
+          <div className="relative z-20 mt-10 w-full sm:mt-14">
+            <BookingWidget />
+          </div>
+        </div>
+      </section>
+
+      {/* ======================================================== */}
+      {/* C. PREMIUM FLEET SHOWCASE                                */}
+      {/* ======================================================== */}
+      <section id="fleet-section" className="homepage-fleet relative isolate overflow-hidden py-12 sm:py-14 lg:py-16">
+        <div className="relative z-10 mx-auto max-w-[1580px] px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto mb-8 max-w-3xl text-center sm:mb-10">
+            <span className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#FFD68E] bg-[#FFF1D2] px-4 py-1.5 text-xs font-extrabold uppercase tracking-wide text-[#D94308]">
+              <CarFront className="h-4 w-4" />
+              Orange Cars Fleet
+            </span>
+            <h2 className="font-heading text-3xl font-black tracking-tight text-[#171717] sm:text-4xl lg:text-[44px]">
+              Vehicle <span className="text-[#E84310]">Categories</span>
+            </h2>
+            <p className="mx-auto mt-2 max-w-2xl text-sm font-medium leading-6 text-[#62666d] sm:text-base">
+              Find the right ride for every journey, with comfortable options and transparent starting rates for local and outstation travel.
+            </p>
+            <span aria-hidden="true" className="mx-auto mt-4 block h-1 w-16 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#FFB900]" />
             <Link
               to="/fleet"
-              className="btn-outline-dark text-xs sm:text-sm self-start md:self-end"
+              className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-extrabold text-[#D94308] transition-colors hover:bg-white/70"
             >
-              <span>View Full Fleet Specs</span>
-              <ArrowRight className="w-4 h-4" />
+              Explore our full fleet
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          {/* 9 Vehicle Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FLEET_DATA.map((vehicle, idx) => (
-              <motion.div
-                key={vehicle.id}
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.45, delay: idx * 0.05 }}
-                className="luxury-card overflow-hidden flex flex-col group"
-              >
-                {/* Real Vehicle Image Area */}
-                <div className="relative h-60 w-full overflow-hidden bg-gray-100">
-                  <img
-                    src={vehicle.image}
-                    alt={vehicle.name}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = VEHICLE_IMAGE_FALLBACK;
-                    }}
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#101010]/90 text-white backdrop-blur-md">
-                      {vehicle.category}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+            {contentLoading
+              ? Array.from({ length: 5 }, (_, index) => (
+                <div key={index} className="h-[360px] animate-pulse rounded-[24px] bg-white/90 shadow-sm" />
+              ))
+              : vehicleCategories.map((vehicle, idx) => (
+                (() => {
+                  const name = vehicle.name.toLowerCase();
+                  const details = name.includes('hatch')
+                    ? { points: ['Ideal for short trips', 'Fuel-efficient & economical'], icons: [BriefcaseBusiness, Fuel] }
+                    : name.includes('sedan')
+                      ? { points: ['Comfortable for city & outstation', 'Spacious & smooth ride'], icons: [BriefcaseBusiness, Armchair] }
+                      : name.includes('suv')
+                        ? { points: ['Spacious for families & groups', 'Top comfort & safety'], icons: [Users, ShieldCheck] }
+                        : name.includes('luxury')
+                          ? { points: ['Premium travel experience', 'Ideal for business & VIP travel'], icons: [Crown, Star] }
+                          : { points: ['Perfect for group travel', 'Ideal for tours & corporate trips'], icons: [Users, BriefcaseBusiness] };
+                  const VehicleIcon = name.includes('luxury') ? Crown : name.includes('suv') ? ShieldCheck : CarFront;
+
+                  return (
+                    <motion.article
+                      key={`${vehicle.name}-${idx}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: idx * 0.04 }}
+                      className={`homepage-fleet-card group relative flex min-w-0 flex-col overflow-visible rounded-[24px] border bg-white/95 p-3.5 shadow-[0_12px_30px_rgba(65,44,22,0.09)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_20px_38px_rgba(65,44,22,0.15)] ${
+                        name.includes('suv') ? 'border-[#F45B0B] ring-1 ring-[#F45B0B]/25' : 'border-white'
+                      }`}
+                    >
+                      {name.includes('suv') && (
+                        <span className="absolute -top-3 left-1/2 z-20 inline-flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-gradient-to-r from-[#FF9D00] to-[#E84310] px-3 py-1 text-[11px] font-extrabold text-white shadow-md">
+                          <Crown className="h-3.5 w-3.5" />
+                          Most Preferred
+                        </span>
+                      )}
+
+                      <div className="relative flex h-[150px] items-center justify-center overflow-hidden rounded-[18px] bg-[radial-gradient(ellipse_at_55%_78%,#FFE2B1_0%,#FFF8EC_54%,#fff_82%)] sm:h-[164px]">
+                        <span aria-hidden="true" className="absolute -bottom-8 left-1/2 h-20 w-[90%] -translate-x-1/2 rounded-[50%] bg-gradient-to-r from-[#FFE9C6] via-[#FFB32C] to-[#FF8A00] opacity-90" />
+                        <img
+                          src={vehicle.image || VEHICLE_IMAGE_FALLBACK}
+                          alt={`${vehicle.name} vehicle`}
+                          loading="lazy"
+                          className="relative z-10 h-full w-full object-contain object-center transition-transform duration-500 ease-out group-hover:scale-105"
+                          onError={(event) => {
+                            event.currentTarget.onerror = null;
+                            event.currentTarget.src = VEHICLE_IMAGE_FALLBACK;
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex flex-1 flex-col px-1 pt-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="min-w-0 font-heading text-lg font-extrabold leading-tight text-[#171717] sm:text-xl">
+                            {vehicle.name}
+                          </h3>
+                          <div className="shrink-0 rounded-xl bg-[#FFF3DF] px-2.5 py-1.5 text-right">
+                            <span className="block whitespace-nowrap text-[10px] font-semibold text-[#4c4c4c]">Starting from</span>
+                            <strong className="block whitespace-nowrap text-base font-black leading-5 text-[#D94308]">
+                              ₹{vehicle.minRate}{vehicle.maxRate > vehicle.minRate ? `–₹${vehicle.maxRate}` : ''}<span className="text-xs">/km</span>
+                            </strong>
+                          </div>
+                        </div>
+
+                        {vehicle.passengers && (
+                          <div className="mt-2 flex items-center gap-2 border-b border-[#eee4d8] pb-2.5 text-sm font-semibold text-[#334155]">
+                            <Users className="h-4 w-4 shrink-0 text-[#D94308]" />
+                            <span>{vehicle.passengers} Passengers</span>
+                          </div>
+                        )}
+
+                        <div className="my-2.5 space-y-1.5">
+                          {details.points.map((point, pointIndex) => {
+                            const PointIcon = details.icons[pointIndex];
+                            return (
+                              <p key={point} className="flex items-center gap-2 text-[12px] font-medium leading-4 text-[#334155]">
+                                <PointIcon className="h-4 w-4 shrink-0 text-[#E84310]" />
+                                <span>{point}</span>
+                              </p>
+                            );
+                          })}
+                        </div>
+
+                        <button
+                          onClick={() => openBookingModal({
+                            cabType: vehicle.name,
+                            category: vehicle.name,
+                            passengers: vehicle.passengers || 1
+                          })}
+                          className="mt-auto inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-3 py-2 text-sm font-extrabold text-white shadow-[0_8px_16px_rgba(217,67,8,0.17)] transition-all hover:brightness-110"
+                        >
+                          Book Now
+                          <ArrowRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </motion.article>
+                  );
+                })()
+              ))}
+          </div>
+
+          {!contentLoading && vehicleCategories.length === 0 && (
+            <p className="mt-6 text-center text-sm text-gray-600">Vehicle categories are temporarily unavailable. Please contact us for current options.</p>
+          )}
+
+          {outstationPricing && (
+            <div className="homepage-fleet-pricing mt-6 grid overflow-hidden rounded-[22px] border border-[#F5D7B5] bg-white/95 shadow-[0_14px_36px_rgba(65,44,22,0.1)] lg:grid-cols-[minmax(260px,1.25fr)_2.75fr]">
+              <div className="flex items-center gap-4 bg-gradient-to-r from-[#FFF0D1] to-[#FFF9F0] p-5 sm:p-6">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#FFB900] to-[#F45B0B] text-white shadow-md">
+                  <MapPin className="h-7 w-7" />
+                </span>
+                <div>
+                  <h3 className="font-heading text-xl font-black leading-tight text-[#171717] sm:text-2xl">
+                    Outstation Pricing, <span className="text-[#D94308]">Clearly Explained</span>
+                  </h3>
+                  <p className="mt-1 text-sm font-medium text-[#555]">
+                    Know how your outstation fare is calculated and what’s included.
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+                {[
+                  {
+                    title: 'Minimum Billing Distance',
+                    value: `${outstationPricing.minimumBillingDistance} km`,
+                    icon: Route
+                  },
+                  { title: 'Toll & Parking Charges', value: outstationPricing.tollParkingInfo, icon: BriefcaseBusiness },
+                  { title: 'Driver Allowance', value: outstationPricing.driverAllowanceInfo, icon: User },
+                  { title: 'Other Applicable Charges', value: outstationPricing.otherChargesInfo, icon: FileText },
+                  { title: 'Final Payment', value: outstationPricing.paymentDueInfo, icon: IndianRupee }
+                ].map(({ title, value, icon: Icon }) => (
+                  <div key={title} className="flex min-h-[130px] flex-col items-center justify-center border-b border-[#f1d8c0] px-3 py-4 text-center last:border-b-0 sm:border-b-0">
+                    <Icon className="mb-2 h-6 w-6 text-[#E84310] sm:h-7 sm:w-7" />
+                    <span className="text-xs font-bold leading-4 text-[#252525]">{title}</span>
+                    <span className="mt-1 text-xs font-medium leading-4 text-[#555]">
+                      {title === 'Minimum Billing Distance' ? value : value || 'As stated in confirmed quote'}
                     </span>
                   </div>
-
-                  {vehicle.popular && (
-                    <div className="absolute top-4 right-4">
-                      <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-brandRed text-white shadow-md">
-                        Executive Pick
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="absolute bottom-3 right-4 px-3 py-1 rounded-xl bg-white/95 text-charcoal font-bold text-xs shadow-sm">
-                    {vehicle.price}
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                  <div>
-                    <h3 className="font-heading font-bold text-xl text-charcoal group-hover:text-brandRed transition-colors">
-                      {vehicle.name}
-                    </h3>
-                    
-                    {/* Specifications */}
-                    <div className="grid grid-cols-3 gap-2 py-3 mt-2 border-y border-gray-100 text-xs text-gray-500">
-                      <div className="flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-accentOrange" />
-                        <span>{vehicle.passengers} Seats</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Luggage className="w-3.5 h-3.5 text-brandRed" />
-                        <span>{vehicle.luggage} Bags</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Wind className="w-3.5 h-3.5 text-sky-500" />
-                        <span>Climate AC</span>
-                      </div>
-                    </div>
-
-                    {/* Features list */}
-                    <ul className="mt-3 space-y-1.5 text-xs text-gray-600">
-                      {vehicle.features.slice(0, 2).map((feat, fidx) => (
-                        <li key={fidx} className="flex items-center gap-2">
-                          <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-2 flex items-center justify-between gap-3">
-                    <div>
-                      <span className="text-[10px] uppercase tracking-wider text-gray-400 block">Starting From</span>
-                      <strong className="text-sm font-bold text-charcoal">{vehicle.baseFare}</strong>
-                    </div>
-
-                    <button
-                      onClick={() => openBookingModal({ cabType: vehicle.name, category: vehicle.category })}
-                      className="btn-primary text-xs font-bold !py-2.5 !px-5"
-                    >
-                      <span>Book This Ride</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* ======================================================== */}
-      {/* E. SERVICES SECTION                                      */}
+      {/* D. SERVICES SECTION                                      */}
       {/* ======================================================== */}
-      <section className="py-20 sm:py-28 bg-white border-y border-gray-100">
+      <section className="py-16 sm:py-20 bg-white border-y border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="badge-pill-orange mb-3">Comprehensive Mobility Solutions</span>
             <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
-              Crafted For Every Occasion
+              Crafted For <span className="text-accentOrange">Every Occasion</span>
             </h2>
             <p className="mt-3 text-base text-gray-600">
-              From corporate daily rosters to VIP airport delegations, Orange Cabs delivers bespoke transportation services backed by punctuality and hospitality.
+              Choose the service that fits your plans and send us your booking details.
             </p>
           </div>
 
-          {/* 6 Professional Service Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {SERVICES_DATA.map((service, idx) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {contentLoading
+              ? Array.from({ length: 6 }, (_, index) => (
+                <div key={index} className="h-96 animate-pulse rounded-3xl bg-gray-50" />
+              ))
+              : services.map((service, idx) => (
               <motion.div
-                key={service.id}
+                key={service._id || service.slug}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -668,13 +576,18 @@ export default function Home() {
                   <img
                     src={service.image}
                     alt={service.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = VEHICLE_IMAGE_FALLBACK;
+                    }}
                   />
-                  <div className="absolute top-4 left-4">
+                  {service.badge && <div className="absolute top-4 left-4">
                     <span className="badge-pill-red !bg-white/90 !text-brandRed !border-none shadow-sm backdrop-blur-sm">
                       {service.badge}
                     </span>
-                  </div>
+                  </div>}
                 </div>
 
                 <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
@@ -687,33 +600,30 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
-                    <Link
-                      to={service.link}
-                      className="text-xs font-bold text-gray-700 hover:text-brandRed flex items-center gap-1"
-                    >
-                      <span>Learn More</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </Link>
-
+                  <div className="pt-3 border-t border-gray-100">
                     <button
+                      type="button"
                       onClick={() => openBookingModal({ serviceType: service.title })}
-                      className="btn-accent text-xs font-bold !py-2 !px-4"
+                      className="btn-accent flex w-full items-center justify-center gap-2 text-xs font-bold !py-2.5"
                     >
                       <span>Book Now</span>
+                      <ArrowRight className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
               </motion.div>
-            ))}
+              ))}
           </div>
+          {!contentLoading && services.length === 0 && (
+            <p className="mt-6 text-center text-sm text-gray-600">Services are temporarily unavailable. Please contact us for assistance.</p>
+          )}
         </div>
       </section>
 
       {/* ======================================================== */}
-      {/* F. WHY CHOOSE Orange Cabs? (Split Layout)                 */}
+      {/* F. WHY CHOOSE Orange Cars? (Split Layout)                 */}
       {/* ======================================================== */}
-      <section className="py-20 sm:py-28 bg-[#F7F7F7]">
+      <section className="py-16 sm:py-20 bg-[#F7F7F7]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
@@ -745,10 +655,10 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="lg:col-span-6 space-y-6"
             >
-              <span className="badge-pill-red">The Orange Cabs Difference</span>
+              <span className="badge-pill-red">The Orange Cars Difference</span>
               
               <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
-                Setting The Benchmark In Premium Mobility
+                Setting The Benchmark In <span className="text-accentOrange">Premium Mobility</span>
               </h2>
 
               <p className="text-base text-gray-600 leading-relaxed">
@@ -771,7 +681,7 @@ export default function Home() {
 
                 {/* 2. Safe & Secure Journeys */}
                 <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-accentYellow/20 text-[#D94308] flex items-center justify-center mb-3">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                   <h4 className="font-heading font-bold text-base text-charcoal">2. Safe & Secure Journeys</h4>
@@ -793,7 +703,7 @@ export default function Home() {
 
                 {/* 4. Transparent Pricing */}
                 <div className="p-4 rounded-2xl bg-white border border-gray-200 shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-3">
+                  <div className="w-10 h-10 rounded-xl bg-accentOrange/10 text-accentOrange flex items-center justify-center mb-3">
                     <Award className="w-5 h-5" />
                   </div>
                   <h4 className="font-heading font-bold text-base text-charcoal">4. Transparent Pricing</h4>
@@ -819,211 +729,280 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ======================================================== */}
-      {/* G. CORPORATE TRANSPORTATION SECTION (Dark Background)   */}
-      {/* ======================================================== */}
-      <section className="py-20 sm:py-28 bg-[#101010] text-white relative overflow-hidden">
-        {/* Subtle Ambient Glows */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brandRed/10 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accentOrange/10 rounded-full blur-[150px] pointer-events-none" />
+      {/* G. CORPORATE TRANSPORTATION */}
+      <section className="relative overflow-hidden bg-[#FFF9F2] py-16 text-[#171717] sm:py-20 lg:py-24">
+        <div className="pointer-events-none absolute -right-36 -top-32 h-[28rem] w-[28rem] rounded-full bg-[#FFB900]/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-48 left-1/4 h-[28rem] w-[28rem] rounded-full bg-[#F45B0B]/10 blur-3xl" />
+        <svg className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.12]" aria-hidden="true" viewBox="0 0 1440 700" fill="none" preserveAspectRatio="xMidYMid slice">
+          <path d="M-100 560C180 560 155 350 430 350S690 560 930 560 1190 315 1540 315" stroke="#F45B0B" strokeWidth="2" strokeDasharray="8 12" />
+          <circle cx="430" cy="350" r="7" fill="#FFB900" />
+          <circle cx="930" cy="560" r="7" fill="#F45B0B" />
+        </svg>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            <div className="lg:col-span-7 space-y-6">
-              <span className="badge-pill-orange">Enterprise Mobility Hub</span>
-              
-              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight">
-                Your Trusted Corporate Mobility Partner
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.55 }}
+              className="space-y-6"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#F45B0B]/15 bg-[#FFF3D6] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#D94308]">
+                <Building2 className="h-4 w-4" />
+                Enterprise Mobility Hub
+              </span>
+
+              <h2 className="max-w-3xl font-heading !text-4xl font-extrabold leading-[1.08] tracking-tight text-[#171717] sm:!text-5xl lg:!text-[52px]">
+                Your Trusted <span className="bg-gradient-to-r from-[#D94308] via-[#F45B0B] to-[#FFB900] bg-clip-text text-transparent">Corporate Mobility</span> <span className="text-accentOrange">Partner</span>
               </h2>
 
-              <p className="text-base text-gray-300 leading-relaxed max-w-xl">
+              <p className="max-w-2xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
                 Streamline employee transit, executive business trips, and client delegations with enterprise-grade mobility solutions built for operational scale.
               </p>
 
-              {/* 6 Features List */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  'Employee transportation (ETS)',
-                  'Enterprise mobility management',
-                  'Kempegowda Airport transfers',
-                  'Monthly consolidated GST billing',
-                  'Dedicated account manager',
-                  'Customized travel solutions'
-                ].map((feat, fidx) => (
-                  <div key={fidx} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-accentOrange/20 text-accentOrange flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 font-bold" />
-                    </div>
-                    <span className="text-sm text-gray-200 font-medium">{feat}</span>
+                  { label: 'Employee Transportation (ETS)', icon: Users },
+                  { label: 'Enterprise Mobility Management', icon: Layers },
+                  { label: 'Kempegowda Airport Transfers', icon: Plane },
+                  { label: 'Monthly Consolidated GST Billing', icon: FileText },
+                  { label: 'Dedicated Account Manager', icon: Headset },
+                  { label: 'Customized Travel Solutions', icon: CarFront }
+                ].map(({ label, icon: BenefitIcon }) => (
+                  <div key={label} className="flex min-h-[58px] items-center gap-3 rounded-xl border border-orange-100/80 bg-white/85 px-3.5 py-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#F45B0B]/30 hover:shadow-md sm:px-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#F45B0B] to-[#D94308] text-white shadow-sm">
+                      <BenefitIcon className="h-5 w-5" />
+                    </span>
+                    <span className="text-sm font-semibold leading-5 text-[#292929] sm:text-[15px]">{label}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-4 flex flex-wrap items-center gap-4">
+              <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                 <button
                   onClick={() => window.dispatchEvent(new CustomEvent('openCorporateProposal'))}
-                  className="btn-accent text-sm sm:text-base !py-3.5 !px-8 shadow-glow-orange"
+                  className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#FFB900] px-6 py-3 text-sm font-bold text-[#171717] shadow-md shadow-orange-200/60 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg sm:px-7 sm:text-base"
                 >
-                  <Briefcase className="w-4 h-4" />
+                  <Briefcase className="h-5 w-5" />
                   <span>Request Corporate Proposal</span>
+                  <ArrowRight className="h-4 w-4" />
                 </button>
 
                 <a
                   href="tel:+919742588995"
-                  className="btn-outline-white text-sm sm:text-base !py-3.5 !px-7"
+                  className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full border border-[#D94308]/50 bg-white/80 px-6 py-3 text-sm font-bold text-[#D94308] transition duration-200 hover:-translate-y-0.5 hover:border-[#F45B0B] hover:bg-[#FFF3D6] sm:px-7 sm:text-base"
                 >
-                  <Phone className="w-4 h-4" />
+                  <Phone className="h-5 w-5" />
                   <span>Speak to Key Accounts</span>
                 </a>
               </div>
-            </div>
+            </motion.div>
 
-            {/* Corporate Fleet SLA Console */}
-            <div className="lg:col-span-5">
-              <div className="rounded-3xl p-7 bg-[#181818] border border-white/10 shadow-2xl space-y-6">
-                <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                  <span className="text-xs font-bold text-accentOrange uppercase tracking-wider">Enterprise Mobility SLA</span>
-                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                    Tier-1 Certified
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.55, delay: 0.08 }}
+              className="rounded-[24px] border border-[#F45B0B]/40 bg-[#171717] p-5 text-white shadow-[0_24px_70px_rgba(23,23,23,0.2)] sm:p-7 lg:p-8"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/15 pb-5">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#F45B0B]/15 text-[#FF8A36]">
+                    <Handshake className="h-6 w-6" />
+                  </span>
+                  <span className="text-sm font-bold uppercase tracking-[0.12em] text-white sm:text-base">
+                    Enterprise <span className="text-[#FF9A2E]">Mobility SLA</span>
                   </span>
                 </div>
-
-                <div className="space-y-4 text-xs">
-                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/5">
-                    <strong className="text-white font-bold block text-sm">20-Minute Replacement Guarantee</strong>
-                    <span className="text-gray-400 mt-0.5 block">Dedicated reserve vehicles stationed on standby near major tech hubs.</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/5">
-                    <strong className="text-white font-bold block text-sm">100% Statutory &amp; Police Compliance</strong>
-                    <span className="text-gray-400 mt-0.5 block">Background-verified chauffeurs with annual biometric and health clearance.</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/5">
-                    <strong className="text-white font-bold block text-sm">Centralized GST &amp; MIS Invoicing</strong>
-                    <span className="text-gray-400 mt-0.5 block">Automated trip logs, route telemetry, and itemized monthly invoices.</span>
-                  </div>
-                </div>
-
-                <div className="pt-2 flex items-center justify-between text-xs text-gray-400 border-t border-white/10">
-                  <span>Duty Manager Hotline:</span>
-                  <a href="tel:+919742588995" className="text-white font-bold hover:text-accentOrange transition-colors">
-                    +91 97425 88995
-                  </a>
-                </div>
+                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-300">
+                  <BadgeCheck className="h-4 w-4" />
+                  Tier-1 Certified
+                </span>
               </div>
-            </div>
 
+              <div className="mt-5 space-y-3.5">
+                {[
+                  { title: '20-Minute Replacement Guarantee', description: 'Dedicated reserve vehicles stationed on standby near major tech hubs.', icon: Clock },
+                  { title: '100% Statutory & Police Compliance', description: 'Background-verified chauffeurs with annual biometric and health clearance.', icon: ShieldCheck },
+                  { title: 'Centralized GST & MIS Invoicing', description: 'Automated trip logs, route telemetry, and itemized monthly invoices.', icon: FileText }
+                ].map(({ title, description, icon: SlaIcon }) => (
+                  <div key={title} className="group flex gap-4 rounded-2xl border border-white/10 bg-white/[0.055] p-4 transition duration-200 hover:border-[#F45B0B]/40 hover:bg-white/[0.08] sm:p-4.5">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#F45B0B]/15 text-[#FF9A2E] transition-colors group-hover:bg-[#F45B0B]/25">
+                      <SlaIcon className="h-6 w-6" />
+                    </span>
+                    <div>
+                      <h3 className="font-heading text-base font-bold leading-6 text-white sm:text-[17px]">{title}</h3>
+                      <p className="mt-1 text-sm leading-5 text-gray-300">{description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 flex flex-col gap-3 border-t border-white/15 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-gray-300">
+                  <Headset className="h-5 w-5 text-[#FF9A2E]" />
+                  Duty Manager Hotline
+                </span>
+                <a href="tel:+919742588995" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110">
+                  <Phone className="h-4 w-4" />
+                  +91 97425 88995
+                </a>
+              </div>
+            </motion.div>
           </div>
-
         </div>
       </section>
 
       {/* ======================================================== */}
-      {/* H. ABOUT THE COMPANY / FOUNDER                           */}
+      {/* G. ABOUT THE COMPANY / FOUNDER                           */}
       {/* ======================================================== */}
-      <section className="py-20 sm:py-28 bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Executive Statement Box (No Personal Photo) */}
-            <div className="lg:col-span-5">
-              <div className="rounded-3xl p-8 bg-[#101010] text-white shadow-2xl border border-gray-800 space-y-6 max-w-md mx-auto">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brandRed to-accentOrange flex items-center justify-center text-white shadow-glow-red">
-                  <ShieldCheck className="w-6 h-6" />
-                </div>
+      <section className="homepage-leadership relative isolate overflow-hidden border-b border-[#f2e4d6] bg-[#fffaf4] py-14 sm:py-16 lg:py-20">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="homepage-leadership__corner absolute -right-52 -top-72 hidden h-[680px] w-[760px] rotate-[-18deg] rounded-[45%] bg-gradient-to-br from-[#FFD25D] via-[#FF9C00] to-[#F45B0B] lg:block" />
+          <svg className="absolute bottom-0 right-0 hidden h-48 w-[65%] opacity-60 lg:block" viewBox="0 0 1000 220" preserveAspectRatio="none">
+            <path d="M0 200h1000v20H0z" fill="#F7C46B" opacity=".35" />
+            <path d="M540 182v-30h12v30h10v-56h13v-23h6V84h6v19h8v23h14v56h14v-41h12v41h14v-65h12v-35h7V60h5V44h5v16h7v35h12v65h16v-25h10v25h14v-54h12v-27h6V57h5V38h5v19h7v27h11v54h14v44h15v-31h12v31h15v-64h13v-29h6V69h5V52h5v17h7v29h12v56h14v28h22v-45h14v45h14V97h11V72h6V55h5v17h7v25h12v63h15v22z" fill="#f3bd65" opacity=".58" />
+            <path d="M0 220c188-43 290-13 441-26 145-12 234-80 354-71 77 6 127 49 205 35v62z" fill="#352a23" opacity=".76" />
+            <path d="M0 220c188-43 290-13 441-26 145-12 234-80 354-71 77 6 127 49 205 35" fill="none" stroke="#FFB900" strokeWidth="5" opacity=".9" />
+            <path d="M570 191c123-46 233-75 430-67" fill="none" stroke="#fff4d8" strokeWidth="4" strokeDasharray="22 17" opacity=".9" />
+          </svg>
+          <svg className="absolute bottom-0 left-0 hidden h-28 w-[42%] lg:block" viewBox="0 0 700 120" preserveAspectRatio="none">
+            <path d="M0 38c145 64 254 72 373 47 102-21 211-31 327 1v34H0z" fill="#FFB900" opacity=".6" />
+            <path d="M0 73c142 48 231 53 353 30 134-25 243-17 347 17H0z" fill="#F45B0B" opacity=".9" />
+          </svg>
+        </div>
 
-                <div className="space-y-3">
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-accentOrange block">
+        <div className="relative z-10 mx-auto grid max-w-[1580px] items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, x: -18 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.55 }}
+            className="relative mx-auto w-full max-w-[520px]"
+          >
+            <div className="absolute -inset-1 rounded-[30px] bg-gradient-to-br from-[#FFB900] via-[#F45B0B] to-[#D94308] opacity-90 blur-[1px]" />
+            <div className="relative min-h-[500px] overflow-hidden rounded-[27px] border border-white/30 bg-[#171717] p-6 text-white shadow-[0_28px_70px_rgba(47,30,18,0.3)] sm:min-h-[550px] sm:p-8">
+              <img
+                src={VEHICLE_IMAGES.crysta}
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover object-center opacity-45"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = VEHICLE_IMAGE_FALLBACK;
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#080808]/90 via-[#101010]/75 to-[#171717]/70" />
+              <div className="relative z-10 flex min-h-[450px] flex-col justify-between sm:min-h-[486px]">
+                <div>
+                  <Quote className="mb-3 h-12 w-12 fill-[#F45B0B] text-[#F45B0B]" />
+                  <span className="text-sm font-extrabold uppercase tracking-wide text-[#FFB900]">
                     Executive Commitment
                   </span>
-                  <p className="text-sm text-gray-300 italic leading-relaxed">
-                    "Every guest deserves a spotless vehicle, an impeccably trained chauffeur, and absolute peace of mind."
+                  <p className="mt-4 max-w-md text-base font-medium italic leading-7 text-white/90 sm:text-lg sm:leading-8">
+                    “Every guest deserves a spotless vehicle, an impeccably trained chauffeur, and absolute peace of mind.”
                   </p>
-                </div>
-
-                <div className="pt-4 border-t border-white/10">
-                  <h4 className="font-heading font-black text-lg text-white">Vikramaditya Rao</h4>
-                  <p className="text-xs text-gray-400 font-medium mt-0.5">
-                    Founder &amp; Chief Executive Officer
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <span className="text-brandRed font-black text-lg block">10k+</span>
-                    <span className="text-gray-400 text-[10px] uppercase tracking-wider">Completed Trips</span>
+                  <div className="mt-5 h-1 w-20 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#FFB900]" />
+                  <div className="mt-5">
+                    <h3 className="font-heading text-xl font-extrabold text-white sm:text-2xl">Vikramaditya Rao</h3>
+                    <p className="mt-1 text-sm font-medium text-white/70 sm:text-base">
+                      Founder &amp; Chief Executive Officer
+                    </p>
                   </div>
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5 text-center">
-                    <span className="text-accentOrange font-black text-lg block">99.8%</span>
-                    <span className="text-gray-400 text-[10px] uppercase tracking-wider">On-Time Record</span>
+                </div>
+
+                <div className="mt-7 grid grid-cols-2 divide-x divide-[#F45B0B]/70 rounded-2xl border border-[#F45B0B]/40 bg-black/35 px-3 py-4 backdrop-blur-sm sm:px-5">
+                  <div className="flex flex-col items-center justify-center gap-1 pr-2 text-center">
+                    <div className="flex items-center gap-2 text-[#FFB900]">
+                      <Car className="h-6 w-6" />
+                      <strong className="font-heading text-2xl font-black sm:text-3xl">10K+</strong>
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-white/85 sm:text-sm">Completed Trips</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center gap-1 pl-2 text-center">
+                    <div className="flex items-center gap-2 text-[#FFB900]">
+                      <Clock className="h-6 w-6" />
+                      <strong className="font-heading text-2xl font-black sm:text-3xl">99.8%</strong>
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-white/85 sm:text-sm">On-Time Record</span>
                   </div>
                 </div>
               </div>
             </div>
+          </motion.div>
 
-            {/* Content & Vision */}
-            <div className="lg:col-span-7 space-y-6">
-              <span className="badge-pill-orange">Leadership &amp; Vision</span>
-              
-              <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
-                Pioneering Safety &amp; Integrity in Indian Mobility
-              </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.55, delay: 0.08 }}
+            className="relative space-y-6 lg:pb-3"
+          >
+            <span className="inline-flex min-h-11 items-center gap-3 rounded-full border border-[#FFD68E] bg-[#FFF1D2] px-5 py-2 text-[13px] font-extrabold tracking-wide text-[#D94308] shadow-sm sm:text-sm">
+              <Users className="h-5 w-5" />
+              LEADERSHIP &amp; VISION
+            </span>
 
-              <p className="text-base text-gray-600 leading-relaxed">
-                Founded with a mission to eliminate surge anxiety and transport unreliability, Orange Cabs was established to provide institutional corporate fleets and discerning private travelers with chauffeur service of international caliber.
-              </p>
+            <h2 className="font-heading text-[clamp(2rem,4vw,3.5rem)] font-black leading-[1.08] tracking-[-0.04em] text-[#171717]">
+              Pioneering Safety &amp; Integrity in
+              <span className="homepage-leadership__highlight relative block text-[#F45B0B]">Indian Mobility</span>
+            </h2>
 
-              <div className="space-y-4 text-sm text-gray-600">
-                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-                  <h4 className="font-heading font-bold text-sm text-charcoal mb-1">Our Core Vision</h4>
-                  <p className="text-xs text-gray-500">
+            <p className="max-w-4xl text-[15px] font-medium leading-7 text-[#62666d] sm:text-[17px] sm:leading-8">
+              Founded with a mission to eliminate surge anxiety and transport unreliability, Orange Cars was established to provide institutional corporate fleets and discerning private travelers with chauffeur service of international caliber.
+            </p>
+
+            <div className="grid gap-4 xl:grid-cols-2">
+              <article className="flex gap-4 rounded-[22px] border border-[#F5DDB8] bg-white/90 p-4 shadow-[0_12px_28px_rgba(60,40,18,0.06)] transition-all duration-200 hover:-translate-y-1 hover:border-[#F4B358] hover:shadow-[0_16px_34px_rgba(60,40,18,0.1)] sm:p-5">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#FFF0CC] text-[#F45B0B]">
+                  <Target className="h-8 w-8" />
+                </span>
+                <div>
+                  <h3 className="font-heading text-lg font-extrabold leading-tight text-[#171717] sm:text-xl">Our Core Vision</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#62666d] sm:text-base">
                     To deliver frictionless, verified, and eco-conscious mobility that respects passenger time, ensures driver dignity, and fosters corporate efficiency.
                   </p>
                 </div>
+              </article>
 
-                <div className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-                  <h4 className="font-heading font-bold text-sm text-charcoal mb-1">Experience &amp; Operational Excellence</h4>
-                  <p className="text-xs text-gray-500">
+              <article className="flex gap-4 rounded-[22px] border border-[#F5DDB8] bg-white/90 p-4 shadow-[0_12px_28px_rgba(60,40,18,0.06)] transition-all duration-200 hover:-translate-y-1 hover:border-[#F4B358] hover:shadow-[0_16px_34px_rgba(60,40,18,0.1)] sm:p-5">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#FFF0CC] text-[#F45B0B]">
+                  <BarChart3 className="h-8 w-8" />
+                </span>
+                <div>
+                  <h3 className="font-heading text-lg font-extrabold leading-tight text-[#171717] sm:text-xl">Experience &amp; Operational Excellence</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#62666d] sm:text-base">
                     Over a decade of logistics leadership, managing 10,000+ flawless intercity journeys and maintaining a 99.8% on-time dispatch record across South India's busiest transit corridors.
                   </p>
                 </div>
-              </div>
-
-              <div className="pt-2 flex items-center gap-4">
-                <Link
-                  to="/about"
-                  className="btn-primary text-xs sm:text-sm !py-3 !px-6"
-                >
-                  <span>Read Full Company Story</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-
+              </article>
             </div>
 
-          </div>
-
+            <div className="pt-1">
+              <Link to="/about" className="btn-primary min-h-[58px] text-sm !px-7 !py-3.5 shadow-[0_12px_24px_rgba(217,67,8,0.22)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_30px_rgba(217,67,8,0.28)] sm:text-base">
+                <span>Read Full Company Story</span>
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ======================================================== */}
-      {/* I. CLIENT TESTIMONIALS (Carousel)                        */}
+      {/* H. CLIENT TESTIMONIALS (Carousel)                        */}
       {/* ======================================================== */}
-      <section className="py-20 sm:py-28 bg-[#F7F7F7]">
+      <section className="py-16 sm:py-20 bg-[#F7F7F7]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
             <div>
               <span className="badge-pill-red mb-3">Verified Traveler Reviews</span>
               <h2 className="font-heading font-black text-3xl sm:text-4xl lg:text-5xl text-[#101010] tracking-tight">
-                Trusted by Discerning Guests
+                Trusted by <span className="text-accentOrange">Discerning Guests</span>
               </h2>
               <p className="mt-3 text-base text-gray-600 max-w-xl">
-                Authentic testimonials from corporate directors, frequent flyers, and family vacationers who choose Orange Cabs.
+                Authentic testimonials from corporate directors, frequent flyers, and family vacationers who choose Orange Cars.
               </p>
             </div>
 
@@ -1038,7 +1017,7 @@ export default function Home() {
               </button>
               <button
                 onClick={() => setActiveTestimonial(prev => (prev === TESTIMONIALS.length - 1 ? 0 : prev + 1))}
-                className="w-11 h-11 rounded-full bg-[#101010] text-white hover:bg-black flex items-center justify-center shadow-md transition-all"
+                className="w-11 h-11 rounded-full bg-accentOrange text-white hover:bg-[#D94308] flex items-center justify-center shadow-md transition-all"
                 aria-label="Next testimonial"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -1093,7 +1072,7 @@ export default function Home() {
       </section>
 
       {/* ======================================================== */}
-      {/* J. FREQUENTLY ASKED QUESTIONS (Accordion)                */}
+      {/* I. FREQUENTLY ASKED QUESTIONS (Accordion)                */}
       {/* ======================================================== */}
       <section className="py-20 sm:py-28 bg-white border-t border-gray-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1101,7 +1080,7 @@ export default function Home() {
           <div className="text-center mb-14">
             <span className="badge-pill-orange mb-3">Clear &amp; Transparent Answers</span>
             <h2 className="font-heading font-black text-3xl sm:text-4xl text-[#101010] tracking-tight">
-              Frequently Asked Questions
+              Frequently Asked <span className="text-accentOrange">Questions</span>
             </h2>
             <p className="mt-3 text-sm text-gray-600">
               Everything you need to know about our luxury booking, tariffs, fleet options, and policies.
@@ -1156,21 +1135,21 @@ export default function Home() {
       </section>
 
       {/* ======================================================== */}
-      {/* K. FINAL CTA BANNER                                      */}
+      {/* J. FINAL CTA BANNER                                      */}
       {/* ======================================================== */}
-      <section className="relative mb-12 mx-6 sm:mx-10 lg:mx-16 rounded-2xl py-12 sm:py-14 bg-[#101010] text-white overflow-hidden">
+      <section className="relative mb-12 mx-4 sm:mx-8 lg:mx-12 rounded-2xl py-12 sm:py-14 bg-gradient-to-r from-[#D94308] via-[#F45B0B] to-[#FFB900] text-white overflow-hidden">
         {/* Automotive Background */}
         <div className="absolute inset-0 z-0 rounded-2xl overflow-hidden">
           <img
             src="/images/fleet/mercedes-vip.jpg"
-            alt="Orange Cabs Chauffeur Experience"
+            alt="Orange Cars Chauffeur Experience"
             className="w-full h-full object-cover object-center filter brightness-[0.25] contrast-[1.1]"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=1920&q=80';
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#101010]/95 via-[#101010]/75 to-[#101010]/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#D94308]/95 via-[#F45B0B]/80 to-[#F45B0B]/35" />
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 flex flex-col lg:flex-row items-center gap-8">
@@ -1179,11 +1158,11 @@ export default function Home() {
             <span className="badge-pill-orange text-xs">Reserve In Seconds</span>
 
             <h2 className="font-heading font-black text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
-              Your Next Journey Starts Here.
+              Your Next <span className="text-[#FFB900]">Journey Starts Here.</span>
             </h2>
 
             <p className="text-sm sm:text-base text-gray-300 max-w-md leading-relaxed">
-              Book your next ride with Orange Cabs and experience transportation without compromise.
+              Book your next ride with Orange Cars and experience transportation without compromise.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
@@ -1212,7 +1191,7 @@ export default function Home() {
           <div className="flex-shrink-0 hidden lg:block w-[300px]">
             <img
               src="/images/fleet/innova-hycross.jpg"
-              alt="Orange Cabs Premium Fleet"
+              alt="Orange Cars Premium Fleet"
               className="w-full h-[200px] rounded-xl shadow-2xl border border-white/10 object-cover"
             />
           </div>

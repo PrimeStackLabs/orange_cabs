@@ -148,7 +148,7 @@ export default function VehicleShowcase3D() {
             className="fleet-showcase-eyebrow mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em]"
           >
             <Sparkles className="w-4 h-4 text-orange" />
-            The Orange Cabs Collection
+            The Orange Cars Collection
           </motion.div>
 
           <motion.h2

@@ -32,7 +32,7 @@ const BlogPage = () => {
             Stories & Highway Guides
           </span>
           <h1 className="font-heading font-black text-4xl sm:text-5xl text-white mt-2">
-            The Orange Cabs Travel Journal
+            The Orange Cars Travel Journal
           </h1>
           <p className="text-sm sm:text-base text-gray-300 mt-3 font-light leading-relaxed">
             Insider route guides, money-saving advice, best roadside dining recommendations, and road trip inspiration across South India.

@@ -64,7 +64,7 @@ const AuthModal = () => {
             </h3>
             <p className="text-xs text-gray-400 mt-1">
               {authMode === 'login' && 'Sign in to access your ride bookings & invoices'}
-              {authMode === 'register' && 'Join Orange Cabs for seamless intercity travels'}
+              {authMode === 'register' && 'Join Orange Cars for seamless intercity travels'}
               {authMode === 'otp' && 'Fast access via 4-digit code (use 1234 for demo)'}
             </p>
           </div>
@@ -203,7 +203,7 @@ const AuthModal = () => {
               ) : (
                 <>
                   <span>
-                    {authMode === 'login' && 'Sign In to Orange Cabs'}
+                    {authMode === 'login' && 'Sign In to Orange Cars'}
                     {authMode === 'register' && 'Complete Registration'}
                     {authMode === 'otp' && 'Verify & Continue'}
                   </span>

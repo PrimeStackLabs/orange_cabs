@@ -13,9 +13,11 @@ import VehiclesView from './pages/VehiclesView';
 import DriversView from './pages/DriversView';
 import ServicesView from './pages/ServicesView';
 import EnquiriesView from './pages/EnquiriesView';
-import ContentView from './pages/ContentView';
 import SettingsView from './pages/SettingsView';
 import LogsView from './pages/LogsView';
+import TariffView from './pages/TariffView';
+import CustomersView from './pages/CustomersView';
+import ReviewsView from './pages/ReviewsView';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -86,10 +88,12 @@ function App() {
             <Route path="vehicles" element={<VehiclesView />} />
             <Route path="drivers" element={<DriversView />} />
             <Route path="services" element={<ServicesView />} />
+            <Route path="pricing" element={<TariffView />} />
             <Route path="enquiries" element={<EnquiriesView />} />
-            <Route path="content" element={<ContentView />} />
             <Route path="settings" element={<SettingsView />} />
             <Route path="logs" element={<LogsView />} />
+            <Route path="customers" element={<CustomersView />} />
+            <Route path="reviews" element={<ReviewsView />} />
           </Route>
 
           {/* Catch-all redirect */}

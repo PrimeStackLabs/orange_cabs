@@ -45,18 +45,18 @@ function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <BookingModalProvider>
-        <div className="site-luxury-theme relative min-h-screen flex flex-col bg-[#F7F7F7] text-[#242424] selection:bg-brandRed selection:text-white">
+        <div className="site-luxury-theme relative min-h-screen flex flex-col bg-[#FFF9F2] text-[#171717] selection:bg-brandRed selection:text-white">
           <Toaster
             position="top-right"
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#101010',
+                background: '#171717',
                 color: '#FFFFFF',
-                border: '1px solid rgba(217, 35, 50, 0.4)',
+                border: '1px solid rgba(244, 91, 11, 0.4)',
                 boxShadow: '0 12px 35px rgba(0, 0, 0, 0.4)',
                 borderRadius: '16px',
-                fontSize: '13px'
+                fontSize: '14px'
               }
             }}
           />

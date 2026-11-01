@@ -24,7 +24,7 @@ export default function FloatingWidgets() {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: 'Welcome to Orange Cabs. I am your 24/7 Mobility Concierge. How may I assist your travel today?',
+      text: 'Welcome to Orange Cars. I am your 24/7 Mobility Concierge. How may I assist your travel today?',
       quickReplies: [
         { label: 'Book a Ride', action: 'book' },
         { label: 'Airport Transfers', action: 'airport' },
@@ -36,6 +36,12 @@ export default function FloatingWidgets() {
   ]);
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef(null);
+  const messageThreadRef = useRef(null);
+
+  useEffect(() => {
+    const thread = messageThreadRef.current;
+    if (thread) thread.scrollTop = thread.scrollHeight;
+  }, [messages]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,6 +75,7 @@ export default function FloatingWidgets() {
     if (!inputText.trim()) return;
 
     const userText = inputText.trim();
+    const normalizedText = userText.toLowerCase();
     setInputText('');
     setMessages(prev => [
       ...prev,
@@ -76,11 +83,40 @@ export default function FloatingWidgets() {
     ]);
 
     setTimeout(() => {
-      let reply = 'Thank you for reaching out. Would you like to reserve a ride with our verified chauffeur fleet or speak directly with our dispatch manager?';
-      if (userText.toLowerCase().includes('rate') || userText.toLowerCase().includes('price') || userText.toLowerCase().includes('fare')) {
-        reply = 'Our fares start from ₹13/km for Executive Sedans and ₹22/km for Toyota Innova Crysta. Zero surge pricing guaranteed!';
-      } else if (userText.toLowerCase().includes('airport')) {
-        reply = 'We provide guaranteed, punctual Bangalore Airport (BLR) transfers with complimentary flight tracking and luggage assistance.';
+      let reply = 'Thanks for your message. Tell me your pickup city, destination, and travel date, and I can help you get started.';
+      let quickReplies = [
+        { label: 'Book a Ride', action: 'book' },
+        { label: 'Call 24/7 Dispatch', action: 'call' }
+      ];
+
+      if (/\b(price|prices|rate|rates|fare|cost|pricing)\b/.test(normalizedText)) {
+        reply = 'You can view the current starting rates in Our Fleet. Your final fare depends on the selected vehicle and trip details; the confirmed quote will show applicable charges before travel.';
+        quickReplies = [
+          { label: 'Book a Ride', action: 'book' },
+          { label: 'Call for a Quote', action: 'call' }
+        ];
+      } else if (/\b(airport|flight|terminal|blr)\b/.test(normalizedText)) {
+        reply = 'We can help with Kempegowda International Airport (BLR) transfers. Share your pickup location and flight or pickup time, or start a booking and choose Airport Pickup & Drop.';
+        quickReplies = [
+          { label: 'Book Airport Transfer', action: 'airport' },
+          { label: 'Call 24/7 Dispatch', action: 'call' }
+        ];
+      } else if (/\b(corporate|company|employee|business|office)\b/.test(normalizedText)) {
+        reply = 'Orange Cars supports corporate and employee transportation. Share your company name and travel requirements, or contact our key accounts team for a proposal.';
+        quickReplies = [
+          { label: 'Corporate Inquiry', action: 'corporate' },
+          { label: 'Call 24/7 Dispatch', action: 'call' }
+        ];
+      } else if (/\b(vehicle|fleet|car|cars|suv|sedan|traveller|innova)\b/.test(normalizedText)) {
+        reply = 'Our fleet includes sedans, SUVs, premium MPVs, and traveller vehicles. Open Our Fleet to compare available categories, passenger capacity, and current starting rates.';
+        quickReplies = [
+          { label: 'Book a Ride', action: 'book' },
+          { label: 'Call 24/7 Dispatch', action: 'call' }
+        ];
+      } else if (/\b(book|booking|ride|reserve|trip)\b/.test(normalizedText)) {
+        reply = 'I can help you arrange a ride. Start a booking and enter your route, travel date, passenger details, and preferred vehicle to receive a confirmed quote.';
+      } else if (/\b(hello|hi|hey|good morning|good evening)\b/.test(normalizedText)) {
+        reply = 'Hello! I’m here to help with bookings, airport transfers, fleet options, and corporate travel. What would you like to know?';
       }
 
       setMessages(prev => [
@@ -88,10 +124,7 @@ export default function FloatingWidgets() {
         {
           sender: 'bot',
           text: reply,
-          quickReplies: [
-            { label: 'Reserve Now', action: 'book' },
-            { label: 'Call 24/7 Dispatch', action: 'call' }
-          ],
+          quickReplies,
           time: 'Just now'
         }
       ]);
@@ -103,11 +136,11 @@ export default function FloatingWidgets() {
       {/* ======================================================== */}
       {/* LEFT SIDE: 24/7 AI Concierge Chatbot Trigger & Modal     */}
       {/* ======================================================== */}
-      <div className="fixed bottom-6 left-6 z-40 flex flex-col items-start gap-3 pointer-events-auto">
+      <div className="floating-widget-chat fixed bottom-6 left-6 z-40 flex flex-col items-start gap-3 pointer-events-auto">
         {/* 24/7 AI Concierge Bot Trigger */}
         <button
           onClick={() => setIsChatOpen(!isChatOpen)}
-          className="w-13 h-13 sm:w-14 sm:h-14 p-3.5 rounded-full bg-[#101010] text-white shadow-[0_10px_30px_rgba(0,0,0,0.4)] hover:scale-105 active:scale-95 border border-white/20 transition-all flex items-center justify-center relative group"
+          className="floating-widget-chat-trigger h-14 w-14 rounded-full bg-[#101010] p-3.5 text-white shadow-[0_10px_30px_rgba(0,0,0,0.4)] transition-all hover:scale-105 active:scale-95 border border-white/20 flex items-center justify-center relative group"
           aria-label="24/7 Travel Concierge"
           title="24/7 Travel Concierge Chatbot"
         >
@@ -132,7 +165,7 @@ export default function FloatingWidgets() {
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="fixed bottom-24 left-4 sm:left-6 z-50 w-[92vw] sm:w-[380px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[520px]"
+            className="floating-widget-chat-panel fixed bottom-24 left-4 sm:left-6 z-50 w-[92vw] sm:w-[380px] bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[520px]"
           >
             {/* Header */}
             <div className="bg-[#101010] text-white p-4 flex items-center justify-between">
@@ -141,7 +174,7 @@ export default function FloatingWidgets() {
                   <Bot className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-heading font-bold text-sm text-white">Orange Cabs Concierge</h4>
+                  <h4 className="font-heading font-bold text-sm text-white">Orange Cars Concierge</h4>
                   <span className="text-[10px] text-emerald-400 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Online &bull; 24/7 Automated Dispatch
@@ -159,7 +192,7 @@ export default function FloatingWidgets() {
             </div>
 
             {/* Message Thread */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/70 text-xs">
+            <div ref={messageThreadRef} aria-live="polite" aria-relevant="additions text" className="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50/70 text-xs">
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
@@ -196,6 +229,7 @@ export default function FloatingWidgets() {
             {/* Input Form */}
             <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-gray-100 flex items-center gap-2">
               <input
+                aria-label="Message Orange Cars Concierge"
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
@@ -217,7 +251,8 @@ export default function FloatingWidgets() {
       {/* ======================================================== */}
       {/* RIGHT SIDE: Scroll To Top, Call Icon & WhatsApp Icon     */}
       {/* ======================================================== */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 pointer-events-auto">
+      {!isChatOpen && (
+      <div className="floating-widget-actions fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 pointer-events-auto">
         {/* Scroll To Top */}
         <AnimatePresence>
           {showScrollTop && (
@@ -226,7 +261,7 @@ export default function FloatingWidgets() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={scrollToTop}
-              className="w-11 h-11 rounded-full bg-white text-charcoal border border-gray-200 shadow-lg hover:bg-gray-50 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+              className="floating-widget-scroll-top w-11 h-11 rounded-full bg-white text-charcoal border border-gray-200 shadow-lg hover:bg-gray-50 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
               aria-label="Scroll to top"
               title="Back to Top"
             >
@@ -238,7 +273,7 @@ export default function FloatingWidgets() {
         {/* 24/7 Call Icon Button */}
         <a
           href="tel:+919742588995"
-          className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-brandRed text-white shadow-[0_8px_25px_rgba(230,0,0,0.35)] hover:bg-[#c90000] hover:scale-105 active:scale-95 border border-white/20 transition-all flex items-center justify-center relative group"
+          className="floating-widget-call h-14 w-14 rounded-full bg-brandRed text-white shadow-[0_8px_25px_rgba(230,0,0,0.35)] hover:bg-[#c90000] hover:scale-105 active:scale-95 border border-white/20 transition-all flex items-center justify-center relative group"
           title="Call 24/7 Dispatch (+91 97425 88995)"
           aria-label="Call Dispatch"
         >
@@ -255,7 +290,7 @@ export default function FloatingWidgets() {
           href="https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20inquire%20about%20booking%20a%20cab."
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_25px_rgba(37,211,102,0.4)] hover:bg-[#20bd5a] hover:scale-105 active:scale-95 transition-all group relative"
+          className="floating-widget-whatsapp flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_25px_rgba(37,211,102,0.4)] hover:bg-[#20bd5a] hover:scale-105 active:scale-95 transition-all group relative"
           title="Instant WhatsApp Support (+91 97425 88995)"
           aria-label="WhatsApp Support"
         >
@@ -264,6 +299,7 @@ export default function FloatingWidgets() {
           </svg>
         </a>
       </div>
+      )}
     </>
   );
 }

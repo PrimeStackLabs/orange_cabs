@@ -10,7 +10,7 @@ import {
   ChevronRight,
   ExternalLink,
   Sparkles,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
 
@@ -27,12 +27,14 @@ export default function Footer() {
   ];
 
   const serviceLinks = [
-    { name: 'Corporate Employee Transportation', path: '/services' },
-    { name: 'Kempegowda Airport VIP Transfers', path: '/airport' },
-    { name: 'Outstation Intercity Travel', path: '/outstation' },
-    { name: 'One-Way Express Drop', path: '/outstation' },
+    { name: 'Airport Pickup & Drop', path: '/airport' },
+    { name: 'Local Travel', path: '/services' },
+    { name: 'Outstation Travel', path: '/outstation' },
+    { name: 'Corporate Travel', path: '/corporate' },
+    { name: 'One-Way Transportation', path: '/outstation' },
     { name: 'Wedding & Event Transportation', path: '/services' },
-    { name: 'VIP Chauffeur Services', path: '/services' }
+    { name: 'One-Day Packages', path: '/services' },
+    { name: 'Hourly Packages', path: '/services' }
   ];
 
   return (
@@ -48,16 +50,16 @@ export default function Footer() {
           
           {/* Column 1: Logo & Company Description (4 cols) */}
           <div className="lg:col-span-4 space-y-5">
-            <Link to="/" aria-label="Orange Cabs home" className="inline-flex items-center rounded-xl bg-white p-2 transition-opacity hover:opacity-90">
+            <Link to="/" aria-label="Orange Cars home" className="inline-flex max-w-full items-center rounded-xl bg-white p-2.5 transition-opacity hover:opacity-90">
               <img
                 src="/images/orange-cabs-premium-logo.png"
-                alt="Orange Cabs — Premium Chauffeur & Mobility"
-                className="h-16 w-52 object-contain"
+                alt="Orange Cars"
+                className="h-auto max-h-16 w-52 max-w-full object-contain"
               />
             </Link>
 
             <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
-              Orange Cabs is South India’s trusted luxury automotive transportation partner. Delivering punctual airport chauffeur services, corporate employee mobility, and premium intercity travel with verified chauffeurs and an immaculate fleet.
+              Orange Cars offers airport, local, outstation, corporate, and event transportation with a choice of vehicle categories.
             </p>
 
             <div className="flex items-center gap-4 pt-2">
@@ -159,7 +161,7 @@ export default function Footer() {
                   href="https://wa.me/919742588995"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-emerald-600 text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-brandRed text-white flex items-center justify-center transition-all"
                   aria-label="WhatsApp"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -172,7 +174,7 @@ export default function Footer() {
                   href="https://instagram.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-gradient-to-tr hover:from-amber-600 hover:to-pink-600 text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-gradient-to-tr hover:from-accentOrange hover:to-accentYellow text-white flex items-center justify-center transition-all"
                   aria-label="Instagram"
                 >
                   <svg className="w-4 h-4 fill-none stroke-current" strokeWidth="2" viewBox="0 0 24 24">
@@ -187,7 +189,7 @@ export default function Footer() {
                   href="https://facebook.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-blue-600 text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-brandRed text-white flex items-center justify-center transition-all"
                   aria-label="Facebook"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -200,7 +202,7 @@ export default function Footer() {
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-sky-600 text-white flex items-center justify-center transition-all"
+                  className="w-9 h-9 rounded-xl bg-white/10 hover:bg-brandRed text-white flex items-center justify-center transition-all"
                   aria-label="LinkedIn"
                 >
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -215,7 +217,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <div>
-            &copy; 2026 Orange Cabs. All Rights Reserved.
+            &copy; 2026 Orange Cars. All Rights Reserved.
           </div>
           <div className="text-gray-400">
             Designed and Developed by <span className="text-gray-300 font-medium">bookmywebsite.in</span>

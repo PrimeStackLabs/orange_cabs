@@ -1,4 +1,5 @@
 import ChatMessage from '../models/ChatMessage.js';
+import Setting from '../models/Setting.js';
 
 export const handleChatMessage = async (req, res, next) => {
   try {
@@ -26,7 +27,14 @@ export const handleChatMessage = async (req, res, next) => {
     ];
 
     if (lower.includes('fare') || lower.includes('price') || lower.includes('cost') || lower.includes('rate')) {
-      reply = 'Our fares start from ₹13/km for Sedans, ₹18/km for SUVs, and ₹22/km for Innova Crysta. Toll and driver allowance are transparently listed with zero hidden charges!';
+      const settings = await Setting.findOne() || await Setting.create({});
+      const categoryRates = (settings.vehicleCategories || []).map(({ name, minRate, maxRate }) => (
+        `${name}: ₹${minRate}${maxRate > minRate ? `–₹${maxRate}` : ''}/km`
+      ));
+      const outstationPricing = settings.outstationPricing;
+      reply = categoryRates.length
+        ? `Current category rates: ${categoryRates.join('; ')}. Outstation minimum billing distance: ${outstationPricing.minimumBillingDistance} km. ${outstationPricing.tollParkingInfo} ${outstationPricing.driverAllowanceInfo} ${outstationPricing.paymentDueInfo}`
+        : 'Current vehicle rates are unavailable. Please contact our team for a confirmed quote.';
       quickReplies = [
         { label: 'Calculate Exact Fare', action: 'fare' },
         { label: 'View Fleet Details', action: 'fleet' }

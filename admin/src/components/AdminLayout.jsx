@@ -6,8 +6,10 @@ import {
   Car, 
   Users, 
   MessageSquare, 
-  Sparkles, 
   Layers, 
+  DollarSign,
+  Contact,
+  Star,
   Settings, 
   Activity, 
   LogOut, 
@@ -33,15 +35,16 @@ export default function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // Trimmed to strictly support the 5 public pages
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Bookings', path: '/bookings', icon: CalendarDays },
+    { name: 'Customers', path: '/customers', icon: Contact },
     { name: 'Enquiries & Chat', path: '/enquiries', icon: MessageSquare },
     { name: 'Fleet Manager', path: '/vehicles', icon: Car },
     { name: 'Drivers Manager', path: '/drivers', icon: Users },
     { name: 'Services Manager', path: '/services', icon: Layers },
-    { name: 'Content Manager', path: '/content', icon: Sparkles },
+    { name: 'Pricing & Categories', path: '/pricing', icon: DollarSign },
+    { name: 'Reviews', path: '/reviews', icon: Star },
     { name: 'Website Settings', path: '/settings', icon: Settings },
     { name: 'Users & Activity Log', path: '/logs', icon: Activity }
   ];
@@ -58,13 +61,17 @@ export default function AdminLayout() {
         <div>
           {/* Logo & Collapse button */}
           <div className="admin-sidebar-brand p-5 border-b flex items-center justify-between">
-            <Link to="/dashboard" className={`rounded-lg bg-white p-1 ${collapsed ? 'mx-auto' : ''}`}>
+            <Link
+              to="/dashboard"
+              aria-label="ORANGE CARS admin home"
+              className={`flex items-center justify-center rounded-lg bg-white p-2 ${collapsed ? 'mx-auto' : ''}`}
+            >
               <img
                 src="/images/orange-cabs-premium-logo.png"
-                alt="Orange Cabs"
-                className={`object-contain ${collapsed ? 'h-8 w-12' : 'h-11 w-40'}`}
+                alt="Orange Cars"
+                className={`h-auto object-contain ${collapsed ? 'max-h-8 w-12' : 'max-h-10 w-40'}`}
               />
-              </Link>
+            </Link>
 
             <button
               onClick={() => setCollapsed(!collapsed)}
@@ -140,11 +147,12 @@ export default function AdminLayout() {
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="md:hidden p-2 rounded-xl glass text-gray-300"
+              aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
             >
               <Menu className="w-5 h-5" />
             </button>
             <span className="text-xs font-semibold text-gray-400 hidden sm:inline">
-              Orange Cab Corporate Management Console
+              ORANGE CARS Management Console
             </span>
           </div>
 
@@ -224,13 +232,13 @@ export default function AdminLayout() {
                   <img
                     src="/images/orange-cabs-premium-logo.png"
                     alt="Orange Cabs"
-                    className="h-10 w-36 rounded-md bg-white p-1 object-contain"
+                    className="h-auto max-h-10 w-36 rounded-md bg-white p-1 object-contain"
                   />
                   <button onClick={() => setMobileOpen(false)} className="text-gray-400">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="space-y-1">
+                <nav aria-label="Admin navigation" className="space-y-1 overflow-y-auto max-h-[calc(100vh-160px)]">
                   {menuItems.map((item) => (
                     <Link
                       key={item.name}
@@ -244,7 +252,7 @@ export default function AdminLayout() {
                       <span>{item.name}</span>
                     </Link>
                   ))}
-                </div>
+                </nav>
               </div>
 
               <button

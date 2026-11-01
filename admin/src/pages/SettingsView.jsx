@@ -5,8 +5,8 @@ import toast from 'react-hot-toast';
 
 export default function SettingsView() {
   const [settings, setSettings] = useState({
-    brandName: 'Orange Cab',
-    tagline: 'Premium Intercity & Airport Mobility Solutions',
+    brandName: 'ORANGE CARS',
+    tagline: 'Your Journey, Our Priority.',
     logoUrl: '',
     phone: '+91 99999 99999',
     whatsapp: '919999999999',
@@ -24,7 +24,7 @@ export default function SettingsView() {
       pinterest: 'https://pinterest.com/orangecab'
     },
     seo: {
-      metaTitle: 'Orange Cab | Premium Intercity & Airport Mobility Solutions',
+      metaTitle: 'ORANGE CARS | South India’s Premier Mobility Company',
       metaDescription: 'Book luxury, certified chauffeur-driven cabs with 100% verified drivers, transparent billing, and premium fleet.',
       keywords: 'cab booking, airport taxi, outstation cabs bangalore, luxury transport'
     },

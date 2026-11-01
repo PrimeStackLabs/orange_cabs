@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Compass, 
@@ -15,6 +15,8 @@ import {
   Phone
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
+import api from '../services/api';
+import toast from 'react-hot-toast';
 
 const POPULAR_ROUTES = [
   {
@@ -22,8 +24,6 @@ const POPULAR_ROUTES = [
     distance: '145 km',
     duration: '2.5 - 3 Hours',
     image: 'https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=800&q=80',
-    sedanFare: '₹2,499',
-    innovaFare: '₹3,799',
     highway: 'Bangalore-Mysore Expressway (NH 275)'
   },
   {
@@ -31,8 +31,6 @@ const POPULAR_ROUTES = [
     distance: '250 km',
     duration: '5 - 5.5 Hours',
     image: 'https://images.unsplash.com/photo-1596176530529-78163a4f7af2?auto=format&fit=crop&w=800&q=80',
-    sedanFare: '₹4,199',
-    innovaFare: '₹6,299',
     highway: 'Via Mysore Expressway & Kushalnagar'
   },
   {
@@ -40,8 +38,6 @@ const POPULAR_ROUTES = [
     distance: '280 km',
     duration: '6 - 6.5 Hours',
     image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=800&q=80',
-    sedanFare: '₹4,799',
-    innovaFare: '₹7,199',
     highway: 'Via Bandipur Tiger Reserve & 36 Hairpin Bends'
   },
   {
@@ -49,8 +45,6 @@ const POPULAR_ROUTES = [
     distance: '240 km',
     duration: '4.5 - 5 Hours',
     image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80',
-    sedanFare: '₹3,999',
-    innovaFare: '₹5,999',
     highway: 'Via Hassan 4-Lane Highway (NH 75)'
   },
   {
@@ -58,8 +52,6 @@ const POPULAR_ROUTES = [
     distance: '250 km',
     duration: '4.5 - 5 Hours',
     image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
-    sedanFare: '₹4,299',
-    innovaFare: '₹6,499',
     highway: 'Via Kolar & Chittoor Highway'
   },
   {
@@ -67,14 +59,24 @@ const POPULAR_ROUTES = [
     distance: '345 km',
     duration: '6 - 7 Hours',
     image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
-    sedanFare: '₹5,799',
-    innovaFare: '₹8,699',
     highway: 'Via Hosur, Krishnagiri & Vellore (NH 48)'
   }
 ];
 
 export default function OutstationBookingPage() {
   const { openBookingModal } = useBookingModal();
+  const [outstationPricing, setOutstationPricing] = useState(null);
+
+  useEffect(() => {
+    api.get('/settings')
+      .then(({ data }) => {
+        if (data.success) setOutstationPricing(data.settings.outstationPricing || null);
+      })
+      .catch((error) => {
+        console.error('Failed to load outstation pricing information:', error);
+        toast.error('Outstation pricing information could not be loaded.');
+      });
+  }, []);
 
   return (
     <div className="pt-24 pb-20 bg-[#F7F7F7] text-charcoal">
@@ -87,10 +89,29 @@ export default function OutstationBookingPage() {
             Intercity Highway Journeys
           </h1>
           <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Transparent per-km tariffs, verified hill &amp; highway chauffeurs, sanitized vehicles, and zero surge pricing across South India.
+            Review vehicle category rates and applicable charges before confirming your South India journey.
           </p>
         </div>
       </section>
+
+      {outstationPricing && (
+        <section className="bg-white py-10">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="rounded-3xl border border-orange-100 bg-gradient-to-r from-orange-50 to-yellow-50 p-6 sm:p-8">
+              <h2 className="font-heading text-xl font-bold text-charcoal">Outstation billing information</h2>
+              <p className="mt-2 text-sm text-gray-700">
+                Minimum billing distance: <strong>{outstationPricing.minimumBillingDistance} km</strong>.
+              </p>
+              <div className="mt-4 grid gap-3 text-sm text-gray-700 md:grid-cols-2">
+                <p>{outstationPricing.tollParkingInfo}</p>
+                <p>{outstationPricing.driverAllowanceInfo}</p>
+                <p>{outstationPricing.otherChargesInfo}</p>
+                <p>{outstationPricing.paymentDueInfo}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Routes Grid */}
       <section className="py-20">
@@ -132,16 +153,9 @@ export default function OutstationBookingPage() {
                     </h3>
                     <p className="text-xs text-gray-500 mt-1">{route.highway}</p>
 
-                    <div className="grid grid-cols-2 gap-3 py-3 mt-3 border-y border-gray-100 text-xs">
-                      <div>
-                        <span className="text-gray-400 block font-medium">Sedan (Dzire):</span>
-                        <strong className="text-charcoal font-bold text-sm">{route.sedanFare}</strong>
-                      </div>
-                      <div>
-                        <span className="text-gray-400 block font-medium">Innova Crysta:</span>
-                        <strong className="text-brandRed font-bold text-sm">{route.innovaFare}</strong>
-                      </div>
-                    </div>
+                    <p className="mt-3 border-y border-gray-100 py-3 text-xs leading-relaxed text-gray-600">
+                      Final pricing is based on the selected vehicle category and confirmed trip details.
+                    </p>
                   </div>
 
                   <div className="pt-2 flex items-center justify-between">
@@ -176,7 +190,7 @@ export default function OutstationBookingPage() {
             Planning a Multi-City Outstation Itinerary?
           </h2>
           <p className="text-sm text-gray-600">
-            Customize multi-day tours with night stay allowances, driver accommodation assistance, and transparent kilometer logs.
+            Share your itinerary and review the applicable charges in your confirmed quote before travel.
           </p>
           <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
             <a

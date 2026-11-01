@@ -25,24 +25,22 @@ import api from '../services/api';
 import { useBookingModal } from '../context/BookingModalContext';
 
 const SERVICE_TYPES = [
-  { id: 'Outstation Travel', label: 'Outstation Intercity' },
-  { id: 'Airport Transfer', label: 'Airport Transfer' },
-  { id: 'Local City Rental', label: 'Local Hourly' },
-  { id: 'Corporate Travel', label: 'Corporate Mobility' },
-  { id: 'One-Way Drop', label: 'One-Way Drop' },
-  { id: 'VIP Chauffeur', label: 'VIP Chauffeur' }
+  { id: 'Airport Pickup & Drop', label: 'Airport Pickup & Drop' },
+  { id: 'Local Travel', label: 'Local Travel' },
+  { id: 'Outstation Travel', label: 'Outstation Travel' },
+  { id: 'Corporate Travel', label: 'Corporate Travel' },
+  { id: 'One-Way Transportation', label: 'One-Way Transportation' },
+  { id: 'Wedding & Event Transportation', label: 'Wedding & Event Transportation' },
+  { id: 'One-Day Packages', label: 'One-Day Packages' },
+  { id: 'Hourly Packages', label: 'Hourly Packages' }
 ];
 
-const VEHICLE_CATEGORIES = [
-  { id: 'Premium Sedan', label: 'Premium Sedan', seats: '4 Seats', sub: 'Dzire / Etios' },
-  { id: 'Executive Sedan', label: 'Executive Sedan', seats: '4 Seats', sub: 'Camry / Superb' },
-  { id: 'Toyota Innova Crysta', label: 'Innova Crysta ZX', seats: '7 Seats', sub: 'Captain Seats' },
-  { id: 'Toyota Innova Hycross', label: 'Innova Hycross', seats: '7 Seats', sub: 'Hybrid Lounge' },
-  { id: 'Toyota Fortuner', label: 'Toyota Fortuner', seats: '7 Seats', sub: 'Luxury 4x4' },
-  { id: 'Luxury SUV', label: 'Luxury SUV', seats: '5 Seats', sub: 'BMW X5 / Audi Q7' },
-  { id: 'Mercedes-Benz', label: 'Mercedes-Benz', seats: '4 Seats', sub: 'E-Class Chauffeur' },
-  { id: 'Tempo Traveller', label: 'Tempo Traveller', seats: '13 Seats', sub: 'Force Urbania' },
-  { id: 'Luxury Mini Bus', label: 'Luxury Mini Bus', seats: '26 Seats', sub: 'BharatBenz Coach' }
+const DEFAULT_VEHICLE_CATEGORIES = [
+  { name: 'Hatchback', passengers: 4 },
+  { name: 'Sedan', passengers: 4 },
+  { name: 'SUV', passengers: 7 },
+  { name: 'Luxury Cars', passengers: 4 },
+  { name: 'Tempo Traveller', passengers: 13 }
 ];
 
 export default function BookingModal() {
@@ -52,6 +50,8 @@ export default function BookingModal() {
   const [loading, setLoading] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [vehicleCategories, setVehicleCategories] = useState(DEFAULT_VEHICLE_CATEGORIES);
+  const [outstationPricing, setOutstationPricing] = useState(null);
 
   const [formData, setFormData] = useState({
     serviceType: 'Outstation Travel',
@@ -59,13 +59,43 @@ export default function BookingModal() {
     drop: '',
     date: new Date().toISOString().split('T')[0],
     time: '09:00 AM',
-    cabType: 'Toyota Innova Crysta',
+    cabType: 'SUV',
     passengers: 2,
     name: '',
     phone: '',
     email: '',
     message: ''
   });
+
+  useEffect(() => {
+    let active = true;
+
+    api.get('/settings')
+      .then(({ data }) => {
+        if (!active || !data.success) return;
+        const categories = data.settings.vehicleCategories || [];
+        if (categories.length) {
+          setVehicleCategories(categories);
+          setFormData((current) => ({
+            ...current,
+            cabType: categories.some(({ name }) => name === current.cabType)
+              ? current.cabType
+              : categories[0].name,
+            passengers: categories.find(({ name }) => name === current.cabType)?.passengers
+              || current.passengers
+          }));
+        }
+        setOutstationPricing(data.settings.outstationPricing || null);
+      })
+      .catch((error) => {
+        console.error('Failed to load booking categories and terms:', error);
+        toast.error('Current vehicle categories could not be loaded.');
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
@@ -120,7 +150,7 @@ export default function BookingModal() {
         particleCount: 90,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#D92332', '#FF6B35', '#101010', '#FFFFFF']
+        colors: ['#F45B0B', '#FFB900', '#171717', '#FFFFFF']
       });
     } catch (e) {}
   };
@@ -203,7 +233,7 @@ export default function BookingModal() {
           className="relative flex h-[640px] max-h-[calc(100dvh-2rem)] w-full max-w-[634px] flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl z-10"
         >
           {/* Header Bar */}
-          <div className="flex shrink-0 items-center justify-between border-b border-white/10 bg-[#101010] px-6 py-5 text-white">
+          <div className="flex shrink-0 items-center justify-between border-b border-white/15 bg-gradient-to-r from-[#D94308] to-[#F45B0B] px-6 py-5 text-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brandRed to-accentOrange flex items-center justify-center text-white font-bold shadow-md">
                 <Car className="w-5 h-5" />
@@ -270,7 +300,7 @@ export default function BookingModal() {
                         onClick={() => setFormData(prev => ({ ...prev, serviceType: svc.id }))}
                         className={`py-2 px-3 rounded-xl text-xs font-semibold text-center border transition-all ${
                           formData.serviceType === svc.id
-                            ? 'bg-[#101010] text-white border-[#101010] shadow-sm'
+                            ? 'bg-brandRed text-white border-brandRed shadow-sm'
                             : 'bg-gray-50 text-gray-700 border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -372,30 +402,46 @@ export default function BookingModal() {
                     Select Vehicle Class <span className="text-brandRed">*</span>
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    {VEHICLE_CATEGORIES.map(veh => {
-                      const isSelected = formData.cabType === veh.id || formData.cabType === veh.label;
+                    {vehicleCategories.map((vehicle) => {
+                      const isSelected = formData.cabType === vehicle.name;
                       return (
-                        <div
-                          key={veh.id}
-                          onClick={() => setFormData(prev => ({ ...prev, cabType: veh.id }))}
+                        <button
+                          key={vehicle.name}
+                          type="button"
+                          onClick={() => setFormData((previous) => ({
+                            ...previous,
+                            cabType: vehicle.name,
+                            passengers: vehicle.passengers || previous.passengers
+                          }))}
                           className={`p-3 rounded-2xl border cursor-pointer transition-all ${
                             isSelected
                               ? 'border-brandRed bg-brandRed/5 shadow-sm ring-1 ring-brandRed'
                               : 'border-gray-200 bg-white hover:border-gray-300'
-                          }`}
+                          } text-left`}
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-heading font-bold text-xs text-charcoal">{veh.label}</span>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">
-                              {veh.seats}
-                            </span>
+                            <span className="font-heading font-bold text-xs text-charcoal">{vehicle.name}</span>
+                            {vehicle.passengers && (
+                              <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600">
+                                {vehicle.passengers} Seats
+                              </span>
+                            )}
                           </div>
-                          <span className="text-[11px] text-gray-400 block">{veh.sub}</span>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
                 </div>
+
+                {outstationPricing && ['Outstation Travel', 'One-Way Transportation'].includes(formData.serviceType) && (
+                  <div className="space-y-1.5 rounded-2xl border border-orange-100 bg-orange-50 p-4 text-xs leading-relaxed text-gray-700">
+                    <p><strong>Minimum billing distance:</strong> {outstationPricing.minimumBillingDistance} km.</p>
+                    <p>{outstationPricing.tollParkingInfo}</p>
+                    <p>{outstationPricing.driverAllowanceInfo}</p>
+                    <p>{outstationPricing.otherChargesInfo}</p>
+                    <p>{outstationPricing.paymentDueInfo}</p>
+                  </div>
+                )}
 
                 {/* Continue CTA */}
                 <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
@@ -569,7 +615,7 @@ export default function BookingModal() {
                     Thank You, {confirmedBooking.name}!
                   </h3>
                   <p className="text-sm text-gray-500 max-w-md mx-auto mt-1">
-                    Your ride request has been registered in the Orange Cabs centralized dispatch network. Chauffeur telematics and trip details are being prepared.
+                    Your ride request has been registered in the Orange Cars centralized dispatch network. Chauffeur telematics and trip details are being prepared.
                   </p>
                 </div>
 

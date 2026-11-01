@@ -246,78 +246,78 @@ const seedDatabase = async () => {
     ];
     const drivers = await Driver.insertMany(driversData);
 
-    // 4. Services (8 services: Corporate, Employee Transport, Airport Transfers, Outstation, Local Rental, Weddings and Events, School/Staff, Tourist Cabs)
+    // 4. Services
     const servicesData = [
       {
-        title: 'Corporate Cab Rentals',
-        slug: 'corporate',
-        image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80',
-        description: 'Impeccable executive travel solutions tailored for enterprise CXOs, business delegations, and daily client transit with GST invoicing.',
-        features: ['Uniformed Chauffeurs', 'Monthly Corporate Billing & GST', 'Guaranteed Premium Fleet', 'Flight Delay Auto-Tracking'],
-        badge: 'Enterprise Choice',
+        title: 'Airport Pickup & Drop',
+        slug: 'airport-pickup-drop',
+        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80',
+        description: 'Book a vehicle for airport pickup or drop-off. Share your flight and pickup details when requesting a booking.',
+        features: ['Airport Pickup', 'Airport Drop-off'],
+        badge: 'Airport Travel',
         order: 1
       },
       {
-        title: 'Employee Transport Services (ETS)',
-        slug: 'employee-transport',
-        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
-        description: 'Safe, punctual, tech-driven roster commuting for tech parks and IT enterprises with GPS telematics and SOS tracking.',
-        features: ['100% Police Verified Drivers', 'Real-Time Telematics & Geofencing', 'Seat-Belt & Speed Monitoring', 'Dedicated 24/7 Control Room'],
-        badge: 'High Reliability',
+        title: 'Local Travel',
+        slug: 'local-travel',
+        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
+        description: 'Arrange point-to-point transportation for local journeys within your city.',
+        features: ['Local Pickup', 'Flexible Destination'],
+        badge: 'City Travel',
         order: 2
       },
       {
-        title: 'Kempegowda Airport Transfers',
-        slug: 'airport-transfers',
-        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80',
-        description: 'Zero cancellation anxiety, terminal gate curbside pickups, and flight delay adjustments with complimentary waiting time.',
-        features: ['Guaranteed On-Time Curbside Pickup', 'Zero Surge Pricing Promise', 'Flight Landing Live Sync', 'Assistance with Heavy Luggage'],
-        badge: 'Zero Surge',
+        title: 'Outstation Travel',
+        slug: 'outstation-travel',
+        image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=900&q=80',
+        description: 'Plan an intercity journey with the vehicle category and route that suit your trip.',
+        features: ['Intercity Travel', 'Category-based Per-kilometre Rates'],
+        badge: 'Intercity',
         order: 3
       },
       {
-        title: 'Intercity Outstation Cabs',
-        slug: 'outstation',
-        image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=800&q=80',
-        description: 'Scenic expressway journeys to Mysore, Coorg, Ooty, Chennai, and Hyderabad with verified highway-expert chauffeurs.',
-        features: ['Pay Only For Actual Kms', 'Toll & State Tax Transparency', 'Experienced Hill Drivers', 'Clean Sanitized Cab Every Time'],
-        badge: 'Most Popular',
+        title: 'Corporate Travel',
+        slug: 'corporate-travel',
+        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=80',
+        description: 'Request transportation for business travel, team movement, or a corporate itinerary.',
+        features: ['Business Travel', 'Team Transportation'],
+        badge: 'Business',
         order: 4
       },
       {
-        title: 'Local City Hourly Rentals',
-        slug: 'local-rental',
-        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80',
-        description: 'Flexible 4Hr/40Km, 8Hr/80Km, and 12Hr/120Km car-with-driver packages for shopping, meetings, and city exploration.',
-        features: ['Multiple Stops At No Extra Cost', 'Air-Conditioned Comfort All Day', 'Flexible Extension On Demand', 'Professional Chauffeur Etiquette'],
-        badge: 'Flexible',
+        title: 'One-Way Transportation',
+        slug: 'one-way-transportation',
+        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
+        description: 'Book a direct trip from your pickup location to your destination.',
+        features: ['Direct Pickup', 'Destination Drop-off'],
+        badge: 'Direct Travel',
         order: 5
       },
       {
-        title: 'Weddings & VIP Events Fleet',
-        slug: 'weddings-events',
-        image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
-        description: 'Grand luxury Mercedes sedans, decorated BMWs, and premium Tempo Travellers for unforgettable wedding guest hospitality.',
-        features: ['Floral Decoration Service', 'Chauffeurs in Formal Attire', 'Coordinated Guest Shuttles', 'Punctual Convoy Dispatch'],
-        badge: 'Luxury',
+        title: 'Wedding & Event Transportation',
+        slug: 'wedding-event-transportation',
+        image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80',
+        description: 'Coordinate transportation for wedding guests and event itineraries.',
+        features: ['Event Transportation', 'Group Vehicle Options'],
+        badge: 'Events',
         order: 6
       },
       {
-        title: 'School & Staff Bus Logistics',
-        slug: 'school-staff',
-        image: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=800&q=80',
-        description: 'High-safety school bus and institution transit fleets equipped with speed governors, CCTV cameras, and lady attendants.',
-        features: ['Speed Governor Calibrated (40km/h)', 'Dual CCTV & Fire Safety Extinguishers', 'Parent Notification App Sync', 'Certified Background Checks'],
-        badge: 'Safe & Secure',
+        title: 'One-Day Packages',
+        slug: 'one-day-packages',
+        image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
+        description: 'Request a vehicle for a day and share your itinerary for a confirmed quote.',
+        features: ['Day-long Itinerary', 'Quote Confirmed Before Travel'],
+        badge: 'Day Trips',
         order: 7
       },
       {
-        title: 'Tourist & Pilgrimage Cabs',
-        slug: 'tourist-cabs',
-        image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80',
-        description: 'Custom sightseeing packages for Tirupati, Hampi, Chikmagalur, and Goa with multi-lingual, courteous driver guides.',
-        features: ['Pre-Planned Sightseeing Schedules', 'Local Sight Knowledgeable Drivers', 'No Hidden Night Charges', 'Luggage Care Guaranteed'],
-        badge: 'Sightseeing',
+        title: 'Hourly Packages',
+        slug: 'hourly-packages',
+        image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=900&q=80',
+        description: 'Request an hourly city itinerary and confirm the applicable package in your quote.',
+        features: ['Hourly Itinerary', 'Quote Confirmed Before Travel'],
+        badge: 'Hourly Travel',
         order: 8
       }
     ];
@@ -663,8 +663,8 @@ const seedDatabase = async () => {
 
     // 9. Initial Settings
     await Setting.create({
-      brandName: 'Orange Cab',
-      tagline: 'Premium Intercity & Airport Mobility',
+      brandName: 'ORANGE CARS',
+      tagline: 'Your Journey, Our Priority.',
       phone: '+91 99999 99999',
       whatsapp: '919999999999',
       email: 'info@orangecab.in',
@@ -686,8 +686,8 @@ const seedDatabase = async () => {
         keywords: 'cab booking, outstation taxi, airport transfer bangalore, luxury cabs, tempo traveller hire'
       },
       hero: {
-        headline: 'Premium Mobility, Redefined For Every Journey',
-        subheadline: 'Experience effortless outstation and corporate rides with 100% verified chauffeurs, instant confirmations, and zero surge anxiety.'
+        headline: "South India's Premier Mobility Company",
+        subheadline: 'Your Journey, Our Priority.'
       },
       about: {
         story: 'Founded in 2016, Orange Cab was born out of a clear mission: to bring true luxury, uncompromised safety, and absolute punctuality to intercity and corporate travel in India. What started with five executive sedans in Bangalore has today evolved into a premier fleet of over 500 premium vehicles serving corporate leaders, families, and discerning travelers across 15+ major cities.',

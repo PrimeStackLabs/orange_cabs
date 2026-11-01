@@ -1,65 +1,70 @@
 import Setting from '../models/Setting.js';
 
-const CAB_RATES = {
-  Sedan: { perKm: 13, baseFare: 800, baseKm: 40, capacity: 4, name: 'Comfort Sedan (Etios/Dzire)' },
-  SUV: { perKm: 18, baseFare: 1200, baseKm: 40, capacity: 6, name: 'Spacious SUV (Ertiga/Carens)' },
-  Innova: { perKm: 22, baseFare: 1600, baseKm: 40, capacity: 7, name: 'Innova Crysta Premium' },
-  'Tempo Traveller': { perKm: 28, baseFare: 2500, baseKm: 50, capacity: 12, name: 'Executive Tempo (12-16 Seater)' },
-  Luxury: { perKm: 45, baseFare: 3500, baseKm: 40, capacity: 4, name: 'Luxury Class (Mercedes/BMW)' }
+const LEGACY_CATEGORY_ALIASES = {
+  'Premium Sedan': 'Sedan',
+  'Executive Sedan': 'Sedan',
+  Innova: 'SUV',
+  'Toyota Innova Crysta': 'SUV',
+  'Toyota Innova Hycross': 'SUV',
+  'Luxury SUV': 'Luxury Cars',
+  Luxury: 'Luxury Cars',
+  'Mercedes-Benz': 'Luxury Cars',
+  'Luxury Mini Bus': 'Tempo Traveller'
+};
+
+const getCategory = (categories, requestedCategory) => {
+  const categoryName = LEGACY_CATEGORY_ALIASES[requestedCategory] || requestedCategory;
+  return categories.find(({ name }) => name.toLowerCase() === categoryName.toLowerCase());
 };
 
 export const calculateFare = async (req, res, next) => {
   try {
-    const { tripType = 'outstation_oneway', distanceKm = 100, cabType = 'Sedan', days = 1 } = req.body;
-    
-    const settings = (await Setting.findOne()) || {
-      gstPercentage: 5,
-      driverAllowancePerDay: 400,
-      tollTaxesEstimated: 250
-    };
+    const {
+      tripType = 'outstation_oneway',
+      distanceKm = 100,
+      cabType = 'Sedan',
+      days = 1
+    } = req.body;
+    const distance = Number(distanceKm);
+    const settings = await Setting.findOne() || await Setting.create({});
+    const categories = settings.vehicleCategories || [];
+    const category = getCategory(categories, cabType);
 
-    const dist = Math.max(Number(distanceKm) || 50, 20);
-    const numDays = Math.max(Number(days) || 1, 1);
-    const cab = CAB_RATES[cabType] || CAB_RATES.Sedan;
-
-    let effectiveDistance = dist;
-    if (tripType === 'outstation_round') {
-      // Outstation round trips generally have min 250 km / day or 2x distance
-      effectiveDistance = Math.max(dist * 2, 250 * numDays);
-    } else if (tripType === 'local') {
-      effectiveDistance = Math.max(dist, 80);
-    } else if (tripType === 'airport') {
-      effectiveDistance = Math.max(dist, 40);
+    if (!Number.isFinite(distance) || distance <= 0) {
+      return res.status(400).json({ success: false, message: 'Enter a valid trip distance.' });
     }
 
-    const distanceFare = Math.round(effectiveDistance * cab.perKm);
-    const driverAllowance = (tripType === 'outstation_round' || tripType === 'outstation_oneway')
-      ? settings.driverAllowancePerDay * numDays
+    if (!category) {
+      return res.status(400).json({ success: false, message: 'Select a valid vehicle category.' });
+    }
+
+    const isOutstation = String(tripType).startsWith('outstation');
+    const minimumDistance = isOutstation
+      ? settings?.outstationPricing?.minimumBillingDistance || 300
       : 0;
-    
-    const tollAndTaxes = tripType.startsWith('outstation') ? settings.tollTaxesEstimated : 100;
-    const subtotal = cab.baseFare + distanceFare + driverAllowance + tollAndTaxes;
-    const gst = Math.round((subtotal * settings.gstPercentage) / 100);
-    const totalFare = subtotal + gst;
+    const chargeableDistanceKm = Math.max(distance, minimumDistance);
+    const distanceFare = Math.round(chargeableDistanceKm * category.minRate);
 
     res.json({
       success: true,
       data: {
         tripType,
-        cabType,
-        cabName: cab.name,
-        capacity: cab.capacity,
-        estimatedDistanceKm: dist,
-        chargeableDistanceKm: effectiveDistance,
-        perKmRate: cab.perKm,
+        cabType: category.name,
+        cabName: category.name,
+        capacity: category.passengers,
+        estimatedDistanceKm: distance,
+        chargeableDistanceKm,
+        perKmRate: category.minRate,
+        maximumPerKmRate: category.maxRate,
         breakdown: {
-          baseFare: cab.baseFare,
+          baseFare: 0,
           distanceFare,
-          driverAllowance,
-          tollAndTaxes,
-          gst,
-          totalFare
-        }
+          driverAllowance: 0,
+          tollAndTaxes: 0,
+          gst: 0,
+          totalFare: distanceFare
+        },
+        outstationPricing: isOutstation ? settings?.outstationPricing : undefined
       }
     });
   } catch (error) {
@@ -67,9 +72,27 @@ export const calculateFare = async (req, res, next) => {
   }
 };
 
-export const getTariffRates = async (req, res) => {
-  res.json({
-    success: true,
-    rates: CAB_RATES
-  });
+export const getTariffRates = async (req, res, next) => {
+  try {
+    const settings = await Setting.findOne() || await Setting.create({});
+    const rates = Object.fromEntries((settings.vehicleCategories || []).map((category) => [
+      category.name,
+      {
+        perKm: category.minRate,
+        maxPerKm: category.maxRate,
+        baseFare: 0,
+        baseKm: settings.outstationPricing?.minimumBillingDistance || 300,
+        capacity: category.passengers,
+        name: category.name
+      }
+    ]));
+
+    res.json({
+      success: true,
+      rates,
+      minimumBillingDistance: settings.outstationPricing?.minimumBillingDistance || 300
+    });
+  } catch (error) {
+    next(error);
+  }
 };

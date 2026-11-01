@@ -84,7 +84,7 @@ export default function CorporateQuotePopup() {
 
       // Also trigger WhatsApp message for convenience
       const message = encodeURIComponent(
-        `*Corporate RFP Quote Request – Orange Cabs*\n` +
+        `*Corporate RFP Quote Request – Orange Cars*\n` +
         `• *Company:* ${company}\n` +
         `• *Contact:* ${person}\n` +
         `• *Phone:* ${phone}\n` +

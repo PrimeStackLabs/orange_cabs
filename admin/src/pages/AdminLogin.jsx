@@ -43,11 +43,9 @@ const AdminLogin = () => {
         
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <img
-            src="/images/orange-cabs-premium-logo.png"
-            alt="Orange Cabs — Premium Chauffeur & Mobility"
-            className="mx-auto mb-5 h-24 w-full max-w-[18rem] rounded-xl bg-white object-contain p-2"
-          />
+          <div className="mx-auto mb-5 flex items-center justify-center rounded-xl bg-white px-5 py-3">
+            <img src="/images/orange-cabs-premium-logo.png" alt="Orange Cars" className="h-auto max-h-20 w-64 max-w-full object-contain" />
+          </div>
           <span className="inline-flex rounded-md bg-brandRed/10 px-2 py-0.5 text-xs font-semibold tracking-wide text-brandRed">
             ADMIN PORTAL
           </span>

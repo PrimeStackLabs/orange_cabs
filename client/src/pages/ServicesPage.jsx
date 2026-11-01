@@ -1,249 +1,183 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Building2, 
-  Users, 
-  Plane, 
-  Compass, 
-  Clock, 
-  HeartHandshake, 
-  Bus, 
-  Sparkles, 
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-  MapPin,
-  Car,
-  Check,
-  Phone
-} from 'lucide-react';
+import { ArrowRight, BusFront, Building2, Check, MapPin, Plane, Sparkles, Users } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import { useBookingModal } from '../context/BookingModalContext';
-
-const DETAILED_SERVICES = [
-  {
-    id: 'corporate-ets',
-    title: 'Corporate Employee Transportation',
-    subtitle: 'Enterprise mobility & shift rostering',
-    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=80',
-    description: 'Safe, punctual, tech-driven roster commuting for tech parks and IT enterprises with GPS telematics, seat-belt tracking, and 24/7 centralized dispatch.',
-    features: [
-      '100% Police Verified Drivers',
-      'Real-Time Telematics & Geofencing',
-      'Dedicated 24/7 Operations Command Desk',
-      'Monthly Consolidated GST Billing'
-    ],
-    pricing: 'Customized corporate monthly contracts',
-    badge: 'Enterprise Choice'
-  },
-  {
-    id: 'airport-pickup',
-    title: 'Airport Pickup & Drop',
-    subtitle: 'Kempegowda Int. Airport (BLR) 24/7 transfers',
-    image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80',
-    description: 'Terminal curbside meet-and-greet with flight delay synchronization. We track your flight live and adjust chauffeur arrival with zero cancellation anxiety.',
-    features: [
-      'Zero Cancellation Guarantee',
-      'Automatic Flight Delay Adjustment',
-      'Terminal 1 & Terminal 2 Curbside Meet & Greet',
-      'Generous Luggage Space Assistance'
-    ],
-    pricing: 'Fixed tariffs starting from ₹999 all-inclusive',
-    badge: 'Zero Surge'
-  },
-  {
-    id: 'outstation-travel',
-    title: 'Outstation Travel',
-    subtitle: 'Intercity journeys across South India',
-    image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=900&q=80',
-    description: 'Scenic expressway journeys to Mysore, Coorg, Ooty, Chikmagalur, Chennai, and Hyderabad with verified highway-expert chauffeurs.',
-    features: [
-      'Pay Only For Actual Kms Driven',
-      'Experienced Ghat & Highway Chauffeurs',
-      'Full Vehicle Sanitization Before Each Tour',
-      'Flexible Multi-Day Itineraries'
-    ],
-    pricing: 'Starting from ₹13/km (Sedan) & ₹22/km (Innova)',
-    badge: 'Most Popular'
-  },
-  {
-    id: 'one-way-drop',
-    title: 'One-Way Drop',
-    subtitle: 'Point-to-point intercity travel',
-    image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
-    description: 'Pay solely for the one-way distance between major cities without paying for the vehicle’s return journey. Cost-efficient and ultra-fast.',
-    features: [
-      'Zero Return Distance Penalties',
-      'Doorstep Pickup and Direct Drop',
-      'Available On All Major Karnataka Routes',
-      'Express Highway Toll Invoicing'
-    ],
-    pricing: 'Fixed point-to-point packages',
-    badge: 'Economical'
-  },
-  {
-    id: 'wedding-events',
-    title: 'Wedding & Event Transportation',
-    subtitle: 'Luxury bridal cars and guest convoys',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80',
-    description: 'Mercedes-Benz bridal sedans, coordinated Tempo Traveller guest shuttles, and decorated convoys for seamless destination wedding hospitality.',
-    features: [
-      'Groomed Chauffeurs in Formal Attire',
-      'Customized Floral Decoration Assistance',
-      'Coordinated Multi-Vehicle Convoy Dispatch',
-      'On-Ground Logistics Marshall Support'
-    ],
-    pricing: 'Full-day wedding packages',
-    badge: 'Luxury Convoy'
-  },
-  {
-    id: 'vip-chauffeur',
-    title: 'VIP Chauffeur Services',
-    subtitle: 'White-glove executive chauffeur mobility',
-    image: '/images/fleet/mercedes-vip.jpg',
-    description: 'High-protocol chauffeur services for dignitaries, boardroom executives, and international delegates with certified confidentiality.',
-    features: [
-      'Mercedes-Benz E-Class & BMW Executive Fleets',
-      'Chauffeurs Trained in Executive Protocol',
-      'Bottled Refreshments & Wi-Fi Onboard',
-      'Strict Privacy & Non-Disclosure Adherence'
-    ],
-    pricing: 'Hourly & Daily Chauffeur Retainers',
-    badge: 'White Glove'
-  }
-];
+import api from '../services/api';
+import { VEHICLE_IMAGE_FALLBACK } from '../constants/vehicleImages';
 
 export default function ServicesPage() {
   const { openBookingModal } = useBookingModal();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    api.get('/services')
+      .then(({ data }) => {
+        if (active && data.success) setServices(data.services || []);
+      })
+      .catch((error) => {
+        console.error('Failed to load public services:', error);
+        toast.error('Services could not be loaded. Please try again later.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
-    <div className="pt-24 pb-20 bg-[#F7F7F7] text-charcoal">
-      
-      {/* Page Header */}
-      <section className="page-hero-surface relative py-20 sm:py-24 text-white overflow-hidden text-center">
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <span className="badge-pill-orange">Transportation Portfolio</span>
-          <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight">
-            Our Transportation Services
-          </h1>
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Tailored mobility solutions crafted for enterprise reliability, executive comfort, and effortless leisure journeys.
-          </p>
-        </div>
-      </section>
+    <div className="bg-[#F7F7F7] pb-20 pt-24 text-charcoal">
+      <section className="services-page-hero relative overflow-hidden">
+        <motion.div
+          className="mx-auto grid min-h-[390px] max-w-7xl grid-cols-1 items-center gap-8 px-5 py-9 sm:px-8 lg:min-h-[410px] lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:px-12"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <div className="relative z-10 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#FFE0A6] bg-[#FFF3D6] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#D94308] sm:text-xs">
+              <BusFront className="h-4 w-4" />
+              Transportation Services
+            </span>
+            <h1 className="mt-4 max-w-[650px] font-heading text-4xl font-black leading-[1.03] tracking-tight text-[#171717] sm:text-5xl lg:text-[52px]">
+              Reliable Travel Solutions for{' '}
+              <span className="services-page-hero__highlight">Every Journey</span>
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-gray-600 sm:text-base sm:leading-7">
+              From airport pickups to corporate travel, choose a service and let our team take care of the details.
+            </p>
 
-      {/* Services List Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-          
-          {DETAILED_SERVICES.map((service, idx) => {
-            const isReversed = idx % 2 === 1;
-            return (
-              <motion.div
-                key={service.id}
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="luxury-card overflow-hidden p-6 sm:p-10 border border-gray-200"
-              >
-                <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
-                  
-                  {/* Image Column */}
-                  <div className={`lg:col-span-5 ${isReversed ? 'lg:order-2' : ''}`}>
-                    <div className="relative h-72 sm:h-80 rounded-2xl overflow-hidden bg-gray-100 shadow-md">
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = '/images/fleet/innova-crysta.jpg';
-                        }}
-                      />
-                      <div className="absolute top-4 left-4">
-                        <span className="badge-pill-red !bg-white/95 !border-none !text-brandRed shadow-sm">
-                          {service.badge}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content Column */}
-                  <div className={`lg:col-span-7 space-y-4 ${isReversed ? 'lg:order-1' : ''}`}>
-                    <span className="text-xs font-bold uppercase tracking-wider text-accentOrange block">
-                      {service.subtitle}
-                    </span>
-                    
-                    <h3 className="font-heading font-black text-2xl sm:text-3xl text-charcoal">
-                      {service.title}
-                    </h3>
-
-                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                      {service.description}
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-                      {service.features.map((feat, fidx) => (
-                        <div key={fidx} className="flex items-center gap-2 text-xs sm:text-sm text-gray-700 font-medium">
-                          <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                          <span>{feat}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="pt-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-4">
-                      <div>
-                        <span className="text-[11px] uppercase tracking-wider text-gray-400 block font-semibold">Pricing Framework</span>
-                        <strong className="text-sm font-bold text-charcoal">{service.pricing}</strong>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => openBookingModal({ serviceType: service.title })}
-                          className="btn-primary text-xs sm:text-sm !py-2.5 !px-6 shadow-glow-red"
-                        >
-                          <span>Book This Service</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
+            <div className="mt-6 grid max-w-xl grid-cols-2 gap-y-4 sm:grid-cols-4 sm:gap-y-0">
+              {[
+                { label: <>Airport<br />Transfers</>, Icon: Plane },
+                { label: <>Group<br />Travel</>, Icon: Users },
+                { label: <>Corporate<br />Travel</>, Icon: Building2 },
+                { label: <>Outstation<br />Trips</>, Icon: MapPin },
+              ].map(({ label, Icon }, index) => (
+                <div
+                  key={index}
+                  className={`flex flex-col items-center gap-1.5 px-2 text-center ${index > 0 ? 'sm:border-l sm:border-gray-300' : ''}`}
+                >
+                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF0DD] text-[#F45B0B]">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <span className="text-xs font-bold leading-tight text-[#262626] sm:text-[13px]">{label}</span>
                 </div>
-              </motion.div>
-            );
-          })}
+              ))}
+            </div>
 
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <section className="py-16 bg-white border-t border-gray-100 text-center">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-          <h2 className="font-heading font-black text-2xl sm:text-3xl text-charcoal">
-            Need a Customized Itinerary or Corporate Fleet?
-          </h2>
-          <p className="text-sm text-gray-600">
-            Our 24/7 travel desk can tailor bespoke packages for multi-city travel, delegate airport protocols, and event fleets.
-          </p>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="tel:+919742588995"
-              className="btn-primary text-xs sm:text-sm !py-3 !px-6"
-            >
-              <Phone className="w-4 h-4" />
-              <span>Call Helpline: +91 97425 88995</span>
-            </a>
-
-            <button
-              onClick={() => openBookingModal()}
-              className="btn-outline-dark text-xs sm:text-sm !py-3 !px-6"
-            >
-              <span>Instant Online Booking</span>
-            </button>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={openBookingModal}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-900/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+              >
+                Book Your Ride <ArrowRight className="h-4 w-4" />
+              </button>
+              <Link
+                to="/fleet"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#171717] px-6 py-2.5 text-sm font-semibold text-[#171717] transition duration-200 hover:border-[#F45B0B] hover:bg-orange-50 hover:text-[#D94308]"
+              >
+                <BusFront className="h-4 w-4" /> View Our Fleet
+              </Link>
+            </div>
           </div>
-        </div>
+
+          <div className="services-page-hero__visual relative mx-auto h-[250px] w-full max-w-[760px] sm:h-[340px] lg:h-[350px]">
+            <div className="services-page-hero__accent" />
+            <div className="services-page-hero__photo-frame">
+              <img
+                src="/images/fleet/force-urbania.webp"
+                alt="Force Urbania ready for comfortable group and corporate travel"
+                className="services-page-hero__image"
+              />
+            </div>
+          </div>
+        </motion.div>
       </section>
 
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {loading ? (
+            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }, (_, index) => (
+                <div key={index} className="h-96 animate-pulse rounded-3xl bg-white shadow-sm" />
+              ))}
+            </div>
+          ) : services.length === 0 ? (
+            <div className="rounded-3xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-600">
+              No services are currently available. Please contact us for assistance.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3">
+              {services.map((service, index) => (
+                <motion.article
+                  key={service._id || service.slug}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.04 }}
+                  className="luxury-card group flex flex-col overflow-hidden"
+                >
+                  <div className="relative h-56 overflow-hidden bg-gray-100">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(event) => {
+                        event.currentTarget.onerror = null;
+                        event.currentTarget.src = VEHICLE_IMAGE_FALLBACK;
+                      }}
+                    />
+                    {service.badge && (
+                      <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold text-brandRed shadow-sm">
+                        <Sparkles className="h-3.5 w-3.5 text-orange-600" />
+                        {service.badge}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-1 flex-col justify-between gap-5 p-6">
+                    <div>
+                      <h2 className="font-heading text-xl font-bold text-charcoal transition-colors group-hover:text-orange-700">
+                        {service.title}
+                      </h2>
+                      <p className="mt-2 text-sm leading-relaxed text-gray-600">{service.description}</p>
+                      {service.features?.length > 0 && (
+                        <ul className="mt-4 space-y-2">
+                          {service.features.slice(0, 3).map((feature) => (
+                            <li key={feature} className="flex items-start gap-2 text-xs text-gray-600">
+                              <Check className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" />
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => openBookingModal({ serviceType: service.title })}
+                      className="btn-primary flex w-full items-center justify-center gap-2 text-sm"
+                    >
+                      Book this service
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

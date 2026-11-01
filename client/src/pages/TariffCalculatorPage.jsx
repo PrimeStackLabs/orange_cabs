@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calculator, ArrowRight, Check, Car, Sparkles, ShieldCheck } from 'lucide-react';
+import { Calculator, ArrowRight, Sparkles } from 'lucide-react';
 import api from '../services/api';
 
 const TariffCalculatorPage = () => {
@@ -9,9 +9,26 @@ const TariffCalculatorPage = () => {
   const [tripType, setTripType] = useState('outstation_oneway');
   const [distanceKm, setDistanceKm] = useState(150);
   const [cabType, setCabType] = useState('Sedan');
-  const [days, setDays] = useState(1);
   const [fareResult, setFareResult] = useState(null);
+  const [rates, setRates] = useState({});
+  const [minimumBillingDistance, setMinimumBillingDistance] = useState(300);
   const [loading, setLoading] = useState(false);
+  const [fareError, setFareError] = useState('');
+
+  useEffect(() => {
+    api.get('/fares/rates')
+      .then(({ data }) => {
+        if (data.success) {
+          setRates(data.rates || {});
+          setMinimumBillingDistance(data.minimumBillingDistance || 300);
+          setCabType((current) => (data.rates?.[current] ? current : Object.keys(data.rates || {})[0] || ''));
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to load category rates:', error);
+        setFareError('Vehicle rates are unavailable right now. Please try again later.');
+      });
+  }, []);
 
   const calculateFare = async () => {
     setLoading(true);
@@ -24,17 +41,20 @@ const TariffCalculatorPage = () => {
       });
       if (data.success) {
         setFareResult(data.data);
+        setFareError('');
       }
     } catch (err) {
       console.error('Failed to calculate tariff:', err);
+      setFareError(err.response?.data?.message || 'Unable to calculate an estimate right now.');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (!cabType) return;
     calculateFare();
-  }, [tripType, distanceKm, cabType, days]);
+  }, [tripType, distanceKm, cabType]);
 
   const handleBookNow = () => {
     navigate(`/book?tripType=${tripType}&cabType=${cabType}&distance=${distanceKm}`);
@@ -52,7 +72,7 @@ const TariffCalculatorPage = () => {
             Tariff & Price Calculator
           </h1>
           <p className="text-sm text-gray-300 mt-3 font-light max-w-2xl mx-auto">
-            No hidden charges, zero surprise tolls, and guaranteed lowest per-km rates across Karnataka.
+            Review the category rate and distance estimate; any applicable charges are stated in your confirmed quote.
           </p>
         </div>
       </section>
@@ -114,58 +134,43 @@ const TariffCalculatorPage = () => {
                 </div>
               </div>
 
-              {/* If Round Trip: Days selector */}
-              {tripType === 'outstation_round' && (
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-xs font-semibold text-slate-700">Total Trip Duration</label>
-                    <span className="text-sm font-bold text-orange">{days} Day(s)</span>
-                  </div>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5, 7].map((d) => (
-                      <button
-                        key={d}
-                        type="button"
-                        onClick={() => setDays(d)}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          days === d ? 'bg-orange text-white shadow-glow-orange' : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
-                        }`}
-                      >
-                        {d}D
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Cab Category Selector */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-2">Select Cab Category</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { id: 'Sedan', name: 'Sedan (Dzire/Etios)', rate: '₹13/km' },
-                    { id: 'SUV', name: 'SUV (Ertiga/Carens)', rate: '₹18/km' },
-                    { id: 'Innova', name: 'Innova Crysta Premium', rate: '₹22/km' },
-                    { id: 'Tempo Traveller', name: 'Tempo (12-16 Seater)', rate: '₹28/km' },
-                    { id: 'Luxury', name: 'Luxury (Mercedes E-Class)', rate: '₹45/km' }
-                  ].map((c) => (
+                  {Object.entries(rates).map(([name, rate]) => (
                     <div
-                      key={c.id}
-                      onClick={() => setCabType(c.id)}
+                      key={name}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setCabType(name)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') setCabType(name);
+                      }}
                       className={`p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                        cabType === c.id
+                        cabType === name
                           ? 'bg-orange/10 border-orange text-slate-900 shadow-sm'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-bold">{c.name}</span>
-                        <span className="text-xs text-orange font-mono font-bold">{c.rate}</span>
+                        <span className="text-sm font-bold">{name}</span>
+                        <span className="text-xs text-orange font-mono font-bold">
+                          ₹{rate.perKm}{rate.maxPerKm > rate.perKm ? `–₹${rate.maxPerKm}` : ''}/km
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
+                {Object.keys(rates).length === 0 && (
+                  <p className="text-xs text-slate-500">Vehicle rates are not available.</p>
+                )}
               </div>
+              {tripType.startsWith('outstation') && (
+                <p className="rounded-xl bg-orange-50 p-3 text-xs leading-relaxed text-slate-700">
+                  Outstation minimum billing distance: {minimumBillingDistance} km.
+                </p>
+              )}
 
             </div>
 
@@ -191,31 +196,15 @@ const TariffCalculatorPage = () => {
 
                     <div className="space-y-2 text-xs sm:text-sm text-slate-600 pb-4 border-b border-slate-100">
                       <div className="flex justify-between">
-                        <span>Base Vehicle Fare</span>
-                        <span className="text-slate-900 font-medium">₹{fareResult.breakdown.baseFare}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Distance Charge</span>
+                        <span>Estimated distance fare</span>
                         <span className="text-slate-900 font-medium">₹{fareResult.breakdown.distanceFare}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Driver Allowance</span>
-                        <span className="text-slate-900 font-medium">₹{fareResult.breakdown.driverAllowance}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Estimated Tolls & Taxes</span>
-                        <span className="text-slate-900 font-medium">₹{fareResult.breakdown.tollAndTaxes}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>GST (5%)</span>
-                        <span className="text-slate-900 font-medium">₹{fareResult.breakdown.gst}</span>
                       </div>
                     </div>
 
                     <div className="flex justify-between items-center py-2">
                       <div>
-                        <span className="text-xs text-slate-500 block">Total Estimated Price</span>
-                        <span className="text-[11px] text-emerald-600 font-medium">All inclusive</span>
+                        <span className="text-xs text-slate-500 block">Estimated distance fare</span>
+                        <span className="text-[11px] text-slate-500 font-medium">Final amount is confirmed in your quote</span>
                       </div>
                       <span className="font-heading font-black text-3xl text-orange">
                         ₹{fareResult.breakdown.totalFare.toLocaleString()}
@@ -229,8 +218,17 @@ const TariffCalculatorPage = () => {
                       <span>Proceed to Book This Ride</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
+                    {fareResult.outstationPricing && (
+                      <div className="space-y-2 rounded-xl bg-orange-50 p-3 text-xs leading-relaxed text-slate-700">
+                        <p>{fareResult.outstationPricing.tollParkingInfo}</p>
+                        <p>{fareResult.outstationPricing.driverAllowanceInfo}</p>
+                        <p>{fareResult.outstationPricing.otherChargesInfo}</p>
+                        <p>{fareResult.outstationPricing.paymentDueInfo}</p>
+                      </div>
+                    )}
                   </div>
                 )}
+                {fareError && <p className="mb-3 text-xs text-red-600" role="alert">{fareError}</p>}
               </div>
             </div>
 

@@ -3,6 +3,34 @@ import { Plus, Edit2, Trash2, Car, Fuel, Users, Check, X } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
+const VEHICLE_IMAGE_FALLBACK = '/images/fleet/innova-crysta-zx.webp';
+
+const getVehicleImage = (vehicle) => {
+  const descriptor = `${vehicle.name || ''} ${vehicle.category || ''}`.toLowerCase();
+  const publicFleetImages = [
+    { match: /hycross/, src: '/images/fleet/innova-hycross.webp' },
+    { match: /crysta/, src: '/images/fleet/innova-crysta-zx.webp' },
+    { match: /ertiga/, src: '/images/fleet/innova-crysta-zx.webp' },
+    { match: /fortuner/, src: '/images/fleet/toyota-fortuner.webp' },
+    { match: /bmw|x5/, src: '/images/fleet/bmw-x5.webp' },
+    { match: /mercedes|e-class/, src: '/images/fleet/mercedes-eclass.webp' },
+    { match: /urbania/, src: '/images/fleet/force-urbania.webp' },
+    { match: /bharatbenz|coach|bus/, src: '/images/fleet/bharatbenz-coach.webp' },
+    { match: /superb/, src: '/images/fleet/skoda-superb.webp' },
+    { match: /honda city/, src: '/images/fleet/honda-city.png' },
+    { match: /dzire|sedan/, src: '/images/fleet/maruti-dzire.webp' },
+    { match: /wagonr|swift|hatchback/, src: '/images/fleet/maruti-dzire.webp' }
+  ];
+  const matchedImage = publicFleetImages.find(({ match }) => match.test(descriptor));
+
+  if (matchedImage) return matchedImage.src;
+
+  const configuredImage = typeof vehicle.image === 'string' ? vehicle.image.trim() : '';
+  return configuredImage && !configuredImage.startsWith('http')
+    ? configuredImage
+    : VEHICLE_IMAGE_FALLBACK;
+};
+
 const VehiclesView = () => {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +98,7 @@ const VehiclesView = () => {
       baseFare: v.baseFare,
       fuelType: v.fuelType,
       modelYear: v.modelYear,
-      image: v.image,
+      image: getVehicleImage(v),
       features: v.features
     });
     setShowModal(true);
@@ -125,7 +153,15 @@ const VehiclesView = () => {
           <div key={v._id} className="glass-card rounded-3xl overflow-hidden border border-white/10 flex flex-col justify-between">
             <div>
               <div className="h-44 relative overflow-hidden">
-                <img src={v.image} alt={v.name} className="w-full h-full object-cover" />
+                <img
+                  src={getVehicleImage(v)}
+                  alt={v.name}
+                  className="w-full h-full object-cover"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = VEHICLE_IMAGE_FALLBACK;
+                  }}
+                />
                 <span className="absolute top-3 right-3 px-3 py-1 rounded-full bg-orange text-white text-xs font-bold">
                   {v.category}
                 </span>
