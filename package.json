@@ -12,7 +12,7 @@
     "seed": "cd server && npm run seed",
     "create-admin": "cd server && npm run create-admin",
     "install:apps": "npm ci --prefix client && npm ci --prefix admin",
-    "install:vercel": "npm ci --prefix server && npm ci --prefix client && npm ci --prefix admin",
+    "install:vercel": "npm ci --prefix server --omit=dev && npm ci --prefix client --include=dev && npm ci --prefix admin --include=dev",
     "build:client": "npm run build --prefix client",
     "build:admin": "npm run build --prefix admin",
     "build:vercel": "node deployment/build-vercel.mjs",
