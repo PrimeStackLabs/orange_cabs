@@ -135,7 +135,7 @@ Output:
 
 Connect the repository to Vercel with the repository root (`.`) as the project root. The root `vercel.json` explicitly builds the API as a Node serverless function and the combined frontends as a static build:
 
-- Install command: `npm run install:vercel`
+- Install command: `npm run install`
 - Build command: `npm run build:vercel`
 - Static build output: `deployment/vercel-output/client`
 
@@ -166,7 +166,7 @@ If API requests return 503, verify the Production `MONGODB_URI`, Atlas network a
 
 #### Local production build
 
-Install all three app dependencies with `npm run install:vercel`, then run `npm run build:vercel`. The combined static output is `deployment/vercel-output/client`.
+Install all three app dependencies with `npm run install`, then run `npm run build:vercel`. The combined static output is `deployment/vercel-output/client`.
 
 ---
 
