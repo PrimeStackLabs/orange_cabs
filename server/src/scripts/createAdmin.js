@@ -1,8 +1,7 @@
+import 'dotenv/config';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import Admin from '../models/Admin.js';
-
-dotenv.config();
+import { connectDB } from '../config/db.js';
 
 const createAdmin = async () => {
   const name = process.env.ADMIN_NAME?.trim();
@@ -19,11 +18,11 @@ const createAdmin = async () => {
     throw new Error('ADMIN_PASSWORD must be at least 6 characters long.');
   }
 
-  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/orangecab');
+  await connectDB();
 
   const existingAdmin = await Admin.findOne({ email });
   if (existingAdmin) {
-    throw new Error(`An admin account already exists for ${email}; no account was changed.`);
+    throw new Error('An admin account already exists for ADMIN_EMAIL; no account was changed.');
   }
 
   await Admin.create({
@@ -32,7 +31,7 @@ const createAdmin = async () => {
     password,
     role: 'Super Admin'
   });
-  console.info(`Created Super Admin account for ${email}.`);
+  console.info('Created the configured Super Admin account.');
 };
 
 try {

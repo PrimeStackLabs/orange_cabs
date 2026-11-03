@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import Admin from '../models/Admin.js';
 import Vehicle from '../models/Vehicle.js';
 import Driver from '../models/Driver.js';
@@ -12,8 +12,8 @@ import FAQ from '../models/FAQ.js';
 import Gallery from '../models/Gallery.js';
 import Setting from '../models/Setting.js';
 import ActivityLog from '../models/ActivityLog.js';
-
-dotenv.config();
+import defaultServices from '../data/defaultServices.js';
+import defaultVehicles from '../data/defaultVehicles.js';
 
 const seedDatabase = async () => {
   try {
@@ -51,129 +51,7 @@ const seedDatabase = async () => {
     }
 
     // 2. Vehicles (8 vehicles across categories: Hatchback, Sedan, SUV, Innova, Tempo Traveller, Luxury, Bus)
-    const vehiclesData = [
-      {
-        name: 'Maruti Suzuki WagonR / Swift',
-        category: 'Hatchback',
-        registrationNumber: 'KA 01 HB 1010',
-        seatingCapacity: 4,
-        luggageCapacity: 2,
-        ac: true,
-        perKmRate: 11,
-        baseFare: 600,
-        features: ['AC Air Conditioning', 'Bluetooth Audio', 'Fast Mobile Charger', 'Clean Sanitized Cabin'],
-        image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80',
-        fuelType: 'CNG',
-        status: 'available',
-        order: 1
-      },
-      {
-        name: 'Maruti Suzuki Dzire',
-        category: 'Sedan',
-        registrationNumber: 'KA 01 MJ 1024',
-        seatingCapacity: 4,
-        luggageCapacity: 3,
-        ac: true,
-        perKmRate: 13,
-        baseFare: 800,
-        features: ['Dual Airbags', 'Dual Zone AC', 'Large Boot Space', 'USB Fast Charger', 'GPS Telematics'],
-        image: '/images/fleet/maruti-dzire.webp',
-        fuelType: 'CNG',
-        status: 'available',
-        order: 2
-      },
-      {
-        name: 'Maruti Suzuki Ertiga Smart Hybrid',
-        category: 'SUV',
-        registrationNumber: 'KA 05 NR 4410',
-        seatingCapacity: 6,
-        luggageCapacity: 3,
-        ac: true,
-        perKmRate: 18,
-        baseFare: 1200,
-        features: ['Roof AC Vents', 'Captain Comfort Seats', 'High Ground Clearance', 'Rear Cup Holders'],
-        image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80',
-        fuelType: 'Petrol',
-        status: 'available',
-        order: 3
-      },
-      {
-        name: 'Toyota Innova Crysta ZX',
-        category: 'Innova',
-        registrationNumber: 'KA 51 EA 9001',
-        seatingCapacity: 7,
-        luggageCapacity: 4,
-        ac: true,
-        perKmRate: 22,
-        baseFare: 1600,
-        features: ['Executive Plush Recliners', 'Independent AC Controls', 'Highway Ride Balance', 'Premium Sound'],
-        image: '/images/fleet/innova-crysta-zx.webp',
-        fuelType: 'Diesel',
-        status: 'available',
-        order: 4
-      },
-      {
-        name: 'Toyota Innova Hycross Hybrid',
-        category: 'Innova',
-        registrationNumber: 'KA 02 LN 8820',
-        seatingCapacity: 7,
-        luggageCapacity: 4,
-        ac: true,
-        perKmRate: 24,
-        baseFare: 1800,
-        features: ['Ottoman Executive Lounge', 'Panoramic Sunroof', 'Silent EV Hybrid Drive', 'JBL Audio'],
-        image: '/images/fleet/innova-hycross.webp',
-        fuelType: 'Petrol',
-        status: 'available',
-        order: 5
-      },
-      {
-        name: 'Force Urbania Executive Cruiser',
-        category: 'Tempo Traveller',
-        registrationNumber: 'KA 03 TT 5555',
-        seatingCapacity: 13,
-        luggageCapacity: 10,
-        ac: true,
-        perKmRate: 28,
-        baseFare: 2500,
-        features: ['Individual Air Vents', 'Individual Reclining Seats', 'LED TV & Microphone', 'High Roof Walkthrough'],
-        image: '/images/fleet/force-urbania.webp',
-        fuelType: 'Diesel',
-        status: 'available',
-        order: 6
-      },
-      {
-        name: 'Mercedes-Benz E-Class Luxury',
-        category: 'Luxury',
-        registrationNumber: 'KA 01 LX 0007',
-        seatingCapacity: 4,
-        luggageCapacity: 3,
-        ac: true,
-        perKmRate: 45,
-        baseFare: 3500,
-        features: ['Chauffeur VIP Amenities', 'Burmester Sound System', 'Chilled Mineral Water', 'Wi-Fi Hotspot'],
-        image: '/images/fleet/mercedes-eclass.webp',
-        fuelType: 'Diesel',
-        status: 'available',
-        order: 7
-      },
-      {
-        name: 'BharatBenz AC Tourist Coach',
-        category: 'Bus',
-        registrationNumber: 'KA 04 BB 3399',
-        seatingCapacity: 26,
-        luggageCapacity: 25,
-        ac: true,
-        perKmRate: 42,
-        baseFare: 4500,
-        features: ['Air Suspension', 'Wide Pushback Seats', 'Overhead Luggage Bins', 'Emergency First Aid Kit'],
-        image: '/images/fleet/bharatbenz-coach.webp',
-        fuelType: 'Diesel',
-        status: 'available',
-        order: 8
-      }
-    ];
-    const vehicles = await Vehicle.insertMany(vehiclesData);
+    const vehicles = await Vehicle.insertMany(defaultVehicles);
 
     // 3. Drivers (6 drivers)
     const driversData = [
@@ -247,81 +125,7 @@ const seedDatabase = async () => {
     const drivers = await Driver.insertMany(driversData);
 
     // 4. Services
-    const servicesData = [
-      {
-        title: 'Airport Pickup & Drop',
-        slug: 'airport-pickup-drop',
-        image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=900&q=80',
-        description: 'Book a vehicle for airport pickup or drop-off. Share your flight and pickup details when requesting a booking.',
-        features: ['Airport Pickup', 'Airport Drop-off'],
-        badge: 'Airport Travel',
-        order: 1
-      },
-      {
-        title: 'Local Travel',
-        slug: 'local-travel',
-        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
-        description: 'Arrange point-to-point transportation for local journeys within your city.',
-        features: ['Local Pickup', 'Flexible Destination'],
-        badge: 'City Travel',
-        order: 2
-      },
-      {
-        title: 'Outstation Travel',
-        slug: 'outstation-travel',
-        image: 'https://images.unsplash.com/photo-1506015391300-4802dc74de2e?auto=format&fit=crop&w=900&q=80',
-        description: 'Plan an intercity journey with the vehicle category and route that suit your trip.',
-        features: ['Intercity Travel', 'Category-based Per-kilometre Rates'],
-        badge: 'Intercity',
-        order: 3
-      },
-      {
-        title: 'Corporate Travel',
-        slug: 'corporate-travel',
-        image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=80',
-        description: 'Request transportation for business travel, team movement, or a corporate itinerary.',
-        features: ['Business Travel', 'Team Transportation'],
-        badge: 'Business',
-        order: 4
-      },
-      {
-        title: 'One-Way Transportation',
-        slug: 'one-way-transportation',
-        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
-        description: 'Book a direct trip from your pickup location to your destination.',
-        features: ['Direct Pickup', 'Destination Drop-off'],
-        badge: 'Direct Travel',
-        order: 5
-      },
-      {
-        title: 'Wedding & Event Transportation',
-        slug: 'wedding-event-transportation',
-        image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80',
-        description: 'Coordinate transportation for wedding guests and event itineraries.',
-        features: ['Event Transportation', 'Group Vehicle Options'],
-        badge: 'Events',
-        order: 6
-      },
-      {
-        title: 'One-Day Packages',
-        slug: 'one-day-packages',
-        image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80',
-        description: 'Request a vehicle for a day and share your itinerary for a confirmed quote.',
-        features: ['Day-long Itinerary', 'Quote Confirmed Before Travel'],
-        badge: 'Day Trips',
-        order: 7
-      },
-      {
-        title: 'Hourly Packages',
-        slug: 'hourly-packages',
-        image: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=900&q=80',
-        description: 'Request an hourly city itinerary and confirm the applicable package in your quote.',
-        features: ['Hourly Itinerary', 'Quote Confirmed Before Travel'],
-        badge: 'Hourly Travel',
-        order: 8
-      }
-    ];
-    await Service.insertMany(servicesData);
+    await Service.insertMany(defaultServices);
 
     // 5. Testimonials (6 reviews)
     const testimonialsData = [

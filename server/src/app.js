@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -24,8 +24,6 @@ import packageRoutes from './routes/packageRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
-
-dotenv.config();
 
 const isProductionRuntime = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 

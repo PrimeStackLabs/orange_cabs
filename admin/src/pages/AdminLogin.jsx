@@ -8,14 +8,8 @@ const AdminLogin = () => {
   const location = useLocation();
   const { login } = useAdminAuth();
 
-  const isLocalDevelopment = import.meta.env.DEV
-    && ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  const [email, setEmail] = useState(
-    isLocalDevelopment ? import.meta.env.VITE_ADMIN_DEMO_EMAIL || '' : ''
-  );
-  const [password, setPassword] = useState(
-    isLocalDevelopment ? import.meta.env.VITE_ADMIN_DEMO_PASSWORD || '' : ''
-  );
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 

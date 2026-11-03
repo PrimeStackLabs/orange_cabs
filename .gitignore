@@ -1,11 +1,19 @@
+# Local dependencies
 node_modules/
+**/node_modules/
+
+# Environment secrets
 .env
 .env.*
 !.env.example
-!**/.env.example
-*.log
-*.zip
-.DS_Store
-.vercel/
-**/dist/
+
+# Build output
+dist/
+build/
 deployment/vercel-output/
+
+# Logs
+*.log
+
+# Local archives and backups
+archive/
