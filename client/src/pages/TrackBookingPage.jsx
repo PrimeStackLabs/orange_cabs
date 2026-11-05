@@ -17,8 +17,10 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 export default function TrackBookingPage() {
+  const { phoneHref, whatsappHref } = useContactSettings();
   const [searchParams] = useSearchParams();
 
   const [bookingId, setBookingId] = useState(searchParams.get('bookingId') || '');
@@ -122,7 +124,7 @@ export default function TrackBookingPage() {
                 <input
                   type="tel"
                   required
-                  placeholder="e.g. 9845012345"
+                  placeholder="Phone used for booking"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none"
@@ -221,7 +223,9 @@ export default function TrackBookingPage() {
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                 <a
-                  href={`https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20am%20inquiring%20about%20my%20booking%20ID:%20${booking.bookingId}`}
+                  href={whatsappHref
+                    ? `${whatsappHref}?text=Hello%20Orange%20Cab,%20I%20am%20inquiring%20about%20my%20booking%20ID:%20${booking.bookingId}`
+                    : undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-accent text-xs font-bold !py-2.5 !px-5"
@@ -231,7 +235,7 @@ export default function TrackBookingPage() {
                 </a>
 
                 <a
-                  href="tel:+919742588995"
+                  href={phoneHref || undefined}
                   className="btn-outline-dark text-xs font-bold !py-2.5 !px-5"
                 >
                   <Phone className="w-4 h-4" />

@@ -55,9 +55,9 @@ html_content = '''<!DOCTYPE html>
       </nav>
 
       <div class="nav-actions">
-        <a href="tel:+919742588995" class="nav-phone" title="Call Operations 24/7">
+        <a href="tel:+919845233300" class="nav-phone" title="Call Operations 24/7">
           <i class="fas fa-phone-alt"></i>
-          <span>+91 97425 88995</span>
+          <span>+91 98452 33300</span>
         </a>
         <a href="#" class="btn btn-primary btn-glow" data-modal-target="modal-quote">
           <span>Get Quote</span>
@@ -686,7 +686,7 @@ html_content = '''<!DOCTYPE html>
               <div class="spec-badge"><span class="emoji">🛰️</span><span>GPS</span></div>
             </div>
             <div class="fleet-card-actions">
-              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20am%20interested%20in%20Electric%20Vehicles%20(EV)." target="_blank" class="btn btn-primary btn-card-inquire">
+              <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20I%20am%20interested%20in%20Electric%20Vehicles%20(EV)." target="_blank" class="btn btn-primary btn-card-inquire">
                 <i class="fab fa-whatsapp"></i> Inquire EV
               </a>
               <button class="btn btn-card-specs">View Specs</button>
@@ -711,7 +711,7 @@ html_content = '''<!DOCTYPE html>
               <div class="spec-badge"><span class="emoji">🛰️</span><span>GPS</span></div>
             </div>
             <div class="fleet-card-actions">
-              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20a%20quote%20for%20CNG%20Vehicles." target="_blank" class="btn btn-primary btn-card-inquire">
+              <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20I%20would%20like%20a%20quote%20for%20CNG%20Vehicles." target="_blank" class="btn btn-primary btn-card-inquire">
                 <i class="fab fa-whatsapp"></i> Inquire CNG
               </a>
               <button class="btn btn-card-specs">View Specs</button>
@@ -736,7 +736,7 @@ html_content = '''<!DOCTYPE html>
               <div class="spec-badge"><span class="emoji">🛰️</span><span>GPS Tracked</span></div>
             </div>
             <div class="fleet-card-actions">
-              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20Please%20provide%20a%20quote%20for%20Executive%20Sedans." target="_blank" class="btn btn-primary btn-card-inquire">
+              <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20Please%20provide%20a%20quote%20for%20Executive%20Sedans." target="_blank" class="btn btn-primary btn-card-inquire">
                 <i class="fab fa-whatsapp"></i> Inquire Sedan
               </a>
               <button class="btn btn-card-specs">View Specs</button>
@@ -761,7 +761,7 @@ html_content = '''<!DOCTYPE html>
               <div class="spec-badge"><span class="emoji">🛰️</span><span>GPS Tracked</span></div>
             </div>
             <div class="fleet-card-actions">
-              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20Inquiring%20about%20Innova%20Crysta%20and%20Ertiga." target="_blank" class="btn btn-primary btn-card-inquire">
+              <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20Inquiring%20about%20Innova%20Crysta%20and%20Ertiga." target="_blank" class="btn btn-primary btn-card-inquire">
                 <i class="fab fa-whatsapp"></i> Inquire SUV
               </a>
               <button class="btn btn-card-specs">View Specs</button>
@@ -786,7 +786,7 @@ html_content = '''<!DOCTYPE html>
               <div class="spec-badge"><span class="emoji">🛰️</span><span>GPS Tracked</span></div>
             </div>
             <div class="fleet-card-actions">
-              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20We%20require%20Force%20Tempo%20Travellers." target="_blank" class="btn btn-primary btn-card-inquire">
+              <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20We%20require%20Force%20Tempo%20Travellers." target="_blank" class="btn btn-primary btn-card-inquire">
                 <i class="fab fa-whatsapp"></i> Inquire Tempo
               </a>
               <button class="btn btn-card-specs">View Specs</button>
@@ -811,7 +811,7 @@ html_content = '''<!DOCTYPE html>
               <div class="spec-badge"><span class="emoji">🛰️</span><span>GPS Tracked</span></div>
             </div>
             <div class="fleet-card-actions">
-              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20Inquiring%20about%20Volvo%20Luxury%20Coaches." target="_blank" class="btn btn-primary btn-card-inquire">
+              <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20Inquiring%20about%20Volvo%20Luxury%20Coaches." target="_blank" class="btn btn-primary btn-card-inquire">
                 <i class="fab fa-whatsapp"></i> Inquire Coach
               </a>
               <button class="btn btn-card-specs">View Specs</button>
@@ -836,7 +836,7 @@ html_content = '''<!DOCTYPE html>
               <div class="spec-badge"><span class="emoji">🛰️</span><span>GPS Tracked</span></div>
             </div>
             <div class="fleet-card-actions">
-              <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20We%20require%20high-capacity%20staff%20buses." target="_blank" class="btn btn-primary btn-card-inquire">
+              <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20We%20require%20high-capacity%20staff%20buses." target="_blank" class="btn btn-primary btn-card-inquire">
                 <i class="fab fa-whatsapp"></i> Inquire Bus
               </a>
               <button class="btn btn-card-specs">View Specs</button>
@@ -1424,7 +1424,7 @@ html_content = '''<!DOCTYPE html>
           </div>
           <div class="faq-answer">
             <p>
-              Call us at +91 97425 88995 or +91 95352 29994, email sales@srivijaytravels.com, or click the "Request a Quote" button on this page. Our team responds within 2 business hours with a customized proposal.
+              Call us at +91 98452 33300 or +91 95352 29994, email sales@srivijaytravels.com, or click the "Request a Quote" button on this page. Our team responds within 2 business hours with a customized proposal.
             </p>
           </div>
         </div>
@@ -1529,7 +1529,7 @@ html_content = '''<!DOCTYPE html>
             <div class="contact-box-icon"><i class="fas fa-phone-volume"></i></div>
             <div class="contact-box-text">
               <h4>Sales &amp; Enquiries</h4>
-              <a href="tel:+919742588995">+91 97425 88995</a>
+              <a href="tel:+919845233300">+91 98452 33300</a>
               <a href="tel:+919535229994">+91 95352 29994</a>
               <a href="tel:+917411144405">+91 74111 44405</a>
             </div>
@@ -1578,7 +1578,7 @@ html_content = '''<!DOCTYPE html>
               </div>
               <div class="form-group">
                 <label class="form-label" for="form-phone">Phone *</label>
-                <input type="tel" id="form-phone" class="form-control" placeholder="+91 97425 88995" required>
+                <input type="tel" id="form-phone" class="form-control" placeholder="+91 98452 33300" required>
               </div>
             </div>
 
@@ -1610,7 +1610,7 @@ html_content = '''<!DOCTYPE html>
               <span>Send via WhatsApp 💬</span>
             </button>
             <div style="font-size: 0.78rem; color: var(--text-dim); text-align: center; margin-top: 10px;">
-              Your message will open directly in WhatsApp to +91 97425 88995
+              Your message will open directly in WhatsApp to +91 98452 33300
             </div>
           </form>
         </div>
@@ -1638,8 +1638,8 @@ html_content = '''<!DOCTYPE html>
             Karnataka's most trusted ISO 9001:2015 certified corporate transport partner. Powered by Nyletech &amp; Technology Partners. Serving 10+ leading enterprises since 2016.
           </p>
           <div style="display: flex; gap: 12px; margin-top: 16px;">
-            <a href="tel:+919742588995" class="spec-badge" style="background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 8px;"><i class="fas fa-phone"></i> +91 97425 88995</a>
-            <a href="https://wa.me/919742588995" target="_blank" class="spec-badge" style="background: rgba(37,211,102,0.15); color:#25D366; padding: 8px 14px; border-radius: 8px;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <a href="tel:+919845233300" class="spec-badge" style="background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 8px;"><i class="fas fa-phone"></i> +91 98452 33300</a>
+            <a href="https://wa.me/919845233300" target="_blank" class="spec-badge" style="background: rgba(37,211,102,0.15); color:#25D366; padding: 8px 14px; border-radius: 8px;"><i class="fab fa-whatsapp"></i> WhatsApp</a>
           </div>
         </div>
 
@@ -1673,7 +1673,7 @@ html_content = '''<!DOCTYPE html>
             Shop No. 7, 8, 9, 1st Floor, Whitefield Main Road, Samethanahalli, Hosakote Taluk, Bengaluru – 560 067
           </p>
           <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
-            <span>📞 +91 97425 88995</span>
+            <span>📞 +91 98452 33300</span>
             <span>📞 +91 95352 29994</span>
             <span>✉️ sales@srivijaytravels.com</span>
           </div>
@@ -1701,13 +1701,13 @@ html_content = '''<!DOCTYPE html>
        ========================================================================== -->
   <div class="floating-widget-bar">
     <!-- Call Trigger -->
-    <a href="tel:+919742588995" class="float-action-btn float-btn-call" aria-label="Call Sri Vijay Travels" title="Instant Phone Call">
+    <a href="tel:+919845233300" class="float-action-btn float-btn-call" aria-label="Call Sri Vijay Travels" title="Instant Phone Call">
       <i class="fas fa-phone-alt"></i>
-      <span class="float-tooltip">Call +91 97425 88995</span>
+      <span class="float-tooltip">Call +91 98452 33300</span>
     </a>
 
     <!-- WhatsApp Trigger -->
-    <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20request%20an%20instant%20corporate%20mobility%20quote." target="_blank" class="float-action-btn float-btn-whatsapp" aria-label="WhatsApp Us" title="Instant WhatsApp">
+    <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20request%20an%20instant%20corporate%20mobility%20quote." target="_blank" class="float-action-btn float-btn-whatsapp" aria-label="WhatsApp Us" title="Instant WhatsApp">
       <i class="fab fa-whatsapp"></i>
       <span class="float-tooltip">Chat on WhatsApp</span>
     </a>
@@ -1781,7 +1781,7 @@ html_content = '''<!DOCTYPE html>
         </div>
         <div class="form-group">
           <label class="form-label">Phone *</label>
-          <input type="tel" id="modal-phone" class="form-control" placeholder="+91 97425 88995" required>
+          <input type="tel" id="modal-phone" class="form-control" placeholder="+91 98452 33300" required>
         </div>
         <div class="form-group">
           <label class="form-label">Service Required</label>
@@ -1884,7 +1884,7 @@ html_content = '''<!DOCTYPE html>
         </ul>
       </div>
 
-      <a href="https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20book%20a%20commercial%20trial%20for%20this%20vehicle%20category." target="_blank" class="btn btn-primary" style="width: 100%;">
+      <a href="https://wa.me/919845233300?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20book%20a%20commercial%20trial%20for%20this%20vehicle%20category." target="_blank" class="btn btn-primary" style="width: 100%;">
         <i class="fab fa-whatsapp"></i> Book Corporate Inspection / Trial
       </a>
     </div>
@@ -1916,7 +1916,8 @@ html_content = '''<!DOCTYPE html>
         `• *Vehicle:* ${cab}`
       );
 
-      window.open(`https://wa.me/919742588995?text=${text}`, '_blank');
+      const whatsappHref = window.orangeContactSettings?.whatsappHref;
+      if (whatsappHref) window.open(`${whatsappHref}?text=${text}`, '_blank');
     }
 
     function handleFormSubmit(e) {
@@ -1940,7 +1941,8 @@ html_content = '''<!DOCTYPE html>
         `• *Details:* ${message || 'N/A'}`
       );
 
-      window.open(`https://wa.me/919742588995?text=${text}`, '_blank');
+      const whatsappHref = window.orangeContactSettings?.whatsappHref;
+      if (whatsappHref) window.open(`${whatsappHref}?text=${text}`, '_blank');
     }
 
     function handleModalQuote(e) {
@@ -1960,7 +1962,8 @@ html_content = '''<!DOCTYPE html>
         `• *Employees/Vehicles:* ${count || 'N/A'}`
       );
 
-      window.open(`https://wa.me/919742588995?text=${text}`, '_blank');
+      const whatsappHref = window.orangeContactSettings?.whatsappHref;
+      if (whatsappHref) window.open(`${whatsappHref}?text=${text}`, '_blank');
       document.getElementById('modal-quote').classList.remove('open');
       document.body.style.overflow = '';
     }
@@ -1982,7 +1985,8 @@ html_content = '''<!DOCTYPE html>
         `• *Company:* ${company || 'N/A'}`
       );
 
-      window.open(`https://wa.me/919742588995?text=${text}`, '_blank');
+      const whatsappHref = window.orangeContactSettings?.whatsappHref;
+      if (whatsappHref) window.open(`${whatsappHref}?text=${text}`, '_blank');
       document.getElementById('modal-fleet-inquiry').classList.remove('open');
       document.body.style.overflow = '';
     }

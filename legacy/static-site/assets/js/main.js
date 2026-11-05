@@ -13,7 +13,83 @@ document.addEventListener('DOMContentLoaded', () => {
   initFAQAccordion();
   initModals();
   initCounters();
+  initContactSettings();
 });
+
+function initContactSettings() {
+  let active = true;
+  const whatsappLinks = Array.from(document.querySelectorAll('a[href^="https://wa.me/"]'));
+  const whatsappQueries = new Map(whatsappLinks.map(link => [link, new URL(link.href).search]));
+  const phoneLinks = Array.from(document.querySelectorAll(
+    '.nav-phone, .float-btn-call, .spec-badge[href^="tel:"], .contact-box-text h4 + a[href^="tel:"], .footer-col > a[href^="tel:"]'
+  ));
+  [...whatsappLinks, ...phoneLinks].forEach(link => link.removeAttribute('href'));
+
+  const refreshSettings = () => {
+    fetch('/api/settings')
+      .then(response => {
+        if (!response.ok) throw new Error(`Settings request failed: ${response.status}`);
+        return response.json();
+      })
+      .then(({ success, settings }) => {
+        if (!active || !success || !settings) return;
+
+        const phoneDigits = String(settings.phone || '').replace(/\D/g, '');
+        const whatsappDigits = String(settings.whatsapp || '').replace(/\D/g, '');
+        const phoneNumber = phoneDigits.length === 10 ? `91${phoneDigits}` : phoneDigits;
+        const whatsappNumber = whatsappDigits.length === 10 ? `91${whatsappDigits}` : whatsappDigits;
+
+        window.orangeContactSettings = {
+          phone: settings.phone || '',
+          phoneHref: phoneNumber ? `tel:+${phoneNumber}` : '',
+          whatsappHref: whatsappNumber ? `https://wa.me/${whatsappNumber}` : ''
+        };
+
+        whatsappLinks.forEach(link => {
+          if (!window.orangeContactSettings.whatsappHref) {
+            return;
+          }
+          link.href = `${window.orangeContactSettings.whatsappHref}${whatsappQueries.get(link) || ''}`;
+        });
+
+        phoneLinks.forEach(link => {
+          if (!window.orangeContactSettings.phoneHref) {
+            return;
+          }
+          link.href = window.orangeContactSettings.phoneHref;
+
+          if (link.classList.contains('nav-phone')) {
+            const label = link.querySelector('span');
+            if (label) label.textContent = settings.phone;
+          } else if (link.classList.contains('float-btn-call')) {
+            return;
+          } else if (link.classList.contains('spec-badge')) {
+            const text = Array.from(link.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+            if (text) text.nodeValue = ` ${settings.phone}`;
+          } else {
+            link.textContent = settings.phone;
+          }
+        });
+
+        document.querySelectorAll('.float-btn-call .float-tooltip').forEach(label => {
+          label.textContent = `Call ${settings.phone}`;
+        });
+        document.dispatchEvent(new CustomEvent('orangeContactSettingsUpdated'));
+      })
+      .catch(error => {
+        console.error('Failed to load legacy site contact settings:', error);
+      });
+  };
+
+  refreshSettings();
+  window.setInterval(() => {
+    if (document.visibilityState === 'visible') refreshSettings();
+  }, 15000);
+  window.addEventListener('focus', refreshSettings);
+  window.addEventListener('pagehide', () => {
+    active = false;
+  }, { once: true });
+}
 
 /* ==========================================================================
    1. NAVBAR STICKY & ACTIVE STATE
@@ -329,9 +405,11 @@ function initCorporateCalculator() {
       `• Estimated Budget: ₹${monthlyTotal.toLocaleString('en-IN')}/mo\n` +
       `Please provide a customized corporate proposal and contract pricing.`
     );
-    whatsappCalcBtn.href = `https://wa.me/919742588995?text=${msg}`;
+    const whatsappHref = window.orangeContactSettings?.whatsappHref;
+    whatsappCalcBtn.href = whatsappHref ? `${whatsappHref}?text=${msg}` : '#';
   }
 
+  window.addEventListener('orangeContactSettingsUpdated', updateCalculator);
   vehicleSelect.addEventListener('change', updateCalculator);
   distanceRange.addEventListener('input', updateCalculator);
   fleetCountRange.addEventListener('input', updateCalculator);

@@ -13,12 +13,14 @@ import {
   Clock,
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref, whatsappHref } = useContactSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -152,15 +154,17 @@ export default function Navbar() {
 
             <div className="pt-2 flex flex-col gap-2.5">
               <a
-                href="tel:+919742588995"
+                href={phoneHref || undefined}
                 className="w-full py-2.5 px-4 rounded-xl bg-gray-50 border border-gray-200 text-charcoal text-xs font-semibold flex items-center justify-center gap-2"
               >
                 <Phone className="w-4 h-4 text-accentOrange" />
-                <span>Call Hotline: +91 97425 88995</span>
+                <span>Call Hotline: {phone}</span>
               </a>
 
               <a
-                href="https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20book%20a%20ride."
+                href={whatsappHref
+                  ? `${whatsappHref}?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20book%20a%20ride.`
+                  : undefined}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-center gap-2"

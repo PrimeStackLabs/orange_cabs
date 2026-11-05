@@ -21,8 +21,10 @@ import {
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { VEHICLE_IMAGES } from '../constants/vehicleImages';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 export default function ContactPage() {
+  const { phone, phoneHref, whatsappHref } = useContactSettings();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -41,7 +43,7 @@ export default function ContactPage() {
     },
     {
       q: 'Can I book an executive cab or airport transfer immediately via phone?',
-      a: 'Yes, absolutely. Call our primary dispatch desk directly at +91 97425 88995. A duty travel manager will assign and confirm your vehicle immediately.'
+      a: `Yes, absolutely. Call our primary dispatch desk directly at ${phone}. A duty travel manager will assign and confirm your vehicle immediately.`
     },
     {
       q: 'Where is your corporate headquarters located?',
@@ -134,7 +136,7 @@ export default function ContactPage() {
             </div>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <a
-                href="tel:+919742588995"
+                href={phoneHref || undefined}
                 className="inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-orange-900/20 transition duration-200 hover:-translate-y-0.5 hover:shadow-xl sm:px-8"
               >
                 <Phone className="h-5 w-5" />
@@ -184,8 +186,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">24/7 Booking &amp; Dispatch Line</span>
-                    <a href="tel:+919742588995" className="text-xl font-heading font-black text-charcoal hover:text-brandRed transition-colors block mt-0.5">
-                      +91 97425 88995
+                    <a href={phoneHref || undefined} className="text-xl font-heading font-black text-charcoal hover:text-brandRed transition-colors block mt-0.5">
+                      {phone}
                     </a>
                     <p className="text-xs text-gray-500 mt-1">Instant chauffeur assignment &amp; flight delay support.</p>
                   </div>
@@ -201,12 +203,14 @@ export default function ContactPage() {
                   <div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">Instant WhatsApp Concierge</span>
                     <a
-                      href="https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20inquire%20about%20a%20ride."
+                      href={whatsappHref
+                        ? `${whatsappHref}?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20inquire%20about%20a%20ride.`
+                        : undefined}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-lg font-heading font-black text-charcoal hover:text-accentOrange transition-colors block mt-0.5"
                     >
-                      Chat on +91 97425 88995
+                      Chat on WhatsApp
                     </a>
                     <p className="text-xs text-gray-500 mt-1">Get quote breakdowns and vehicle pictures in seconds.</p>
                   </div>
@@ -309,7 +313,7 @@ export default function ContactPage() {
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
-                          placeholder="e.g. +91 98450 12345"
+                          placeholder="Enter your phone number"
                           required
                           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none transition-all"
                         />

@@ -144,7 +144,7 @@ const AuthModal = () => {
                     type="tel"
                     name="phone"
                     required
-                    placeholder="+91 99999 99999"
+                    placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-sm"

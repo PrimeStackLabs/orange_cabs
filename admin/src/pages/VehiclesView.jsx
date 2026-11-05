@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Car, Fuel, Users, Check, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Edit2, Trash2, Car, Fuel, Users, Check, X, ImagePlus, Upload } from 'lucide-react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -21,14 +21,10 @@ const getVehicleImage = (vehicle) => {
     { match: /dzire|sedan/, src: '/images/fleet/maruti-dzire.webp' },
     { match: /wagonr|swift|hatchback/, src: '/images/fleet/maruti-dzire.webp' }
   ];
-  const matchedImage = publicFleetImages.find(({ match }) => match.test(descriptor));
-
-  if (matchedImage) return matchedImage.src;
-
   const configuredImage = typeof vehicle.image === 'string' ? vehicle.image.trim() : '';
-  return configuredImage && !configuredImage.startsWith('http')
-    ? configuredImage
-    : VEHICLE_IMAGE_FALLBACK;
+  if (configuredImage) return configuredImage;
+
+  return publicFleetImages.find(({ match }) => match.test(descriptor))?.src || VEHICLE_IMAGE_FALLBACK;
 };
 
 const VehiclesView = () => {
@@ -36,6 +32,10 @@ const VehiclesView = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalVehicle, setModalVehicle] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImagePreview, setSelectedImagePreview] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const imageInputRef = useRef(null);
 
   const [form, setForm] = useState({
     name: '',
@@ -68,8 +68,20 @@ const VehiclesView = () => {
     fetchVehicles();
   }, []);
 
+  useEffect(() => {
+    if (!selectedImage) {
+      setSelectedImagePreview('');
+      return undefined;
+    }
+
+    const previewUrl = URL.createObjectURL(selectedImage);
+    setSelectedImagePreview(previewUrl);
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [selectedImage]);
+
   const openAdd = () => {
     setModalVehicle(null);
+    setSelectedImage(null);
     setForm({
       name: '',
       category: 'Sedan',
@@ -88,6 +100,7 @@ const VehiclesView = () => {
 
   const openEdit = (v) => {
     setModalVehicle(v);
+    setSelectedImage(null);
     setForm({
       name: v.name,
       category: v.category,
@@ -98,20 +111,79 @@ const VehiclesView = () => {
       baseFare: v.baseFare,
       fuelType: v.fuelType,
       modelYear: v.modelYear,
-      image: getVehicleImage(v),
+      image: v.image || getVehicleImage(v),
       features: v.features
     });
     setShowModal(true);
   };
 
+  const handleImageSelection = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    const supportedTypes = {
+      jpg: ['image/jpeg'],
+      jpeg: ['image/jpeg'],
+      png: ['image/png'],
+      webp: ['image/webp']
+    };
+
+    if (!supportedTypes[extension]?.includes(file.type)) {
+      toast.error('Choose a JPG, JPEG, PNG, or WEBP image.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be 5 MB or smaller.');
+      return;
+    }
+
+    setSelectedImage(file);
+  };
+
+  const handleImageUpload = async () => {
+    if (!selectedImage) {
+      toast.error('Choose an image before uploading.');
+      return;
+    }
+
+    const body = new FormData();
+    body.append('image', selectedImage);
+    setUploadingImage(true);
+    try {
+      const { data } = await api.post('/cabs/upload-image', body, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (!data.success || !data.imageUrl) {
+        throw new Error(data.message || 'Image upload did not return an image URL.');
+      }
+
+      setForm((current) => ({ ...current, image: data.imageUrl }));
+      setSelectedImage(null);
+      toast.success('Image uploaded successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message || 'Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setForm((current) => ({ ...current, image: '' }));
+    if (imageInputRef.current) imageInputRef.current.value = '';
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     try {
+      const vehicleForm = { ...form, image: form.image || VEHICLE_IMAGE_FALLBACK };
       if (modalVehicle) {
-        await api.put(`/cabs/${modalVehicle._id}`, form);
+        await api.put(`/cabs/${modalVehicle._id}`, vehicleForm);
         toast.success('Vehicle updated');
       } else {
-        await api.post('/cabs', form);
+        await api.post('/cabs', vehicleForm);
         toast.success('Vehicle added to fleet');
       }
       setShowModal(false);
@@ -214,7 +286,7 @@ const VehiclesView = () => {
       {/* Modal for Add / Edit */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/85 backdrop-blur-md">
-          <div className="glass-card border border-white/20 p-6 sm:p-8 rounded-3xl max-w-lg w-full shadow-2xl relative">
+          <div className="glass-card border border-white/20 p-6 sm:p-8 rounded-3xl max-h-[90vh] overflow-y-auto max-w-lg w-full shadow-2xl relative">
             <button onClick={() => setShowModal(false)} className="absolute top-5 right-5 p-1.5 text-gray-400 hover:text-white">
               <X className="w-5 h-5" />
             </button>
@@ -289,16 +361,75 @@ const VehiclesView = () => {
                 <input
                   type="text"
                   value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
+                  disabled={uploadingImage}
+                  onChange={(e) => {
+                    setSelectedImage(null);
+                    setForm({ ...form, image: e.target.value });
+                  }}
                   className="w-full px-3 py-2 rounded-xl glass-input"
                 />
+              </div>
+              <div className="space-y-2">
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                  onChange={handleImageSelection}
+                  className="hidden"
+                  aria-label="Choose a vehicle image"
+                />
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => imageInputRef.current?.click()}
+                    disabled={uploadingImage}
+                    className="px-3 py-2 rounded-xl glass text-gray-200 flex items-center gap-2"
+                  >
+                    <ImagePlus className="w-4 h-4 text-orange" />
+                    Upload Image from Gallery
+                  </button>
+                  {selectedImage && (
+                    <button
+                      type="button"
+                      onClick={handleImageUpload}
+                      disabled={uploadingImage}
+                      className="px-3 py-2 rounded-xl bg-orange hover:bg-orange-glow text-white font-semibold flex items-center gap-2 disabled:opacity-60"
+                    >
+                      <Upload className="w-4 h-4" />
+                      {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                    </button>
+                  )}
+                  {form.image && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      disabled={uploadingImage}
+                      className="px-3 py-2 rounded-xl glass text-red-300 flex items-center gap-2 disabled:opacity-60"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Remove Image
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-gray-400">JPG, JPEG, PNG, or WEBP. Maximum file size: 5 MB.</p>
+                {(selectedImagePreview || form.image) && (
+                  <img
+                    src={selectedImagePreview || form.image}
+                    alt="Vehicle image preview"
+                    className="h-32 w-full rounded-xl border border-white/10 object-cover"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = VEHICLE_IMAGE_FALLBACK;
+                    }}
+                  />
+                )}
               </div>
               <div className="flex justify-end gap-2 pt-4">
                 <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 rounded-xl glass text-gray-300">
                   Cancel
                 </button>
-                <button type="submit" className="px-5 py-2 rounded-xl bg-orange hover:bg-orange-glow text-white font-bold">
-                  Save Vehicle
+                <button type="submit" disabled={uploadingImage} className="px-5 py-2 rounded-xl bg-orange hover:bg-orange-glow text-white font-bold disabled:opacity-60">
+                  {uploadingImage ? 'Uploading image...' : 'Save Vehicle'}
                 </button>
               </div>
             </form>

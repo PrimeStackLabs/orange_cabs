@@ -16,9 +16,11 @@ import {
   Phone
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 export default function AirportTransportationPage() {
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref } = useContactSettings();
 
   const [pickupCity, setPickupCity] = useState('Electronic City');
   const [terminal, setTerminal] = useState('Kempegowda Int. Airport - Terminal 1');
@@ -200,11 +202,11 @@ export default function AirportTransportationPage() {
           </p>
           <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="tel:+919742588995"
+              href={phoneHref || undefined}
               className="btn-primary text-xs sm:text-sm !py-3 !px-7 shadow-glow-red"
             >
               <Phone className="w-4 h-4" />
-              <span>Call Airport Hotline: +91 97425 88995</span>
+              <span>Call Airport Hotline: {phone}</span>
             </a>
           </div>
         </div>

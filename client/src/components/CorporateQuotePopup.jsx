@@ -4,11 +4,13 @@ import { X, Building2, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../services/api';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 const POPUP_SHOWN_KEY = 'oc_quote_popup_shown';
 
 export default function CorporateQuotePopup() {
   const location = useLocation();
+  const { whatsappHref } = useContactSettings();
   const isBookingPage = location.pathname.startsWith('/book');
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -92,7 +94,9 @@ export default function CorporateQuotePopup() {
         `• *Employees/Vehicles:* ${count || 'N/A'}`
       );
       setTimeout(() => {
-        window.open(`https://wa.me/919742588995?text=${message}`, '_blank', 'noopener,noreferrer');
+        if (whatsappHref) {
+          window.open(`${whatsappHref}?text=${message}`, '_blank', 'noopener,noreferrer');
+        }
       }, 1200);
     } catch (err) {
       console.error('Corporate enquiry error:', err);
@@ -179,7 +183,7 @@ export default function CorporateQuotePopup() {
                         type="tel"
                         name="phone"
                         required
-                        placeholder="e.g. +91 98450 12345"
+                        placeholder="Enter your phone number"
                         className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none"
                       />
                     </div>

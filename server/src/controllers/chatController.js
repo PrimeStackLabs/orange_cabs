@@ -58,10 +58,11 @@ export const handleChatMessage = async (req, res, next) => {
         { label: 'Book Innova Crysta', action: 'book' }
       ];
     } else if (lower.includes('agent') || lower.includes('human') || lower.includes('call') || lower.includes('whatsapp') || lower.includes('help')) {
-      reply = 'Our 24x7 customer support desk is ready to help you directly. You can call +91 99999 99999 or chat with us on WhatsApp!';
+      const settings = await Setting.findOne() || await Setting.create({});
+      reply = `Our 24x7 customer support desk is ready to help you directly. You can call ${settings.phone} or chat with us on WhatsApp!`;
       quickReplies = [
         { label: 'Chat on WhatsApp', action: 'whatsapp' },
-        { label: 'Call Support (+91 99999 99999)', action: 'call' }
+        { label: `Call Support (${settings.phone})`, action: 'call' }
       ];
     } else {
       reply = 'Hello! I am OrangeBot, your 24/7 Orange Cab personal travel assistant. How may I assist your travel plans today?';

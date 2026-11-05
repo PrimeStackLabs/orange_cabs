@@ -15,9 +15,11 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 export default function FloatingWidgets() {
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref, whatsappHref } = useContactSettings();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   
@@ -66,7 +68,7 @@ export default function FloatingWidgets() {
       setIsChatOpen(false);
       window.dispatchEvent(new CustomEvent('openCorporateProposal'));
     } else if (action === 'call') {
-      window.location.href = 'tel:+919742588995';
+      if (phoneHref) window.location.href = phoneHref;
     }
   };
 
@@ -272,26 +274,28 @@ export default function FloatingWidgets() {
 
         {/* 24/7 Call Icon Button */}
         <a
-          href="tel:+919742588995"
+          href={phoneHref || undefined}
           className="floating-widget-call h-14 w-14 rounded-full bg-brandRed text-white shadow-[0_8px_25px_rgba(230,0,0,0.35)] hover:bg-[#c90000] hover:scale-105 active:scale-95 border border-white/20 transition-all flex items-center justify-center relative group"
-          title="Call 24/7 Dispatch (+91 97425 88995)"
+          title={`Call 24/7 Dispatch (${phone})`}
           aria-label="Call Dispatch"
         >
           <Phone className="w-5 h-5 text-white group-hover:rotate-12 transition-transform duration-300" />
           
           {/* Tooltip */}
           <span className="pointer-events-none absolute right-16 whitespace-nowrap rounded-xl bg-[#101010] px-3 py-1.5 text-xs font-bold text-white opacity-0 shadow-xl border border-white/10 transition-opacity group-hover:opacity-100 hidden sm:inline-block">
-            Call Dispatch (+91 97425 88995)
+            Call Dispatch ({phone})
           </span>
         </a>
 
         {/* WhatsApp Direct Button */}
         <a
-          href="https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20inquire%20about%20booking%20a%20cab."
+          href={whatsappHref
+            ? `${whatsappHref}?text=Hello%20Orange%20Cab,%20I%20would%20like%20to%20inquire%20about%20booking%20a%20cab.`
+            : undefined}
           target="_blank"
           rel="noopener noreferrer"
           className="floating-widget-whatsapp flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_25px_rgba(37,211,102,0.4)] hover:bg-[#20bd5a] hover:scale-105 active:scale-95 transition-all group relative"
-          title="Instant WhatsApp Support (+91 97425 88995)"
+          title="Instant WhatsApp Support"
           aria-label="WhatsApp Support"
         >
           <svg className="h-6 w-6 fill-current group-hover:rotate-12 transition-transform duration-300" viewBox="0 0 24 24">

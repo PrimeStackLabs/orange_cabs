@@ -8,8 +8,8 @@ export default function SettingsView() {
     brandName: 'ORANGE CARS',
     tagline: 'Your Journey, Our Priority.',
     logoUrl: '',
-    phone: '+91 99999 99999',
-    whatsapp: '919999999999',
+    phone: '+91 98452 33300',
+    whatsapp: '919845233300',
     email: 'info@orangecab.in',
     address: 'Ground Floor, Prestige Meridian, MG Road, Bangalore 560001, Karnataka, India',
     workingHours: '24 Hours / 7 Days a Week',
@@ -19,7 +19,7 @@ export default function SettingsView() {
       twitter: 'https://x.com/orangecab',
       youtube: 'https://youtube.com/@orangecab',
       linkedin: 'https://linkedin.com/company/orangecab',
-      whatsapp: 'https://wa.me/919999999999',
+      whatsapp: 'https://wa.me/919845233300',
       telegram: 'https://t.me/orangecab',
       pinterest: 'https://pinterest.com/orangecab'
     },
@@ -67,6 +67,11 @@ export default function SettingsView() {
       };
       const { data } = await api.put('/content/settings', payload);
       if (data.success) {
+        try {
+          window.localStorage.setItem('orange-cabs-contact-settings-updated', String(Date.now()));
+        } catch (error) {
+          console.error('Could not notify open client tabs about updated contact settings:', error);
+        }
         toast.success('Website configuration saved successfully');
       }
     } catch (err) {
@@ -126,7 +131,7 @@ export default function SettingsView() {
               />
             </div>
             <div>
-              <label className="block text-gray-300 font-semibold mb-1">WhatsApp Number (e.g. 919999999999)</label>
+              <label className="block text-gray-300 font-semibold mb-1">WhatsApp Number (e.g. 919845233300)</label>
               <input
                 type="text"
                 value={settings.whatsapp || ''}

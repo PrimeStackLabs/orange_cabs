@@ -469,8 +469,8 @@ const seedDatabase = async () => {
     await Setting.create({
       brandName: 'ORANGE CARS',
       tagline: 'Your Journey, Our Priority.',
-      phone: '+91 99999 99999',
-      whatsapp: '919999999999',
+      phone: '+91 98452 33300',
+      whatsapp: '919845233300',
       email: 'info@orangecab.in',
       address: 'Ground Floor, Prestige Meridian, MG Road, Bangalore 560001, Karnataka, India',
       workingHours: '24 Hours / 7 Days a Week',
@@ -480,7 +480,7 @@ const seedDatabase = async () => {
         twitter: 'https://x.com/orangecab',
         youtube: 'https://youtube.com/@orangecab',
         linkedin: 'https://linkedin.com/company/orangecab',
-        whatsapp: 'https://wa.me/919999999999',
+        whatsapp: 'https://wa.me/919845233300',
         telegram: 'https://t.me/orangecab',
         pinterest: 'https://pinterest.com/orangecab'
       },

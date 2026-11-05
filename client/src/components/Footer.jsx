@@ -13,9 +13,11 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { useBookingModal } from '../context/BookingModalContext';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 export default function Footer() {
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref, whatsappHref } = useContactSettings();
 
   const quickLinks = [
     { name: 'Home', path: '/' },
@@ -134,8 +136,8 @@ export default function Footer() {
 
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-accentOrange shrink-0" />
-                <a href="tel:+919742588995" className="hover:text-white transition-colors font-medium text-white">
-                  +91 97425 88995
+                <a href={phoneHref || undefined} className="hover:text-white transition-colors font-medium text-white">
+                  {phone}
                 </a>
               </li>
 
@@ -158,7 +160,7 @@ export default function Footer() {
               <div className="flex items-center gap-2.5">
                 {/* WhatsApp */}
                 <a
-                  href="https://wa.me/919742588995"
+                  href={whatsappHref || undefined}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-9 h-9 rounded-xl bg-white/10 hover:bg-brandRed text-white flex items-center justify-center transition-all"

@@ -19,6 +19,7 @@ import {
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useBookingModal } from '../context/BookingModalContext';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 const CORPORATE_CLIENTS = [
   { name: 'AECOM', logo: '/images/AECOM.png' },
@@ -33,6 +34,7 @@ const CORPORATE_CLIENTS = [
 
 export default function CorporateTravelPage() {
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref } = useContactSettings();
 
   const [formData, setFormData] = useState({
     company: '',
@@ -173,8 +175,8 @@ export default function CorporateTravelPage() {
               {/* Direct Call Box */}
               <div className="p-6 rounded-2xl bg-[#101010] text-white space-y-2 mt-6">
                 <span className="text-xs uppercase tracking-wider text-accentOrange font-bold block">Enterprise Hotline</span>
-                <a href="tel:+919742588995" className="text-xl font-heading font-black hover:text-accentOrange transition-colors block">
-                  +91 97425 88995
+                <a href={phoneHref || undefined} className="text-xl font-heading font-black hover:text-accentOrange transition-colors block">
+                  {phone}
                 </a>
                 <p className="text-xs text-gray-400">Speak directly with our VP of Corporate Mobility.</p>
               </div>
@@ -237,7 +239,7 @@ export default function CorporateTravelPage() {
                           required
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="e.g. +91 98450 12345"
+                          placeholder="Enter your phone number"
                           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:border-brandRed focus:ring-1 focus:ring-brandRed outline-none"
                         />
                       </div>

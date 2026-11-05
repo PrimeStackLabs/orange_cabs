@@ -23,6 +23,7 @@ import confetti from 'canvas-confetti';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import { useBookingModal } from '../context/BookingModalContext';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 const SERVICE_TYPES = [
   { id: 'Airport Pickup & Drop', label: 'Airport Pickup & Drop' },
@@ -45,6 +46,7 @@ const DEFAULT_VEHICLE_CATEGORIES = [
 
 export default function BookingModal() {
   const { isOpen, closeBookingModal, initialData } = useBookingModal();
+  const { whatsappHref } = useContactSettings();
 
   const [step, setStep] = useState(1); // 1 = Ride Details, 2 = Passenger & Review, 3 = Confirmation
   const [loading, setLoading] = useState(false);
@@ -669,7 +671,9 @@ export default function BookingModal() {
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                   <a
-                    href={`https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20have%20confirmed%20Booking%20ID:%20${confirmedBooking.bookingId}%20for%20pickup%20at%20${encodeURIComponent(confirmedBooking.pickup)}.`}
+                    href={whatsappHref
+                      ? `${whatsappHref}?text=Hello%20Orange%20Cab,%20I%20have%20confirmed%20Booking%20ID:%20${confirmedBooking.bookingId}%20for%20pickup%20at%20${encodeURIComponent(confirmedBooking.pickup)}.`
+                      : undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full sm:w-auto btn-accent text-xs font-bold !py-3 !px-5"

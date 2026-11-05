@@ -80,7 +80,7 @@ function initAIChatbot() {
 
     return {
       text: "Thank you for reaching out! For tailored corporate contracts, SLA customization, or instant fleet deployment, our operations team is ready to connect with you directly on WhatsApp or phone.",
-      chips: ['WhatsApp Support', 'Call +91 97425 88995', 'Calculate Fare']
+      chips: ['WhatsApp Support', 'Call Support', 'Calculate Fare']
     };
   }
 
@@ -118,12 +118,16 @@ function initAIChatbot() {
 
   function handleChipAction(actionText) {
     if (actionText === 'Instant WhatsApp Proposal' || actionText === 'WhatsApp Support' || actionText === 'WhatsApp Dispatch') {
-      window.open('https://wa.me/919742588995?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20inquire%20about%20corporate%20mobility%20services.', '_blank');
+      const whatsappHref = window.orangeContactSettings?.whatsappHref;
+      if (whatsappHref) {
+        window.open(`${whatsappHref}?text=Hello%20Orange%20Cabs!%20I%20would%20like%20to%20inquire%20about%20corporate%20mobility%20services.`, '_blank');
+      }
       return;
     }
 
     if (actionText.includes('Call')) {
-      window.location.href = 'tel:+919742588995';
+      const phoneHref = window.orangeContactSettings?.phoneHref;
+      if (phoneHref) window.location.href = phoneHref;
       return;
     }
 

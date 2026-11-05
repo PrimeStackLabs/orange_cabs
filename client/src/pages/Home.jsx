@@ -52,6 +52,7 @@ import { useBookingModal } from '../context/BookingModalContext';
 import api from '../services/api';
 import { VEHICLE_IMAGES, VEHICLE_IMAGE_FALLBACK } from '../constants/vehicleImages';
 import toast from 'react-hot-toast';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 // Testimonials
 const TESTIMONIALS = [
@@ -89,7 +90,7 @@ const TESTIMONIALS = [
 const FAQS = [
   {
     q: 'How can I book a cab?',
-    a: 'You can book a ride seamlessly using our online booking widget on the homepage, clicking "Book Your Ride" at the top of any page, or calling our 24/7 hotline at +91 97425 88995. Instant confirmation with a unique booking reference ID is sent to your screen and via WhatsApp.'
+    a: 'You can book a ride seamlessly using our online booking widget on the homepage, clicking "Book Your Ride" at the top of any page, or calling our 24/7 hotline. Instant confirmation with a unique booking reference ID is sent to your screen and via WhatsApp.'
   },
   {
     q: 'Which cities do you serve?',
@@ -105,11 +106,11 @@ const FAQS = [
   },
   {
     q: 'How can I cancel a booking?',
-    a: 'Cancellations are completely hassle-free and free of charge when requested up to 2 hours prior to your scheduled pickup. You can cancel by contacting our 24/7 dispatch desk on WhatsApp or calling +91 97425 88995.'
+    a: 'Cancellations are completely hassle-free and free of charge when requested up to 2 hours prior to your scheduled pickup. You can cancel by contacting our 24/7 dispatch desk on WhatsApp or by phone.'
   },
   {
     q: 'How can I contact customer support?',
-    a: 'Our dispatch command center is available 24/7, 365 days a year. You can call our direct helpline at +91 97425 88995, chat with us on WhatsApp, or email us at info@orangecab.in.'
+    a: 'Our dispatch command center is available 24/7, 365 days a year. You can call our direct helpline, chat with us on WhatsApp, or email us at info@orangecab.in.'
   }
 ];
 
@@ -124,6 +125,7 @@ const HERO_VEHICLES = [
 
 export default function Home() {
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref } = useContactSettings();
 
   const [activeHeroVehicle, setActiveHeroVehicle] = useState(0);
   // Testimonial Carousel Index
@@ -794,7 +796,7 @@ export default function Home() {
                 </button>
 
                 <a
-                  href="tel:+919742588995"
+                  href={phoneHref || undefined}
                   className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-full border border-[#D94308]/50 bg-white/80 px-6 py-3 text-sm font-bold text-[#D94308] transition duration-200 hover:-translate-y-0.5 hover:border-[#F45B0B] hover:bg-[#FFF3D6] sm:px-7 sm:text-base"
                 >
                   <Phone className="h-5 w-5" />
@@ -848,9 +850,9 @@ export default function Home() {
                   <Headset className="h-5 w-5 text-[#FF9A2E]" />
                   Duty Manager Hotline
                 </span>
-                <a href="tel:+919742588995" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110">
+                <a href={phoneHref || undefined} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#F45B0B] to-[#D94308] px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110">
                   <Phone className="h-4 w-4" />
-                  +91 97425 88995
+                  {phone}
                 </a>
               </div>
             </motion.div>
@@ -1187,7 +1189,7 @@ export default function Home() {
             </div>
 
             <p className="text-xs text-gray-400 pt-1">
-              24/7 Telephone Hotline: <a href="tel:+919742588995" className="text-white font-semibold underline underline-offset-4">+91 97425 88995</a>
+              24/7 Telephone Hotline: <a href={phoneHref || undefined} className="text-white font-semibold underline underline-offset-4">{phone}</a>
             </p>
           </div>
 

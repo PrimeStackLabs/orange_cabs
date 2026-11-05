@@ -17,6 +17,7 @@ import {
 import { useBookingModal } from '../context/BookingModalContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 const POPULAR_ROUTES = [
   {
@@ -65,6 +66,7 @@ const POPULAR_ROUTES = [
 
 export default function OutstationBookingPage() {
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref } = useContactSettings();
   const [outstationPricing, setOutstationPricing] = useState(null);
 
   useEffect(() => {
@@ -194,11 +196,11 @@ export default function OutstationBookingPage() {
           </p>
           <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
             <a
-              href="tel:+919742588995"
+              href={phoneHref || undefined}
               className="btn-primary text-xs sm:text-sm !py-3 !px-7 shadow-glow-red"
             >
               <Phone className="w-4 h-4" />
-              <span>Call Outstation Desk: +91 97425 88995</span>
+              <span>Call Outstation Desk: {phone}</span>
             </a>
           </div>
         </div>

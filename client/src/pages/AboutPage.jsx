@@ -15,9 +15,11 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useBookingModal } from '../context/BookingModalContext';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 export default function AboutPage() {
   const { openBookingModal } = useBookingModal();
+  const { phone, phoneHref } = useContactSettings();
 
   const corePillars = [
     {
@@ -242,8 +244,8 @@ export default function AboutPage() {
               <Building2 className="h-4 w-4" /> Corporate Inquiries
             </button>
           </div>
-          <a href="tel:+919742588995" className="mt-4 inline-flex items-center gap-2 text-xs text-gray-600 transition hover:text-[#D94308]">
-            <Phone className="h-3.5 w-3.5 text-[#D94308]" /> Need help? +91 97425 88995
+          <a href={phoneHref || undefined} className="mt-4 inline-flex items-center gap-2 text-xs text-gray-600 transition hover:text-[#D94308]">
+            <Phone className="h-3.5 w-3.5 text-[#D94308]" /> Need help? {phone}
           </a>
         </div>
       </section>

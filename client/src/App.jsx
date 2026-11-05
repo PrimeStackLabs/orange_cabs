@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import { BookingModalProvider } from './context/BookingModalContext';
+import { ContactSettingsProvider } from './context/ContactSettingsContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import FloatingWidgets from './components/FloatingWidgets';
@@ -45,7 +46,8 @@ function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <BookingModalProvider>
-        <div className="site-luxury-theme relative min-h-screen flex flex-col bg-[#FFF9F2] text-[#171717] selection:bg-brandRed selection:text-white">
+        <ContactSettingsProvider>
+          <div className="site-luxury-theme relative min-h-screen flex flex-col bg-[#FFF9F2] text-[#171717] selection:bg-brandRed selection:text-white">
           <Toaster
             position="top-right"
             toastOptions={{
@@ -97,7 +99,8 @@ function App() {
 
           <Footer />
           <FloatingWidgets />
-        </div>
+          </div>
+        </ContactSettingsProvider>
       </BookingModalProvider>
     </BrowserRouter>
   );

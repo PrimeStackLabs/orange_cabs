@@ -29,6 +29,7 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import { VEHICLE_IMAGE_FALLBACK, VEHICLE_IMAGES } from '../constants/vehicleImages';
+import { useContactSettings } from '../context/ContactSettingsContext';
 
 const SERVICE_OPTIONS = [
   { id: 'Airport Pickup & Drop', label: 'Airport Pickup & Drop', desc: 'Airport pickup or drop-off', icon: Plane },
@@ -83,6 +84,7 @@ const getVehicleImage = (vehicle) => {
 };
 
 export default function BookCabPage() {
+  const { whatsappHref } = useContactSettings();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const initialData = location.state || {};
@@ -630,7 +632,7 @@ export default function BookCabPage() {
                     <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#171717]">
                       <Phone className="h-4 w-4 text-[#F45B0B]" /> Mobile Number <span className="text-[#F45B0B]">*</span>
                     </label>
-                    <input type="tel" required autoComplete="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+91 98765 43210" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
+                    <input type="tel" required autoComplete="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="Enter your phone number" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none transition focus:border-[#F45B0B] focus:ring-4 focus:ring-[#F45B0B]/10" />
                   </div>
 
                   <div>
@@ -744,7 +746,9 @@ export default function BookCabPage() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
                   <a
-                    href={`https://wa.me/919742588995?text=Hello%20Orange%20Cab,%20I%20have%20confirmed%20Booking%20ID:%20${confirmedBooking.bookingId}%20for%20pickup%20at%20${encodeURIComponent(confirmedBooking.pickup)}.`}
+                    href={whatsappHref
+                      ? `${whatsappHref}?text=Hello%20Orange%20Cab,%20I%20have%20confirmed%20Booking%20ID:%20${confirmedBooking.bookingId}%20for%20pickup%20at%20${encodeURIComponent(confirmedBooking.pickup)}.`
+                      : undefined}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full sm:w-auto btn-accent text-xs font-bold !py-3 !px-6"
