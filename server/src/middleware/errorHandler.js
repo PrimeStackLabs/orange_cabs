@@ -1,5 +1,9 @@
+export const redactSensitiveLogValue = (value) => String(value ?? '')
+  .replace(/mongodb(?:\+srv)?:\/\/[^\s"'<>]+/gi, '[MongoDB URI redacted]')
+  .replace(/\bBearer\s+[A-Za-z0-9._~+/-]+=*/gi, 'Bearer [redacted]')
+  .replace(/\b(password|passwd|token|secret|api[_-]?key)\b\s*[:=]\s*[^,\s;]+/gi, '$1=[redacted]');
+
 export const errorHandler = (err, req, res, next) => {
-  console.error('[Error Caught]:', err.stack || err.message);
 
   let statusCode = err.statusCode || err.status || (res.statusCode === 200 ? 500 : res.statusCode);
   let message = err.publicMessage || err.message || 'Internal Server Error';
@@ -19,6 +23,14 @@ export const errorHandler = (err, req, res, next) => {
     statusCode = 400;
     message = Object.values(err.errors).map(val => val.message).join(', ');
   }
+
+  console.error('[API Error]', JSON.stringify({
+    method: req.method,
+    path: req.path,
+    statusCode,
+    error: err.name || 'Error',
+    message: redactSensitiveLogValue(err.message)
+  }));
 
   res.status(statusCode).json({
     success: false,

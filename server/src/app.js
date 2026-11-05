@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 
 import { connectDB } from './config/db.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import { errorHandler, redactSensitiveLogValue } from './middleware/errorHandler.js';
 
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -26,11 +26,19 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
 
 const isProductionRuntime = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+const requiredBrowserOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'https://orange-cars.com',
+  'https://www.orange-cars.com'
+];
 
 const normalizeOrigin = (value) => {
-  if (!value) return null;
+  if (!value || typeof value !== 'string') return null;
   try {
-    return new URL(value.includes('://') ? value : `https://${value}`).origin;
+    const candidate = value.trim();
+    if (!candidate) return null;
+    return new URL(candidate.includes('://') ? candidate : `https://${candidate}`).origin;
   } catch {
     return null;
   }
@@ -38,6 +46,7 @@ const normalizeOrigin = (value) => {
 
 export const getAllowedOrigins = () => {
   const configuredOrigins = [
+    ...requiredBrowserOrigins,
     process.env.CLIENT_URL,
     process.env.ADMIN_URL,
     process.env.VERCEL_URL,
@@ -66,20 +75,27 @@ export const createApp = ({ io } = {}) => {
 
   app.use(helmet({ crossOriginResourcePolicy: false }));
   app.use((req, res, next) => {
-    const requestOrigin = `${req.protocol}://${req.get('host')}`;
-    cors({
+    const corsOptions = {
       origin(origin, callback) {
+        const requestOrigin = `${req.protocol}://${req.get('host')}`;
         if (!origin || origin === requestOrigin || allowedOrigins.includes(origin)) {
           callback(null, true);
           return;
         }
 
+        console.warn('[CORS] Rejected request', JSON.stringify({
+          method: req.method,
+          path: req.path,
+          origin: redactSensitiveLogValue(origin || '(missing)').slice(0, 200)
+        }));
         const error = new Error('This origin is not allowed to access the API.');
         error.statusCode = 403;
         callback(error);
       },
       credentials: true
-    })(req, res, next);
+    };
+    // cors() answers OPTIONS preflight requests by default; keep it ahead of all routes.
+    cors(corsOptions)(req, res, next);
   });
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -97,7 +113,12 @@ export const createApp = ({ io } = {}) => {
       await connectDB();
       next();
     } catch (error) {
-      console.error(`[MongoDB] API request could not connect: ${error.message}`);
+      console.error('[MongoDB] API connection failed', JSON.stringify({
+        method: req.method,
+        path: req.path,
+        error: error.name || 'Error',
+        message: redactSensitiveLogValue(error.message)
+      }));
       error.statusCode = 503;
       error.publicMessage = 'Database connection unavailable. Please try again later.';
       next(error);
