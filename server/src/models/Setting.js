@@ -35,7 +35,7 @@ const settingSchema = new mongoose.Schema({
   phone: { type: String, default: '+91 98452 33300' },
   whatsapp: { type: String, default: '919845233300' },
   email: { type: String, default: 'info@orangecab.in' },
-  address: { type: String, default: 'Ground Floor, Prestige Meridian, MG Road, Bangalore 560001, India' },
+  address: { type: String, default: '#50, 3rd Main, Peenya, Dasarahalli, Bangalore - 560057' },
   workingHours: { type: String, default: '24 Hours / 7 Days a Week' },
   socialLinks: {
     facebook: { type: String, default: 'https://facebook.com/orangecab' },
@@ -59,11 +59,11 @@ const settingSchema = new mongoose.Schema({
   vehicleCategories: {
     type: [vehicleCategorySchema],
     default: [
-      { name: 'Hatchback', minRate: 12, maxRate: 12, image: '/images/fleet/maruti-dzire.webp', passengers: 4 },
-      { name: 'Sedan', minRate: 14, maxRate: 14, image: '/images/fleet/skoda-superb.webp', passengers: 4 },
-      { name: 'SUV', minRate: 22, maxRate: 22, image: '/images/fleet/innova-crysta-zx.webp', passengers: 7 },
-      { name: 'Luxury Cars', minRate: 30, maxRate: 30, image: '/images/fleet/mercedes-eclass.webp', passengers: 4 },
-      { name: 'Tempo Traveller', minRate: 20, maxRate: 28, image: '/images/fleet/force-urbania.webp', passengers: 13 }
+      { name: 'Hatchback', minRate: 12, maxRate: 12, image: '/images/fleet/hatchback.jpeg', passengers: 4 },
+      { name: 'Sedan', minRate: 14, maxRate: 14, image: '/images/fleet/sedan.jpeg', passengers: 4 },
+      { name: 'SUV', minRate: 22, maxRate: 22, image: '/images/fleet/suv-clean.png', passengers: 7 },
+      { name: 'Luxury Cars', minRate: 30, maxRate: 30, image: '/images/fleet/luxury.jpeg', passengers: 4 },
+      { name: 'Tempo Traveller', minRate: 20, maxRate: 28, image: '/images/fleet/tempo-traveller.jpeg', passengers: 13 }
     ]
   },
   outstationPricing: { type: outstationPricingSchema, default: () => ({}) },

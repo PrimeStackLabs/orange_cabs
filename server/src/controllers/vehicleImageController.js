@@ -1,4 +1,5 @@
-import { v2 as cloudinary } from 'cloudinary';
+import mongoose from 'mongoose';
+import VehicleImage from '../models/VehicleImage.js';
 import { validateVehicleImageContents } from '../middleware/vehicleImageUpload.js';
 
 export const uploadVehicleImage = async (req, res, next) => {
@@ -14,42 +15,34 @@ export const uploadVehicleImage = async (req, res, next) => {
       });
     }
 
-    const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
-    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-      return res.status(503).json({
-        success: false,
-        message: 'Image storage is not configured. Contact the system administrator.'
-      });
-    }
-
-    cloudinary.config({
-      cloud_name: CLOUDINARY_CLOUD_NAME,
-      api_key: CLOUDINARY_API_KEY,
-      api_secret: CLOUDINARY_API_SECRET,
-      secure: true
+    const storedImage = await VehicleImage.create({
+      data: req.file.buffer,
+      contentType: req.file.mimetype
     });
 
-    const image = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream({
-        folder: 'orange-cabs/vehicles',
-        resource_type: 'image',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'webp']
-      }, (error, result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve(result);
-      });
-      stream.end(req.file.buffer);
-    });
-
-    if (!image?.secure_url) {
-      throw new Error('Image storage did not return a secure image URL.');
-    }
-
-    res.status(201).json({ success: true, imageUrl: image.secure_url });
+    const imageUrl = new URL(`/api/cabs/images/${storedImage._id}`, `${req.protocol}://${req.get('host')}`).toString();
+    return res.status(201).json({ success: true, imageUrl });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getVehicleImage = async (req, res, next) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(404).end();
+    }
+
+    const image = await VehicleImage.findById(req.params.id).select('data contentType');
+    if (!image) return res.status(404).end();
+
+    res.set({
+      'Content-Type': image.contentType,
+      'Cache-Control': 'public, max-age=31536000, immutable',
+      'X-Content-Type-Options': 'nosniff'
+    });
+    return res.send(image.data);
+  } catch (error) {
+    return next(error);
   }
 };

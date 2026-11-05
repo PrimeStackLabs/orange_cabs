@@ -9,7 +9,7 @@ const defaultVehicles = [
     perKmRate: 11,
     baseFare: 600,
     features: ['AC Air Conditioning', 'Bluetooth Audio', 'Fast Mobile Charger', 'Clean Sanitized Cabin'],
-    image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80',
+    image: '/images/fleet/hatchback.jpeg',
     fuelType: 'CNG',
     status: 'available',
     order: 1
@@ -24,7 +24,7 @@ const defaultVehicles = [
     perKmRate: 13,
     baseFare: 800,
     features: ['Dual Airbags', 'Dual Zone AC', 'Large Boot Space', 'USB Fast Charger', 'GPS Telematics'],
-    image: '/images/fleet/maruti-dzire.webp',
+    image: '/images/fleet/sedan.jpeg',
     fuelType: 'CNG',
     status: 'available',
     order: 2
@@ -39,7 +39,7 @@ const defaultVehicles = [
     perKmRate: 18,
     baseFare: 1200,
     features: ['Roof AC Vents', 'Captain Comfort Seats', 'High Ground Clearance', 'Rear Cup Holders'],
-    image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80',
+    image: '/images/fleet/suv-clean.png',
     fuelType: 'Petrol',
     status: 'available',
     order: 3
@@ -84,7 +84,7 @@ const defaultVehicles = [
     perKmRate: 28,
     baseFare: 2500,
     features: ['Individual Air Vents', 'Individual Reclining Seats', 'LED TV & Microphone', 'High Roof Walkthrough'],
-    image: '/images/fleet/force-urbania.webp',
+    image: '/images/fleet/tempo-traveller.jpeg',
     fuelType: 'Diesel',
     status: 'available',
     order: 6
@@ -99,7 +99,7 @@ const defaultVehicles = [
     perKmRate: 45,
     baseFare: 3500,
     features: ['Chauffeur VIP Amenities', 'Burmester Sound System', 'Chilled Mineral Water', 'Wi-Fi Hotspot'],
-    image: '/images/fleet/mercedes-eclass.webp',
+    image: '/images/fleet/luxury.jpeg',
     fuelType: 'Diesel',
     status: 'available',
     order: 7

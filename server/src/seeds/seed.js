@@ -472,7 +472,7 @@ const seedDatabase = async () => {
       phone: '+91 98452 33300',
       whatsapp: '919845233300',
       email: 'info@orangecab.in',
-      address: 'Ground Floor, Prestige Meridian, MG Road, Bangalore 560001, Karnataka, India',
+      address: '#50, 3rd Main, Peenya, Dasarahalli, Bangalore - 560057',
       workingHours: '24 Hours / 7 Days a Week',
       socialLinks: {
         facebook: 'https://facebook.com/orangecab',

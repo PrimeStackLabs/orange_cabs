@@ -8,11 +8,12 @@ import {
 } from '../controllers/fleetController.js';
 import { protectAdmin, requireRole } from '../middleware/auth.js';
 import { receiveVehicleImage } from '../middleware/vehicleImageUpload.js';
-import { uploadVehicleImage } from '../controllers/vehicleImageController.js';
+import { getVehicleImage, uploadVehicleImage } from '../controllers/vehicleImageController.js';
 
 const router = express.Router();
 
 router.get('/', getVehicles);
+router.get('/images/:id', getVehicleImage);
 router.get('/:id', getVehicleById);
 router.post(
   '/upload-image',
